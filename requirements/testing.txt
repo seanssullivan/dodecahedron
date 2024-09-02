@@ -1,0 +1,11 @@
+# Testing requirements
+-r base.txt
+coverage
+fpdf
+pytest
+pytest-cov
+pytest-env
+tox
+types-openpyxl
+XlsxWriter
+
