@@ -8,6 +8,7 @@ Module provides function for converting values to datatimes.
 # Standard Library Imports
 import datetime
 import logging
+import operator
 import typing
 
 # Third-Party Imports
@@ -15,6 +16,7 @@ import cachetools
 from cachetools.keys import hashkey
 from dateutil.parser import parse
 from dateutil.parser import ParserError
+from dateutil.tz import tzlocal
 import pytz
 
 # Local Imports
@@ -25,6 +27,9 @@ __all__ = ["to_datetime"]
 
 # Initialize logger.
 log = logging.getLogger("dodecahedron")
+
+# Getters
+get_cache = operator.attrgetter("_cache")
 
 
 class DatetimeConverter(AbstractConverter):
@@ -40,7 +45,7 @@ class DatetimeConverter(AbstractConverter):
         self,
         *,
         default: typing.Optional[datetime.datetime] = None,
-        timezone: typing.Optional[datetime.tzinfo] = None,
+        timezone: typing.Optional[typing.Union[str, datetime.tzinfo]] = None,
     ) -> None:
         if default and not isinstance(default, datetime.datetime):
             message = f"expected type 'datetime', got {type(default)} instead"
@@ -48,12 +53,13 @@ class DatetimeConverter(AbstractConverter):
 
         super().__init__(default=default)
         self._timezone = timezone
+        self._cache = cachetools.LRUCache(maxsize=1000)
 
     @property
     def default(self) -> typing.Optional[datetime.datetime]:
         """Default."""
         result = (
-            self._default.astimezone(self._timezone)
+            self._add_timezone(self._default)
             if isinstance(self._default, datetime.datetime)
             else self._default
         )
@@ -113,8 +119,9 @@ class DatetimeConverter(AbstractConverter):
             raise TypeError(message)
 
         time = datetime.datetime.min.time()
-        result = datetime.datetime.combine(__value, time)
-        return result.astimezone(self._timezone)
+        dt = datetime.datetime.combine(__value, time)
+        result = self._add_timezone(dt)
+        return result
 
     def from_datetime(
         self, __value: datetime.datetime, /
@@ -132,7 +139,7 @@ class DatetimeConverter(AbstractConverter):
             message = f"expected type 'datetime', got {type(__value)} instead"
             raise TypeError(message)
 
-        result = datetime.datetime(
+        dt = datetime.datetime(
             __value.year,
             __value.month,
             __value.day,
@@ -142,7 +149,8 @@ class DatetimeConverter(AbstractConverter):
             __value.microsecond,
             __value.tzinfo,
         )
-        return result.astimezone(self._timezone)
+        result = self._add_timezone(dt)
+        return result
 
     def from_float(self, __value: float, /) -> datetime.datetime:
         """Convert float value to ``datetime``.
@@ -158,9 +166,13 @@ class DatetimeConverter(AbstractConverter):
             message = f"expected type 'float', got {type(__value)} instead"
             raise TypeError(message)
 
-        # TODO: Determine whether value is a serial date.
-        result = self._from_serial_date(__value)
-        return result.astimezone(self._timezone)
+        try:
+            dt = self._from_serial_date(__value)
+        except ValueError:
+            dt = self._from_timestamp(__value)
+
+        result = self._add_timezone(dt)
+        return result
 
     def _from_serial_date(self, __value: float, /) -> datetime.datetime:
         """Convert serial date value to ``datetime``.
@@ -195,10 +207,13 @@ class DatetimeConverter(AbstractConverter):
             message = f"expected type 'int', got {type(__value)} instead"
             raise TypeError(message)
 
-        result = self._from_timestamp(__value)
-        return result.astimezone(self._timezone)
+        dt = self._from_timestamp(__value)
+        result = self._add_timezone(dt)
+        return result
 
-    def _from_timestamp(self, __value: int, /) -> datetime.datetime:
+    def _from_timestamp(
+        self, __value: typing.Union[float, int], /
+    ) -> datetime.datetime:
         """Convert timestamp value to ``datetime``.
 
         Args:
@@ -211,7 +226,7 @@ class DatetimeConverter(AbstractConverter):
         result = datetime.datetime.fromtimestamp(__value)
         return result
 
-    @cachetools.cachedmethod(cachetools.LRUCache(maxsize=1000), hashkey)
+    @cachetools.cachedmethod(get_cache, hashkey)
     def from_str(self, __value: str, /) -> datetime.datetime:
         """Convert string value to ``datetime``.
 
@@ -232,27 +247,50 @@ class DatetimeConverter(AbstractConverter):
 
         try:
             value = __value.replace("  ", " ").strip()
-            result = parse(value) if value else self.default
+            dt = parse(value) if value else self.default
 
         except (ParserError, ValueError):
             log.warn("Cannot convert '%s' to datetime", __value)
-            result = self.default
+            dt = self.default
 
-        return result.astimezone(self._timezone)
+        result = self._add_timezone(dt)
+        return result
+
+    def _add_timezone(
+        self, __datetime: datetime.datetime
+    ) -> datetime.datetime:
+        """Add timezone.
+
+        Args:
+            __datetime: Datetime.
+
+        Returns:
+            Datetime.
+
+        """
+        if self._timezone is None:
+            return __datetime
+
+        if isinstance(self._timezone, str) and is_naive(__datetime):
+            result = pytz.timezone(self._timezone).localize(__datetime)
+            return result
+
+        result = __datetime.astimezone(self._timezone)
+        return result
 
 
 def to_datetime(
     __value: typing.Any,
     /,
     default: typing.Optional[datetime.datetime] = None,
-    timezone: datetime.tzinfo = pytz.utc,
+    timezone: typing.Optional[typing.Union[str, datetime.tzinfo]] = tzlocal(),
 ) -> typing.Optional[datetime.datetime]:
     """Convert value to ``datetime``.
 
     Args:
         __value: Value to convert to ``datetime``.
         default (optional): Default value. Default ``None``.
-        timezone (optional): Timezone. Default `UTC`.
+        timezone (optional): Timezone. Default `local`.
 
     Returns:
         Datetime.
@@ -260,4 +298,21 @@ def to_datetime(
     """
     converter = DatetimeConverter(default=default, timezone=timezone)
     result = converter(__value)
+    return result
+
+
+# ----------------------------------------------------------------------------
+# Validators
+# ----------------------------------------------------------------------------
+def is_naive(__dt: datetime.datetime) -> bool:
+    """Check whether datetime is naive.
+
+    Args:
+        __dt: Datetime.
+
+    Returns:
+        Wether datetime is naive.
+
+    """
+    result = __dt.tzinfo is None or __dt.tzinfo.utcoffset(__dt) is None
     return result
