@@ -8,6 +8,7 @@ Module provides function for converting values to dates.
 # Standard Library Imports
 import datetime
 import logging
+import operator
 import typing
 
 # Third-Party Imports
@@ -24,6 +25,9 @@ __all__ = ["to_date"]
 
 # Initialize logger.
 log = logging.getLogger("dodecahedron")
+
+# Getters
+get_cache = operator.attrgetter("_cache")
 
 
 class DateConverter(AbstractConverter):
@@ -42,6 +46,7 @@ class DateConverter(AbstractConverter):
             raise TypeError(message)
 
         super().__init__(default=default)
+        self._cache = cachetools.LRUCache(maxsize=1000)
 
     def __call__(
         self, __value: typing.Any, /
@@ -130,8 +135,11 @@ class DateConverter(AbstractConverter):
             message = f"expected type 'float', got {type(__value)} instead"
             raise TypeError(message)
 
-        # TODO: Determine whether value is a serial date.
-        result = self._from_serial_date(__value)
+        try:
+            result = self._from_serial_date(__value)
+        except ValueError:
+            result = self._from_timestamp(__value)
+
         return result
 
     def _from_serial_date(self, __value: float, /) -> datetime.date:
@@ -170,7 +178,9 @@ class DateConverter(AbstractConverter):
         result = self._from_timestamp(__value)
         return result
 
-    def _from_timestamp(self, __value: int, /) -> datetime.date:
+    def _from_timestamp(
+        self, __value: typing.Union[float, int], /
+    ) -> datetime.date:
         """Convert timestamp value to ``date``.
 
         Args:
@@ -184,7 +194,7 @@ class DateConverter(AbstractConverter):
         result = self.from_datetime(dt)
         return result
 
-    @cachetools.cachedmethod(cachetools.LRUCache(maxsize=1000), hashkey)
+    @cachetools.cachedmethod(get_cache, hashkey)
     def from_str(self, __value: str, /) -> datetime.date:
         """Convert string value to ``date``.
 
