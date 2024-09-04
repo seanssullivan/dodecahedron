@@ -7,6 +7,7 @@ Module provides functions for converting values to distances.
 
 # Standard Library Imports
 import datetime
+import decimal
 import re
 import typing
 
@@ -35,6 +36,9 @@ class DistanceConverter(AbstractConverter):
         if __value is None:
             return self.default
 
+        if isinstance(__value, decimal.Decimal):
+            return self.from_decimal(__value)
+
         if isinstance(__value, float):
             return self.from_float(__value)
 
@@ -62,7 +66,7 @@ class DistanceConverter(AbstractConverter):
 
         raise TypeError("'bool' cannot be converted to distance")
 
-    def from_date(self, __value: datetime.date, /) -> bool:
+    def from_date(self, __value: datetime.date, /) -> float:
         """Convert date value to distance.
 
         Args:
@@ -78,7 +82,7 @@ class DistanceConverter(AbstractConverter):
 
         raise TypeError("'date' cannot be converted to distance")
 
-    def from_datetime(self, __value: datetime.datetime, /) -> bool:
+    def from_datetime(self, __value: datetime.datetime, /) -> float:
         """Convert datetime value to distance.
 
         Args:
@@ -93,6 +97,23 @@ class DistanceConverter(AbstractConverter):
             raise TypeError(message)
 
         raise TypeError("'datetime' cannot be converted to distance")
+
+    def from_decimal(self, __value: decimal.Decimal, /) -> float:
+        """Convert decimal value to distance.
+
+        Args:
+            __value: Value to convert to distance.
+
+        Returns:
+            Distance.
+
+        """
+        if not isinstance(__value, decimal.Decimal):
+            message = f"expected type 'Decimal', got {type(__value)} instead"
+            raise TypeError(message)
+
+        result = float(__value)
+        return result
 
     def from_float(self, __value: float, /) -> float:
         """Convert float value to distance.
@@ -151,13 +172,14 @@ class DistanceConverter(AbstractConverter):
             return self.default
 
         try:
-            pattern = r"(\d+),?(\d*.?\d*)\s?m?"
-            replacement = r"\1\2"
-            result = float(re.sub(pattern, replacement, value, flags=re.I))
+            representation = re.sub(r"[^0-9a-zA-Z.]+", r"", value)
+            number = re.sub(r"(\d+)\s?m?", r"\1", representation, flags=re.I)
+            result = float(number)
+
         except ValueError:
-            raise ValueError(
-                f"{type(__value)} cannot be converted to distance"
-            )
+            message = f"{type(__value)} cannot be converted to distance"
+            raise ValueError(message)
+
         else:
             return result
 

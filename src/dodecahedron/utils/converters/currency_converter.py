@@ -7,6 +7,7 @@ Module provides function for converting values to currencies.
 
 # Standard Library Imports
 import datetime
+import decimal
 import re
 import typing
 
@@ -35,6 +36,9 @@ class CurrencyConverter(AbstractConverter):
         if __value is None:
             return self.default
 
+        if isinstance(__value, decimal.Decimal):
+            return self.from_decimal(__value)
+
         if isinstance(__value, float):
             return self.from_float(__value)
 
@@ -62,7 +66,7 @@ class CurrencyConverter(AbstractConverter):
 
         raise TypeError("'bool' cannot be converted to currency")
 
-    def from_date(self, __value: datetime.date, /) -> bool:
+    def from_date(self, __value: datetime.date, /) -> float:
         """Convert date value to currency.
 
         Args:
@@ -78,7 +82,7 @@ class CurrencyConverter(AbstractConverter):
 
         raise TypeError("'date' cannot be converted to currency")
 
-    def from_datetime(self, __value: datetime.datetime, /) -> bool:
+    def from_datetime(self, __value: datetime.datetime, /) -> float:
         """Convert datetime value to currency.
 
         Args:
@@ -93,6 +97,23 @@ class CurrencyConverter(AbstractConverter):
             raise TypeError(message)
 
         raise TypeError("'datetime' cannot be converted to currency")
+
+    def from_decimal(self, __value: decimal.Decimal, /) -> float:
+        """Convert decimal value to currency.
+
+        Args:
+            __value: Value to convert to currency.
+
+        Returns:
+            Amount.
+
+        """
+        if not isinstance(__value, decimal.Decimal):
+            message = f"expected type 'Decimal', got {type(__value)} instead"
+            raise TypeError(message)
+
+        result = float(round(__value, 2))
+        return result
 
     def from_float(self, __value: float, /) -> float:
         """Convert float value to currency.
@@ -151,9 +172,10 @@ class CurrencyConverter(AbstractConverter):
             return self.default
 
         try:
-            amount = float(re.sub(r"(\d+),(\d+.?\d*)", r"\1\2", value))
+            amount = float(re.sub(r"[^0-9a-zA-Z.]+", r"", value))
         except ValueError:
-            raise ValueError(f"'{__value}' cannot be converted to currency")
+            message = f"'{__value}' cannot be converted to currency"
+            raise ValueError(message)
         else:
             result = round(amount, 2)
             return result
