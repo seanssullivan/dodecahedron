@@ -7,6 +7,7 @@ Module provides function for converting values to datatimes.
 
 # Standard Library Imports
 import datetime
+import decimal
 import logging
 import operator
 import typing
@@ -76,6 +77,9 @@ class DatetimeConverter(AbstractConverter):
 
         if isinstance(__value, datetime.date):
             return self.from_date(__value)
+
+        if isinstance(__value, decimal.Decimal):
+            return self.from_decimal(__value)
 
         if isinstance(__value, float):
             return self.from_float(__value)
@@ -150,6 +154,23 @@ class DatetimeConverter(AbstractConverter):
             __value.tzinfo,
         )
         result = self._add_timezone(dt)
+        return result
+
+    def from_decimal(self, __value: decimal.Decimal, /) -> datetime.datetime:
+        """Convert decimal value to ``datetime``.
+
+        Args:
+            __value: Value to convert to ``datetime``.
+
+        Returns:
+            Datetime.
+
+        """
+        if not isinstance(__value, decimal.Decimal):
+            message = f"expected type 'Decimal', got {type(__value)} instead"
+            raise TypeError(message)
+
+        result = self.from_float(float(__value))
         return result
 
     def from_float(self, __value: float, /) -> datetime.datetime:

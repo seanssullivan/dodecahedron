@@ -7,6 +7,7 @@ Module provides function for converting values to integers.
 
 # Standard Library Imports
 import datetime
+import decimal
 import time
 import typing
 
@@ -43,6 +44,9 @@ class IntegerConverter(AbstractConverter):
 
         if isinstance(__value, datetime.date):
             return self.from_date(__value)
+
+        if isinstance(__value, decimal.Decimal):
+            return self.from_decimal(__value)
 
         if isinstance(__value, float):
             return self.from_float(__value)
@@ -106,6 +110,23 @@ class IntegerConverter(AbstractConverter):
 
         timestamp = __value.timestamp()
         result = int(timestamp)
+        return result
+
+    def from_decimal(self, __value: decimal.Decimal, /) -> int:
+        """Convert decimal value to ``int``.
+
+        Args:
+            __value: Value to convert to ``int``.
+
+        Returns:
+            Integer.
+
+        """
+        if not isinstance(__value, decimal.Decimal):
+            message = f"expected type 'Decimal', got {type(__value)} instead"
+            raise TypeError(message)
+
+        result = int(__value)
         return result
 
     def from_float(self, __value: float, /) -> int:

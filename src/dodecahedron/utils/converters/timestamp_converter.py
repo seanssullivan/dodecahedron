@@ -7,6 +7,7 @@ Module provides function for converting values to timestamps.
 
 # Standard Library Imports
 import datetime
+import decimal
 import logging
 import time
 import typing
@@ -50,6 +51,9 @@ class TimestampConverter(AbstractConverter):
         if isinstance(__value, datetime.date):
             return self.from_date(__value)
 
+        if isinstance(__value, decimal.Decimal):
+            return self.from_decimal(__value)
+
         if isinstance(__value, float):
             return self.from_float(__value)
 
@@ -59,9 +63,9 @@ class TimestampConverter(AbstractConverter):
         if isinstance(__value, str):
             return self.from_str(__value)
 
-        raise TypeError(f"{type(__value)} cannot be converted to int")
+        raise TypeError(f"{type(__value)} cannot be converted to timestamp")
 
-    def from_bool(self, __value: bool, /) -> int:
+    def from_bool(self, __value: bool, /) -> float:
         """Convert boolean value to timestamp.
 
         Args:
@@ -77,7 +81,7 @@ class TimestampConverter(AbstractConverter):
 
         raise TypeError("'bool' cannot be converted to timestamp")
 
-    def from_date(self, __value: datetime.date, /) -> int:
+    def from_date(self, __value: datetime.date, /) -> float:
         """Convert date value to timestamp.
 
         Args:
@@ -94,7 +98,7 @@ class TimestampConverter(AbstractConverter):
         result = time.mktime(__value.timetuple())
         return result
 
-    def from_datetime(self, __value: datetime.datetime, /) -> int:
+    def from_datetime(self, __value: datetime.datetime, /) -> float:
         """Convert datetime value to timestamp.
 
         Args:
@@ -111,7 +115,24 @@ class TimestampConverter(AbstractConverter):
         result = __value.timestamp()
         return result
 
-    def from_float(self, __value: float, /) -> int:
+    def from_decimal(self, __value: decimal.Decimal, /) -> int:
+        """Convert decimal value to timestamp.
+
+        Args:
+            __value: Value to convert to timestamp.
+
+        Returns:
+            Timestamp.
+
+        """
+        if not isinstance(__value, decimal.Decimal):
+            message = f"expected type 'Decimal', got {type(__value)} instead"
+            raise TypeError(message)
+
+        result = self.from_float(float(__value))
+        return result
+
+    def from_float(self, __value: float, /) -> float:
         """Convert float value to timestamp.
 
         Args:
@@ -128,7 +149,7 @@ class TimestampConverter(AbstractConverter):
         result = float(__value)
         return result
 
-    def from_int(self, __value: int, /) -> int:
+    def from_int(self, __value: int, /) -> float:
         """Convert integer value to timestamp.
 
         Args:
@@ -145,7 +166,7 @@ class TimestampConverter(AbstractConverter):
         result = float(__value)
         return result
 
-    def from_str(self, __value: str, /) -> int:
+    def from_str(self, __value: str, /) -> float:
         """Convert string value to timestamp.
 
         Args:

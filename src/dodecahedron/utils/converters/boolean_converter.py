@@ -7,6 +7,7 @@ Module provides function for converting values to booleans.
 
 # Standard Library Imports
 import datetime
+import decimal
 import typing
 
 # Local Imports
@@ -50,6 +51,9 @@ class BooleanConverter(AbstractConverter):
 
         if isinstance(__value, datetime.date):
             return self.from_date(__value)
+
+        if isinstance(__value, decimal.Decimal):
+            return self.from_decimal(__value)
 
         if isinstance(__value, float):
             return self.from_float(__value)
@@ -108,6 +112,23 @@ class BooleanConverter(AbstractConverter):
         """
         if not isinstance(__value, datetime.datetime):
             message = f"expected type 'datetime', got {type(__value)} instead"
+            raise TypeError(message)
+
+        result = bool(__value)
+        return result
+
+    def from_decimal(self, __value: decimal.Decimal, /) -> bool:
+        """Convert decimal value to ``bool``.
+
+        Args:
+            __value: Value to convert to ``bool``.
+
+        Returns:
+            Boolean.
+
+        """
+        if not isinstance(__value, decimal.Decimal):
+            message = f"expected type 'Decimal', got {type(__value)} instead"
             raise TypeError(message)
 
         result = bool(__value)

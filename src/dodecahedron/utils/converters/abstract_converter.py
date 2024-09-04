@@ -8,6 +8,7 @@ Module defines a class for converting values to boolean.
 # Standard Library Imports
 import abc
 import datetime
+import decimal
 import typing
 
 __all__ = ["AbstractConverter"]
@@ -45,6 +46,11 @@ class AbstractConverter(abc.ABC):
     @abc.abstractmethod
     def from_datetime(self, __value: datetime.datetime, /) -> typing.Any:
         """Make value from datetime."""
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def from_decimal(self, __value: decimal.Decimal, /) -> typing.Any:
+        """Make value from decimal."""
         raise NotImplementedError
 
     @abc.abstractmethod

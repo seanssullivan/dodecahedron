@@ -73,18 +73,3 @@ def make_datetime(__date: datetime.date) -> datetime.datetime:
     time = datetime.datetime.min.time()
     result = datetime.datetime.combine(__date, time)
     return result
-
-
-def make_timestamp(__date: datetime.date) -> float:
-    """Make timestamp.
-
-    Args:
-        __date: Date.
-
-    Returns:
-        Timestamp.
-
-    """
-    time = datetime.datetime.min.time()
-    result = datetime.datetime.combine(__date, time).timestamp()
-    return result
