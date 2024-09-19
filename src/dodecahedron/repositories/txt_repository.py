@@ -6,7 +6,7 @@ import logging
 import typing
 
 # Local Imports
-from .file_repository import AbstractFileRepository
+from .file_system_repository import AbstractFileSystemRepository
 from ..wrappers.txt_file_wrappers import AbstractTxtWrapper
 
 __all__ = ["AbstractTxtRepository"]
@@ -16,7 +16,7 @@ __all__ = ["AbstractTxtRepository"]
 log = logging.getLogger("dodecahedron")
 
 
-class AbstractTxtRepository(AbstractFileRepository):
+class AbstractTxtRepository(AbstractFileSystemRepository):
     """Represents an abstract `.txt` file repository.
 
     Args:

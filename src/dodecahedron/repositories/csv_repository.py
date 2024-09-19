@@ -13,7 +13,7 @@ import logging
 import typing
 
 # Local Imports
-from .file_repository import AbstractFileRepository
+from .file_system_repository import AbstractFileSystemRepository
 from ..wrappers.csv_file_wrappers import AbstractCsvWrapper
 
 __all__ = ["AbstractCsvRepository"]
@@ -23,7 +23,7 @@ __all__ = ["AbstractCsvRepository"]
 log = logging.getLogger("dodecahedron")
 
 
-class AbstractCsvRepository(AbstractFileRepository):
+class AbstractCsvRepository(AbstractFileSystemRepository):
     """Represents an abstract `.csv` file repository.
 
     Args:

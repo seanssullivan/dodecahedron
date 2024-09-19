@@ -9,7 +9,15 @@ __all__ = ["BaseDispatcher"]
 
 
 class BaseDispatcher(AbstractDispatcher):
-    """Implements a base class for dispatchers to inherit."""
+    """Implements a base class for dispatchers to inherit.
+
+    Args:
+        __bus: Message bus.
+
+    Attributes:
+        messagebus: Message bus.
+
+    """
 
     def __init__(self, __bus: AbstractMessageBus, /) -> None:
         self._messagebus = __bus

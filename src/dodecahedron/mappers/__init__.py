@@ -2,3 +2,4 @@
 
 # Local Imports
 from .abstract_mapper import *
+from .class_mapper import *

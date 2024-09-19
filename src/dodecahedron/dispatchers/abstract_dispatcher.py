@@ -11,7 +11,12 @@ __all__ = ["AbstractDispatcher"]
 
 
 class AbstractDispatcher(abc.ABC):
-    """Represents an abstract dispatcherr."""
+    """Represents an abstract dispatcherr.
+
+    Attributes:
+        messagebus: Message bus.
+
+    """
 
     @property
     @abc.abstractmethod

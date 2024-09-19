@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""File Repository."""
+"""File-System Repository."""
 
 # Standard Library Imports
 import typing
@@ -8,11 +8,11 @@ import typing
 from .abstract_repository import AbstractRepository
 from ..wrappers import AbstractFileSystemWrapper
 
-__all__ = ["AbstractFileRepository"]
+__all__ = ["AbstractFileSystemRepository"]
 
 
-class AbstractFileRepository(AbstractRepository):
-    """Represents an abstract file repository.
+class AbstractFileSystemRepository(AbstractRepository):
+    """Represents an abstract file-system repository.
 
     Args:
         __file: File.

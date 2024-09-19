@@ -6,14 +6,14 @@ import logging
 import typing
 
 # Local Imports
-from .file_repository import AbstractFileRepository
+from .file_system_repository import AbstractFileSystemRepository
 from ..wrappers.xlsx_file_wrappers import AbstractXlsxWrapper
 
 # Initiate logger.
 log = logging.getLogger("dodecahedron")
 
 
-class AbstractXlsxRepository(AbstractFileRepository):
+class AbstractXlsxRepository(AbstractFileSystemRepository):
     """Represents an abstract `.xlsx` file repository.
 
     Args:

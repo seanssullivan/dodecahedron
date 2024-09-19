@@ -8,7 +8,6 @@ Implementation based on 'Architecture Patterns in Python' domain model pattern.
 .. _Architecture Patterns in Python:
     https://github.com/cosmicpython/code
 
-
 """
 
 # pylint: disable=too-few-public-methods
