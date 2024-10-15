@@ -8,25 +8,20 @@ from __future__ import annotations
 import abc
 import datetime
 
+# Local Imports
+from ..metaclasses import MessageMeta
+
 __all__ = ["BaseMessage"]
 
 
-# Attributes
-CREATED_AT = "__created_at__"
-
-
-class BaseMessage(abc.ABC):
+class BaseMessage(abc.ABC, metaclass=MessageMeta):
     """Class implements a message."""
 
-    def __new__(cls) -> BaseMessage:
-        instance = super().__new__(cls)
-        now = datetime.datetime.now()
-        setattr(instance, CREATED_AT, now)
-        return instance
+    __created_at__: datetime.datetime
 
     def __gt__(self, other: object) -> bool:
         result = (
-            getattr(self, CREATED_AT) > getattr(other, CREATED_AT)
+            self.__created_at__ > other.__created_at__
             if isinstance(other, BaseMessage)
             else False
         )
@@ -34,7 +29,7 @@ class BaseMessage(abc.ABC):
 
     def __lt__(self, other: object) -> bool:
         result = (
-            getattr(self, CREATED_AT) < getattr(other, CREATED_AT)
+            self.__created_at__ < other.__created_at__
             if isinstance(other, BaseMessage)
             else False
         )
