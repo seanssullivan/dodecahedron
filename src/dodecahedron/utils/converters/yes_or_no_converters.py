@@ -17,7 +17,7 @@ __all__ = ["to_y_or_n", "to_yes_or_no"]
 
 def to_y_or_n(
     __value: object, /, default: Optional[str] = None
-) -> Optional[Literal["N", "Y"]]:
+) -> Optional[Literal["Y", "N"]]:
     """Convert value to `Y` or `N`.
 
     Args:
@@ -50,7 +50,7 @@ def to_y_or_n(
 
 def to_yes_or_no(
     __value: object, /, default: Optional[str] = None
-) -> Optional[Literal["No", "Yes"]]:
+) -> Optional[Literal["Yes", "No"]]:
     """Convert value to `Yes` or `No`.
 
     Args:

@@ -6,8 +6,7 @@
 # Standard Library Imports
 import json
 import pathlib
-from typing import Any
-from typing import Callable
+import typing
 
 # Third-Party Imports
 import pytest
@@ -23,7 +22,7 @@ def test_raises_error_when_filepath_argument_is_not_path() -> None:
 
 
 def test_raises_error_when_encoding_argument_is_not_str(
-    make_json_file: Callable[[str, Any], pathlib.Path],
+    make_json_file: typing.Callable[[str, typing.Any], pathlib.Path],
 ) -> None:
     with pytest.raises(TypeError, match="expected type 'str'"):
         path = make_json_file("test.json", "")
@@ -31,7 +30,7 @@ def test_raises_error_when_encoding_argument_is_not_str(
 
 
 def test_raises_error_when_filepath_argument_is_a_directory(
-    make_json_file: Callable[[str, Any], pathlib.Path],
+    make_json_file: typing.Callable[[str, typing.Any], pathlib.Path],
 ) -> None:
     with pytest.raises(IsADirectoryError):
         path = make_json_file("test.json", "")
@@ -47,7 +46,7 @@ def test_raises_error_when_file_does_not_have_json_extension(
 
 
 def test_opening_file_returns_json_io_wrapper(
-    make_json_file: Callable[[str, Any], pathlib.Path],
+    make_json_file: typing.Callable[[str, typing.Any], pathlib.Path],
 ) -> None:
     path = make_json_file("test.json", {})
     wrapper = JsonFileWrapper(path.resolve())
@@ -56,7 +55,7 @@ def test_opening_file_returns_json_io_wrapper(
 
 
 def test_returned_io_wrapper_is_not_closed(
-    make_json_file: Callable[[str, Any], pathlib.Path],
+    make_json_file: typing.Callable[[str, typing.Any], pathlib.Path],
 ) -> None:
     path = make_json_file("test.json", "")
     wrapper = JsonFileWrapper(path.resolve())
@@ -65,7 +64,7 @@ def test_returned_io_wrapper_is_not_closed(
 
 
 def test_can_be_passed_to_builtin_open_function(
-    make_json_file: Callable[[str, Any], pathlib.Path],
+    make_json_file: typing.Callable[[str, typing.Any], pathlib.Path],
 ) -> None:
     path = make_json_file("test.json", "")
     wrapper = JsonFileWrapper(path.resolve())
@@ -73,7 +72,7 @@ def test_can_be_passed_to_builtin_open_function(
 
 
 def test_can_load_from_json_file(
-    make_json_file: Callable[[str, Any], pathlib.Path],
+    make_json_file: typing.Callable[[str, typing.Any], pathlib.Path],
 ) -> None:
     content = [
         {"id": "1", "value": "One"},
@@ -95,7 +94,7 @@ def test_can_load_from_json_file(
 
 
 def test_can_dump_to_json_file(
-    make_json_file: Callable[[str, Any], pathlib.Path],
+    make_json_file: typing.Callable[[str, typing.Any], pathlib.Path],
 ) -> None:
     path = make_json_file("test.json", {})
     wrapper = JsonFileWrapper(path.resolve())

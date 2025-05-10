@@ -21,12 +21,7 @@ log = logging.getLogger("dodecahedron")
 
 
 class RedisListener(AbstractListener):
-    """Implements a Redis listener.
-
-    Args:
-        __bus: Messagebus.
-
-    """
+    """Implements a Redis listener."""
 
     def __init__(self, **kwargs) -> None:
         self._connection = redis.Redis(**kwargs)
