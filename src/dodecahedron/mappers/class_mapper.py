@@ -6,7 +6,7 @@ from contextlib import contextmanager
 import typing
 
 # Local Imports
-from .abstract_mapper import AbstractClassMapper
+from .abstract_mapper import AbstractMapper
 
 __all__ = ["ClassMapper"]
 
@@ -15,17 +15,18 @@ __all__ = ["ClassMapper"]
 T = typing.TypeVar("T")
 
 
-class ClassMapper(AbstractClassMapper):
+class ClassMapper(AbstractMapper):
     """Implements a class mapper."""
 
     def __init__(
         self,
         __class: typing.Type[T],
-        schema: typing.Any,
-        properties: typing.Dict[str, typing.Any],
+        /,
+        schema: typing.Dict[str, typing.Any],
+        properties: typing.Optional[typing.Dict[str, typing.Any]] = None,
     ) -> None:
+        super().__init__(schema)
         self._class = __class
-        self._schema = schema
         self._properties = properties
 
         setattr(self._class, "__mapper__", self)
@@ -36,47 +37,91 @@ class ClassMapper(AbstractClassMapper):
         return self._class
 
     @property
-    def schema(self) -> typing.Dict[str, typing.Any]:
-        """Mapped schema."""
-        return self._schema
-
-    @property
     def properties(self) -> typing.Dict[str, typing.Any]:
         """Mapped properties."""
-        return self._properties
+        results = self._properties or self._get_attribute_names()
+        return results
 
-    def from_dict(self, __dict: dict) -> T:
-        """Instantiate class from dictionary."""
+    def from_dict(self, __dict: dict, /) -> T:
+        """Instantiate class from dictionary.
+
+        Args:
+            __dict: Dictionary.
+
+        Returns:
+            Instance of mapped class.
+
+        """
         with replace_init(self.cls) as cls:
             result = cls()
             for attr, key in self.properties.items():
-                setattr(result, attr, __dict[key])
+                converter = self._get_converter(key, direction="outward")
+                value = converter(__dict[key]) if converter else __dict[key]
+                setattr(result, attr, value)
 
         return result
 
-    def from_list(self, __list: list) -> T:
-        """Instantiate class from list."""
+    def from_list(self, __list: list, /) -> T:
+        """Instantiate class from list.
+
+        Args:
+            __list: List.
+
+        Returns:
+            Instance of mapped class.
+
+        """
         with replace_init(self.cls) as cls:
             result = cls()
-            for attr, index in self.properties.items():
-                setattr(result, attr, __list[index])
+            for attr, idx in self.properties.items():
+                converter = self._get_converter(idx, direction="outward")
+                value = converter(__list[idx]) if converter else __list[idx]
+                setattr(result, attr, value)
 
         return result
 
-    def to_dict(self, __instant: T) -> dict:
-        """Convert instance of class to dictionary."""
-        result = {
-            key: getattr(__instant, attr)
-            for attr, key in self.properties.items()
-        }
+    def to_dict(self, __instance: T, /) -> dict:
+        """Convert instance of class to dictionary.
+
+        Args:
+            __instance: Instance of mapped class.
+
+        Returns:
+            Dictionary.
+
+        """
+        result = {}
+        for attr, key in self.properties.items():
+            converter = self._get_converter(key, direction="inward")
+            value = (
+                converter(getattr(__instance, attr))
+                if converter
+                else getattr(__instance, attr)
+            )
+            result[key] = value
+
         return result
 
-    def to_list(self, __instant: T) -> list:
-        """Convert instance of class to list."""
-        result = [
-            getattr(__instant, attr)
-            for attr in sorted(self.properties.items(), key=lambda i: i[1])
-        ]
+    def to_list(self, __instance: T, /) -> list:
+        """Convert instance of class to list.
+
+        Args:
+            __instance: Instance of mapped class.
+
+        Returns:
+            List.
+
+        """
+        result = []
+        for attr, key in sorted(self.properties.items(), key=lambda i: i[1]):
+            converter = self._get_converter(key, direction="inward")
+            value = (
+                converter(getattr(__instance, attr))
+                if converter
+                else getattr(__instance, attr)
+            )
+            result.append(value)
+
         return result
 
 
