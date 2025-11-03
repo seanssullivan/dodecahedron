@@ -29,27 +29,40 @@ from __future__ import annotations
 import abc
 import logging
 from operator import methodcaller
+from typing import Any
 from typing import Callable
 from typing import Dict
 from typing import List
+from typing import Literal
+from typing import Optional
 from typing import Type
 
 # Local Imports
-from .errors import BaseError
 from .messages import BaseCommand
 from .messages import BaseEvent
-from .messages import BaseMessage
-from .queue import MessageQueue
+from .messages import AbstractMessage
+from .queues import MessageQueue
 from .units_of_work import AbstractUnitOfWork
+from . import config
 
-__all__ = ["BaseMessageBus"]
+__all__ = [
+    "AbstractMessageBus",
+    "MessageBus",
+]
 
 
 # Initialize logger.
 log = logging.getLogger("dodecahedron")
 
+# Custom types
+Handler = Callable[..., None]
+CommandHandlers = Dict[Type[BaseCommand], Handler]
+EventHandlers = Dict[Type[BaseEvent], List[Handler]]
+
 # Constants
 eventcollector = methodcaller("collect_events")
+IGNORE = "ignore"
+RAISE = "raise"
 
 
 class AbstractMessageBus(abc.ABC):
@@ -69,22 +82,30 @@ class AbstractMessageBus(abc.ABC):
 
     @property
     @abc.abstractmethod
-    def queue(self) -> MessageQueue[BaseMessage]:
+    def queue(self) -> MessageQueue:
         """Message queue."""
         raise NotImplementedError
 
     @abc.abstractmethod
-    def handle(self, message: BaseMessage) -> None:
+    def handle(
+        self,
+        message: AbstractMessage,
+        /,
+        callback: Optional[Callable[..., Any]] = None,
+    ) -> None:
         """Handle a message.
 
         Args:
             message: Message to handle.
+            callback (optional): Function to call after handling message. Default ``None``.
 
         """
         raise NotImplementedError
 
     @abc.abstractmethod
-    def subscribe(self, message: Type[BaseMessage], handler: Callable) -> None:
+    def subscribe(
+        self, message: Type[AbstractMessage], handler: Handler
+    ) -> None:
         """Subscribe a handler for a `Command` or `Event`.
 
         Args:
@@ -94,8 +115,8 @@ class AbstractMessageBus(abc.ABC):
         raise NotImplementedError
 
 
-class BaseMessageBus(AbstractMessageBus):
-    """Implements a base class for message buses to inherit.
+class MessageBus(AbstractMessageBus):
+    """Implements a message buse.
 
     Args:
         uow: Unit of work.
@@ -113,8 +134,9 @@ class BaseMessageBus(AbstractMessageBus):
     def __init__(
         self,
         uow: AbstractUnitOfWork,
-        command_handlers: Dict[Type[BaseCommand], Callable],
-        event_handlers: Dict[Type[BaseEvent], List[Callable]],
+        /,
+        command_handlers: CommandHandlers,
+        event_handlers: EventHandlers,
     ) -> None:
         self._uow = uow
         self._command_handlers = command_handlers
@@ -127,89 +149,168 @@ class BaseMessageBus(AbstractMessageBus):
         return self._uow
 
     @property
-    def queue(self) -> MessageQueue[BaseMessage]:
+    def queue(self) -> MessageQueue:
         """Message queue."""
         return self._queue
 
-    def handle(self, message: BaseMessage) -> None:
-        """Handle a message.
+    def handle(
+        self,
+        message: AbstractMessage,
+        /,
+        callback: Optional[Callable[..., Any]] = None,
+    ) -> None:
+        """Handle message.
 
         Provided message is passed to an appropriate handler function.
 
         Args:
             message: Message.
+            callback (optional): Function to call after handling message. Default ``None``.
 
         """
+        if not isinstance(message, AbstractMessage):  # type: ignore
+            expected = "expected type 'AbstractMessage'"
+            actual = f"got {type(message)} instead"
+            error = ", ".join([expected, actual])
+            raise TypeError(error)
+
         self.queue.append(message)
         while self.queue:
             message = self.queue.popleft()
-            self.handle_message(message)
+            self._handle_message(message)
 
-    def subscribe(self, message: Type[BaseMessage], handler: Callable) -> None:
-        """Subscribe a handler for a `Command` or `Event`.
+        if callback is not None:
+            callback()
+
+    def subscribe(
+        self,
+        message: Type[AbstractMessage],
+        handler: Handler,
+    ) -> None:
+        """Subscribe handler to `Command` or `Event`.
 
         Args:
             message: Message type to which to subscribe.
             handler: Handler function to subscribe.
 
         """
+        if not issubclass(message, (BaseCommand, BaseEvent)):
+            msg = f"{type(message)} was not a 'Command' or an 'Event'"
+            raise TypeError(msg)
+
         if issubclass(message, BaseCommand):
             self._command_handlers[message] = handler
-        elif issubclass(message, BaseEvent):
-            self._event_handlers[message].append(handler)
-        else:
-            error = f"{type(message)} is not a 'Command' or an 'Event'"
-            raise TypeError(error)
 
-    def handle_message(self, message: BaseMessage) -> None:
+        if issubclass(message, BaseEvent):
+            self._event_handlers.setdefault(message, [])
+            self._event_handlers[message].append(handler)
+
+    def _handle_message(self, message: AbstractMessage, /) -> None:
         """Handle message.
 
         Args:
             message: Message to handle.
 
         """
-        if isinstance(message, BaseCommand):
-            self.handle_command(message)
-        elif isinstance(message, BaseEvent):
-            self.handle_event(message)
-        else:
-            error = f"{message} was not a 'Command' or an 'Event'"
+        if not isinstance(message, AbstractMessage):  # type: ignore
+            expected = "expected type 'AbstractMessage'"
+            actual = f"got {type(message)} instead"
+            error = ", ".join([expected, actual])
             raise TypeError(error)
 
-    def handle_command(self, command: BaseCommand) -> None:
-        """Handle command.
+        if not isinstance(message, (BaseCommand, BaseEvent)):
+            msg = f"{type(message)} was not a 'Command' or an 'Event'"
+            raise TypeError(msg)
+
+        if isinstance(message, BaseCommand):
+            self._pass_message_to_command_handler(message, on_error=RAISE)
+
+        if isinstance(message, BaseEvent):
+            self._pass_message_to_event_handlers(message, on_error=IGNORE)
+
+    def _pass_message_to_command_handler(
+        self,
+        message: AbstractMessage,
+        /,
+        on_error: Literal["ignore", "raise"] = RAISE,
+    ) -> None:
+        """Pass message to command handler.
 
         Args:
-            command: Command to handle.
+            message: Message to handle.
+            on_error (optional): Strategy for handling errors. Default ``raise``.
 
         """
+        if not isinstance(message, BaseCommand):  # type: ignore
+            expected = "expected type 'BaseCommand'"
+            actual = f"got {type(message)} instead"
+            msg = ", ".join([expected, actual])
+            raise TypeError(msg)
+
         try:
-            handler = self._command_handlers[type(command)]
-            handler(command)
-        except BaseError as error:
-            log.exception("Error handlings %s", command)
-            raise error
-        else:
-            self.collect_events()
+            handler = self._command_handlers[type(message)]
+            log.debug("Handling '%s' with handler %s", message, handler)
+            handler(message)
 
-    def handle_event(self, event: BaseEvent) -> None:
-        """Handle event.
+        except Exception as error:
+            handle_error(message, error, on_error=on_error)
+
+        self._collect_events()
+
+    def _pass_message_to_event_handlers(
+        self,
+        message: AbstractMessage,
+        /,
+        on_error: Optional[Literal["ignore", "raise"]] = IGNORE,
+    ) -> None:
+        """Pass message to event handlers.
 
         Args:
-            event: Event to handle.
+            message: Message to handle.
+            on_error (optional): Strategy for handling errors. Default ``ignore``.
 
         """
-        for handler in self._event_handlers[type(event)]:
-            try:
-                log.debug("handling event %s with handler %s", event, handler)
-                handler(event)
-            except BaseError:
-                log.exception("Error handling %s", event)
-            else:
-                self.collect_events()
+        if not isinstance(message, BaseEvent):  # type: ignore
+            expected = "expected type 'BaseEvent'"
+            actual = f"got {type(message)} instead"
+            msg = ", ".join([expected, actual])
+            raise TypeError(msg)
 
-    def collect_events(self) -> None:
+        for handler in self._event_handlers[type(message)]:
+            try:
+                log.debug("Handling '%s' with handler %s", message, handler)
+                handler(message)
+
+            except Exception as error:
+                handle_error(message, error, on_error=on_error)
+
+            self._collect_events()
+
+    def _collect_events(self) -> None:
         """Collect events."""
         if hasattr(self.uow, "collect_events"):
             events = list(eventcollector(self.uow))
             self.queue.extend(events)
+
+
+# ----------------------------------------------------------------------------
+# Helpers
+# ----------------------------------------------------------------------------
+def handle_error(
+    message: AbstractMessage,
+    error: Exception,
+    *,
+    on_error: Optional[Literal["ignore", "raise"]],
+) -> None:
+    """Handle error raised when handling message.
+
+    Args:
+        message: Message.
+        error: Error raised when handling message.
+        on_error: Strategy for handling errors.
+
+    """
+    exc_info = not config.is_production_environment()
+    log.error("Error handling %s", message, exc_info=exc_info)
+    if on_error == RAISE:
+        raise error

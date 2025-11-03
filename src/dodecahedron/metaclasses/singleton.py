@@ -32,9 +32,9 @@ class SingletonMeta(abc.ABCMeta):
 
     """
 
-    __instances__: Dict[str, T] = {}
+    __instances__: Dict[str, Any] = {}
 
-    def __call__(cls: Type[T], *args, **kwargs) -> T:
+    def __call__(cls: Type[T], *args: Any, **kwargs: Any) -> T:
         key = make_key(cls)
 
         if key not in SingletonMeta.__instances__:
@@ -75,7 +75,7 @@ class SingletonMeta(abc.ABCMeta):
             Whether object is a singleton.
 
         """
-        result = getattr(__obj, "__singleton__", False)  # type: bool
+        result: bool = getattr(__obj, "__singleton__", False)
         return result
 
 

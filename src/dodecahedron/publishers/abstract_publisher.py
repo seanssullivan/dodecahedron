@@ -3,6 +3,7 @@
 # Standard Library Imports
 import abc
 from dataclasses import asdict
+from dataclasses import is_dataclass
 import logging
 import json
 from typing import Any
@@ -35,6 +36,7 @@ class AbstractPublisher(abc.ABC):
 
         """
         log.info("publishing: channel=%s, event=%s", channel, event)
-        payload = json.dumps(asdict(event))
+        data = asdict(event) if is_dataclass(event) else event
+        payload = json.dumps(data)
 
         getattr(self.connection, "publish")(channel, payload)

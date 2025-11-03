@@ -8,7 +8,10 @@ Module provides function for converting values to currencies.
 # Standard Library Imports
 import decimal
 import re
-import typing
+from typing import Any
+from typing import Callable
+from typing import Dict
+from typing import Literal
 
 # Local Imports
 from .base_converter import BaseConverter
@@ -16,7 +19,7 @@ from .base_converter import BaseConverter
 __all__ = ["to_currency"]
 
 
-def to_currency(__value: typing.Any, /, default: float = 0.00) -> float:
+def to_currency(__value: Any, /, default: float = 0.00) -> float:
     """Convert value to currency.
 
     Args:
@@ -45,7 +48,7 @@ class CurrencyConverter(BaseConverter):
         self,
         *,
         default: float = 0.00,
-        on_error: typing.Literal["default", "raise"] = "raise",
+        on_error: Literal["default", "raise"] = "raise",
     ) -> None:
         if not isinstance(default, float):
             message = f"expected type 'float', got {type(default)} instead"
@@ -69,7 +72,7 @@ def currency_from_decimal(__value: decimal.Decimal, _: float, /) -> float:
         TypeError: when value is not type 'Decimal'.
 
     """
-    if not isinstance(__value, decimal.Decimal):
+    if not isinstance(__value, decimal.Decimal):  # type: ignore
         message = f"expected type 'Decimal', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -111,7 +114,7 @@ def currency_from_int(__value: int, _: float, /) -> float:
         TypeError: when value is not type 'int'.
 
     """
-    if not isinstance(__value, int):
+    if not isinstance(__value, int):  # type: ignore
         message = f"expected type 'int', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -134,7 +137,7 @@ def currency_from_str(__value: str, default: float = 0.00, /) -> float:
         ValueError: when value cannot be converted to currency.
 
     """
-    if not isinstance(__value, str):
+    if not isinstance(__value, str):  # type: ignore
         message = f"expected type 'str', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -144,17 +147,18 @@ def currency_from_str(__value: str, default: float = 0.00, /) -> float:
 
     try:
         amount = float(re.sub(r"[^0-9a-zA-Z.]+", r"", value))
+
     except ValueError:
         message = f"'{__value}' cannot be converted to currency"
         raise ValueError(message)
-    else:
-        result = round(amount, 2)
-        return result
+
+    result = round(amount, 2)
+    return result
 
 
-DEFAULT_CONVERSIONS = {
+DEFAULT_CONVERSIONS: Dict[type, Callable[..., float]] = {
     decimal.Decimal: currency_from_decimal,
     float: currency_from_float,
     int: currency_from_int,
     str: currency_from_str,
-}  # type: typing.Dict[type, typing.Callable]
+}

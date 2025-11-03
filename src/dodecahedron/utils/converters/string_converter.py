@@ -8,7 +8,10 @@ Module provides function for converting values to strings.
 # Standard Library Imports
 import datetime
 import decimal
-import typing
+from typing import Callable
+from typing import Dict
+from typing import Literal
+from typing import Optional
 
 # Local Imports
 from .base_converter import BaseConverter
@@ -17,8 +20,8 @@ __all__ = ["to_string"]
 
 
 def to_string(
-    __value: object, /, default: typing.Optional[str] = None
-) -> typing.Optional[str]:
+    __value: object, /, default: Optional[str] = None
+) -> Optional[str]:
     """Convert value to string.
 
     Args:
@@ -45,10 +48,10 @@ class StringConverter(BaseConverter):
     def __init__(
         self,
         *,
-        default: typing.Optional[str] = None,
-        on_error: typing.Literal["default", "raise"] = "raise",
+        default: Optional[str] = None,
+        on_error: Literal["default", "raise"] = "raise",
     ) -> None:
-        if default and not isinstance(default, str):
+        if default and not isinstance(default, str):  # type: ignore
             message = f"expected type 'str', got {type(default)} instead"
             raise TypeError(message)
 
@@ -57,7 +60,7 @@ class StringConverter(BaseConverter):
         self._conversions = self._conversions.new_child()
 
 
-def str_from_bool(__value: bool, _: typing.Optional[str] = None, /) -> str:
+def str_from_bool(__value: bool, _: Optional[str] = None, /) -> str:
     """Convert boolean value to ``str``.
 
     Args:
@@ -70,7 +73,7 @@ def str_from_bool(__value: bool, _: typing.Optional[str] = None, /) -> str:
         TypeError: when value is not type 'bool'.
 
     """
-    if not isinstance(__value, bool):
+    if not isinstance(__value, bool):  # type: ignore
         message = f"expected type 'bool', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -78,9 +81,7 @@ def str_from_bool(__value: bool, _: typing.Optional[str] = None, /) -> str:
     return result
 
 
-def str_from_date(
-    __value: datetime.date, _: typing.Optional[str] = None, /
-) -> str:
+def str_from_date(__value: datetime.date, _: Optional[str] = None, /) -> str:
     """Convert date value to ``str``.
 
     Args:
@@ -93,7 +94,7 @@ def str_from_date(
         TypeError: when value is not type 'date'.
 
     """
-    if not isinstance(__value, datetime.date):
+    if not isinstance(__value, datetime.date):  # type: ignore
         message = f"expected type 'date', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -102,7 +103,7 @@ def str_from_date(
 
 
 def str_from_datetime(
-    __value: datetime.datetime, _: typing.Optional[str] = None, /
+    __value: datetime.datetime, _: Optional[str] = None, /
 ) -> str:
     """Convert datetime value to ``str``.
 
@@ -116,7 +117,7 @@ def str_from_datetime(
         TypeError: when value is not type 'datetime'.
 
     """
-    if not isinstance(__value, datetime.datetime):
+    if not isinstance(__value, datetime.datetime):  # type: ignore
         message = f"expected type 'datetime', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -125,8 +126,8 @@ def str_from_datetime(
 
 
 def str_from_decimal(
-    __value: decimal.Decimal, _: typing.Optional[str] = None, /
-) -> int:
+    __value: decimal.Decimal, _: Optional[str] = None, /
+) -> str:
     """Convert decimal value to ``str``.
 
     Args:
@@ -139,7 +140,7 @@ def str_from_decimal(
         TypeError: when value is not type 'Decimal'.
 
     """
-    if not isinstance(__value, decimal.Decimal):
+    if not isinstance(__value, decimal.Decimal):  # type: ignore
         message = f"expected type 'Decimal', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -147,7 +148,7 @@ def str_from_decimal(
     return result
 
 
-def str_from_float(__value: float, _: typing.Optional[str] = None, /) -> str:
+def str_from_float(__value: float, _: Optional[str] = None, /) -> str:
     """Convert float value to ``str``.
 
     Args:
@@ -168,7 +169,7 @@ def str_from_float(__value: float, _: typing.Optional[str] = None, /) -> str:
     return result
 
 
-def str_from_int(__value: int, _: typing.Optional[str] = None, /) -> str:
+def str_from_int(__value: int, _: Optional[str] = None, /) -> str:
     """Convert integer value to ``str``.
 
     Args:
@@ -181,7 +182,7 @@ def str_from_int(__value: int, _: typing.Optional[str] = None, /) -> str:
         TypeError: when value is not type 'int'.
 
     """
-    if not isinstance(__value, int):
+    if not isinstance(__value, int):  # type: ignore
         message = f"expected type 'int', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -190,8 +191,8 @@ def str_from_int(__value: int, _: typing.Optional[str] = None, /) -> str:
 
 
 def str_from_str(
-    __value: str, default: typing.Optional[str] = None, /
-) -> typing.Optional[str]:
+    __value: str, default: Optional[str] = None, /
+) -> Optional[str]:
     """Convert string value to ``str``.
 
     Args:
@@ -206,7 +207,7 @@ def str_from_str(
         ValueError: when value cannot be converted to ``str``.
 
     """
-    if not isinstance(__value, str):
+    if not isinstance(__value, str):  # type: ignore
         message = f"expected type 'str', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -218,7 +219,7 @@ def str_from_str(
     return result
 
 
-DEFAULT_CONVERSIONS = {
+DEFAULT_CONVERSIONS: Dict[type, Callable[..., Optional[str]]] = {
     bool: str_from_bool,
     datetime.date: str_from_date,
     datetime.datetime: str_from_datetime,
@@ -226,4 +227,4 @@ DEFAULT_CONVERSIONS = {
     float: str_from_float,
     int: str_from_int,
     str: str_from_str,
-}  # type: typing.Dict[type, typing.Callable]
+}

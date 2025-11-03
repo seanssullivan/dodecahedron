@@ -4,7 +4,10 @@
 # pylint: disable=missing-function-docstring
 
 # Standard Library Imports
-import typing
+from typing import Any
+from typing import List
+from typing import Optional
+from typing import Union
 
 # Third-Party Imports
 import pytest
@@ -18,7 +21,7 @@ class ExampleRepository(AbstractCsvRepository):
     """Example repository for testing."""
 
     def __init__(
-        self, __file: typing.Any, objects: typing.Optional[list] = None
+        self, __file: Any, objects: Optional[List[Any]] = None
     ) -> None:
         super().__init__(__file)
         self._objects = set(objects or [])
@@ -30,15 +33,15 @@ class ExampleRepository(AbstractCsvRepository):
         """Add object."""
         self._objects.add(obj)
 
-    def get(self, _: str) -> object:
+    def get(self, ref: Union[int, str]) -> object:
         """Get object."""
         raise NotImplementedError
 
-    def list(self) -> list:
+    def list(self) -> List[Any]:
         """List objects."""
         raise NotImplementedError
 
-    def remove(self, _: object) -> None:
+    def remove(self, obj: object) -> None:
         """Remove object."""
         raise NotImplementedError
 
@@ -54,5 +57,5 @@ def test_raises_error_when_not_a_csv_file(
     name: str, request: pytest.FixtureRequest
 ) -> None:
     with pytest.raises(TypeError, match="expected type 'AbstractCsvWrapper'"):
-        wrapper = request.getfixturevalue(name)  # type: AbstractFileWrapper
+        wrapper: AbstractFileWrapper = request.getfixturevalue(name)
         ExampleRepository(wrapper)

@@ -6,8 +6,12 @@ Module defines a base class for converting values between data types.
 """
 
 # Standard Library Imports
-import collections
-import typing
+from collections import ChainMap
+from typing import Any
+from typing import Callable
+from typing import Literal
+from typing import Type
+from typing import TypeVar
 
 # Local Imports
 from .abstract_converter import AbstractConverter
@@ -16,7 +20,7 @@ __all__ = ["BaseConverter"]
 
 
 # Custom type
-T = typing.TypeVar("T")
+T = TypeVar("T")
 
 
 class BaseConverter(AbstractConverter):
@@ -28,13 +32,15 @@ class BaseConverter(AbstractConverter):
 
     """
 
+    _conversions: ChainMap[Type[Any], Callable[..., Any]]
+
     def __init__(
         self,
         *,
-        default: typing.Any = None,
-        on_error: typing.Literal["default", "raise"] = "raise",
+        default: Any = None,
+        on_error: Literal["default", "raise"] = "raise",
     ) -> None:
-        self._conversions = collections.ChainMap()
+        self._conversions = ChainMap()
         self._default = default
 
         if on_error not in ("default", "raise"):
@@ -43,7 +49,7 @@ class BaseConverter(AbstractConverter):
 
         self._on_error = on_error
 
-    def __call__(self, __value: typing.Any, /) -> typing.Any:
+    def __call__(self, __value: Any, /) -> Any:
         try:
             result = (
                 self._handle_conversion(__value)
@@ -55,7 +61,7 @@ class BaseConverter(AbstractConverter):
 
         return result
 
-    def _handle_conversion(self, __value: typing.Any, /) -> typing.Any:
+    def _handle_conversion(self, __value: Any, /) -> Any:
         """Handle conversion between data types.
 
         Args:
@@ -69,9 +75,7 @@ class BaseConverter(AbstractConverter):
         result = conversion(__value, self._default)
         return result
 
-    def _handle_exception(
-        self, __value: typing.Any, error: Exception, /
-    ) -> typing.Any:
+    def _handle_exception(self, __value: Any, error: Exception, /) -> Any:
         """Handle conversion between data types.
 
         Args:
@@ -87,7 +91,9 @@ class BaseConverter(AbstractConverter):
 
         return self._default
 
-    def set_conversion(self, __type: type, func: typing.Callable, /) -> None:
+    def set_conversion(
+        self, __type: type, func: Callable[..., Any], /
+    ) -> None:
         """Set conversion for type.
 
         Args:

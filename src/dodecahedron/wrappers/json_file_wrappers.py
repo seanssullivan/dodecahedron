@@ -6,7 +6,10 @@ from __future__ import annotations
 import abc
 import json
 import os
-import typing
+from typing import Any
+from typing import IO
+from typing import Optional
+from typing import Union
 
 # Local Imports
 from .abstract_file_wrappers import AbstractDirectoryWrapper
@@ -25,11 +28,11 @@ class AbstractJsonWrapper(AbstractTextWrapper):
 
     @property
     @abc.abstractmethod
-    def indent(self) -> typing.Optional[typing.Union[int, str]]:
+    def indent(self) -> Optional[Union[int, str]]:
         """Indent."""
         raise NotImplementedError
 
-    def _init_json_io_wrapper(self, __file: typing.IO, /) -> JsonIOWrapper:
+    def _init_json_io_wrapper(self, __file: IO[Any], /) -> JsonIOWrapper:
         """Initialize I/O wrapper for `.json` file.
 
         Args:
@@ -57,10 +60,10 @@ class JsonDirectoryWrapper(AbstractJsonWrapper, AbstractDirectoryWrapper):
 
     def __init__(
         self,
-        directory: os.PathLike,
+        directory: "os.PathLike[Any]",
         *,
         encoding: str = settings.DEFAULT_FILE_ENCODING,
-        indent: typing.Optional[typing.Union[int, str]] = None,
+        indent: Optional[Union[int, str]] = None,
         read_only: bool = False,
     ) -> None:
         super().__init__(
@@ -72,7 +75,7 @@ class JsonDirectoryWrapper(AbstractJsonWrapper, AbstractDirectoryWrapper):
         self._indent = indent
 
     @property
-    def indent(self) -> typing.Optional[typing.Union[int, str]]:
+    def indent(self) -> Optional[Union[int, str]]:
         """Indent."""
         return self._indent
 
@@ -112,10 +115,10 @@ class JsonFileWrapper(AbstractJsonWrapper, AbstractFileWrapper):
 
     def __init__(
         self,
-        filepath: os.PathLike,
+        filepath: "os.PathLike[Any]",
         *,
         encoding: str = settings.DEFAULT_FILE_ENCODING,
-        indent: typing.Optional[typing.Union[int, str]] = None,
+        indent: Optional[Union[int, str]] = None,
         read_only: bool = False,
     ) -> None:
         super().__init__(
@@ -128,7 +131,7 @@ class JsonFileWrapper(AbstractJsonWrapper, AbstractFileWrapper):
         self._indent = indent
 
     @property
-    def indent(self) -> typing.Optional[typing.Union[int, str]]:
+    def indent(self) -> Optional[Union[int, str]]:
         """Indent."""
         return self._indent
 
@@ -150,12 +153,12 @@ class JsonFileWrapper(AbstractJsonWrapper, AbstractFileWrapper):
 class JsonIOWrapper(AbstractIOWrapper):
     """Implements a I/O wrapper for `.json` files."""
 
-    def __init__(self, __file: typing.IO) -> None:
+    def __init__(self, __file: IO[Any]) -> None:
         self._file = __file
-        self._context = None  # type: typing.Optional[AbstractJsonWrapper]
+        self._context: Optional[AbstractJsonWrapper] = None
 
     @property
-    def file(self) -> typing.IO:
+    def file(self) -> IO[Any]:
         """File."""
         return self._file
 
@@ -165,14 +168,14 @@ class JsonIOWrapper(AbstractIOWrapper):
         return self._file.closed
 
     @property
-    def indent(self) -> typing.Optional[typing.Union[int, str]]:
+    def indent(self) -> Optional[Union[int, str]]:
         """Indent."""
         default = getattr(self._context, "indent", None)
         result = getattr(self, "_indent", default)
         return result
 
     @indent.setter
-    def indent(self, value: typing.Any) -> None:
+    def indent(self, value: Any) -> None:
         if not isinstance(value, (int, str)):
             expected = "expected type 'int' or 'str'"
             actual = f"got {type(value)} instead"
@@ -197,11 +200,11 @@ class JsonIOWrapper(AbstractIOWrapper):
         """Close `.csv` file."""
         self._file.close()
 
-    def dump(self, obj: typing.Any) -> None:
+    def dump(self, obj: Any) -> None:
         """Serialize `obj` to file."""
         json.dump(obj, self._file)
 
-    def load(self) -> typing.Any:
+    def load(self) -> Any:
         """Deserialize contents of file."""
         result = json.load(self._file)
         return result

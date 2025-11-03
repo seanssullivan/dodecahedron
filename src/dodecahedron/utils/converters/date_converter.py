@@ -8,7 +8,12 @@ Module provides function for converting values to dates.
 # Standard Library Imports
 import datetime
 import decimal
-import typing
+from typing import Any
+from typing import Callable
+from typing import Dict
+from typing import Literal
+from typing import Optional
+from typing import Union
 
 # Third-Party Imports
 import cachetools
@@ -23,8 +28,8 @@ __all__ = ["to_date"]
 
 
 def to_date(
-    __value: typing.Any, /, default: typing.Optional[datetime.date] = None
-) -> typing.Optional[datetime.date]:
+    __value: Any, /, default: Optional[datetime.date] = None
+) -> Optional[datetime.date]:
     """Converts value to date.
 
     Args:
@@ -52,10 +57,10 @@ class DateConverter(BaseConverter):
     def __init__(
         self,
         *,
-        default: typing.Optional[datetime.date] = None,
-        on_error: typing.Literal["default", "raise"] = "raise",
+        default: Optional[datetime.date] = None,
+        on_error: Literal["default", "raise"] = "raise",
     ) -> None:
-        if default and not isinstance(default, datetime.date):
+        if default and not isinstance(default, datetime.date):  # type: ignore
             message = f"expected type 'date', got {type(default)} instead"
             raise TypeError(message)
 
@@ -65,7 +70,7 @@ class DateConverter(BaseConverter):
 
 
 def date_from_date(
-    __value: datetime.date, _: typing.Optional[datetime.date], /
+    __value: datetime.date, _: Optional[datetime.date], /
 ) -> datetime.date:
     """Convert date value to ``date``.
 
@@ -79,7 +84,7 @@ def date_from_date(
         TypeError: when value is not type 'date'.
 
     """
-    if not isinstance(__value, datetime.date):
+    if not isinstance(__value, datetime.date):  # type: ignore
         message = f"expected type 'date', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -88,7 +93,7 @@ def date_from_date(
 
 
 def date_from_datetime(
-    __value: datetime.datetime, _: typing.Optional[datetime.date], /
+    __value: datetime.datetime, _: Optional[datetime.date], /
 ) -> datetime.date:
     """Convert datetime value to ``date``.
 
@@ -102,7 +107,7 @@ def date_from_datetime(
         TypeError: when value is not type 'datetime'.
 
     """
-    if not isinstance(__value, datetime.datetime):
+    if not isinstance(__value, datetime.datetime):  # type: ignore
         message = f"expected type 'datetime', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -111,7 +116,7 @@ def date_from_datetime(
 
 
 def date_from_decimal(
-    __value: decimal.Decimal, _: typing.Optional[datetime.date], /
+    __value: decimal.Decimal, _: Optional[datetime.date], /
 ) -> datetime.date:
     """Convert decimal value to ``date``.
 
@@ -125,7 +130,7 @@ def date_from_decimal(
         TypeError: when value is not type 'Decimal'.
 
     """
-    if not isinstance(__value, decimal.Decimal):
+    if not isinstance(__value, decimal.Decimal):  # type: ignore
         message = f"expected type 'Decimal', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -134,7 +139,7 @@ def date_from_decimal(
 
 
 def date_from_float(
-    __value: float, _: typing.Optional[datetime.date], /
+    __value: float, _: Optional[datetime.date], /
 ) -> datetime.date:
     """Convert float value to ``date``.
 
@@ -154,6 +159,7 @@ def date_from_float(
 
     try:
         result = date_from_serial_date(__value, _)
+
     except ValueError:
         result = date_from_timestamp(__value, _)
 
@@ -161,7 +167,7 @@ def date_from_float(
 
 
 def date_from_serial_date(
-    __value: float, _: typing.Optional[datetime.date], /
+    __value: float, _: Optional[datetime.date], /
 ) -> datetime.date:
     """Convert serial date value to ``date``.
 
@@ -190,7 +196,7 @@ def date_from_serial_date(
 
 
 def date_from_int(
-    __value: int, _: typing.Optional[datetime.date], /
+    __value: int, _: Optional[datetime.date], /
 ) -> datetime.date:
     """Convert integer value to ``date``.
 
@@ -204,7 +210,7 @@ def date_from_int(
         TypeError: when value is not type 'int'.
 
     """
-    if not isinstance(__value, int):
+    if not isinstance(__value, int):  # type: ignore
         message = f"expected type 'int', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -214,8 +220,8 @@ def date_from_int(
 
 @cachetools.cached(cachetools.LRUCache(maxsize=1000), hashkey)
 def date_from_str(
-    __value: str, default: typing.Optional[datetime.date] = None, /
-) -> typing.Optional[datetime.date]:
+    __value: str, default: Optional[datetime.date] = None, /
+) -> Optional[datetime.date]:
     """Convert string value to ``date``.
 
     Args:
@@ -230,7 +236,7 @@ def date_from_str(
         ValueError: when value cannot be converted to ``date``.
 
     """
-    if not isinstance(__value, str):
+    if not isinstance(__value, str):  # type: ignore
         message = f"expected type 'str', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -246,7 +252,7 @@ def date_from_str(
 
 
 def date_from_timestamp(
-    __value: typing.Union[float, int], _: datetime.date, /
+    __value: Union[float, int], _: Optional[datetime.date], /
 ) -> datetime.date:
     """Convert timestamp value to ``date``.
 
@@ -260,7 +266,7 @@ def date_from_timestamp(
         TypeError: when value is not type 'float' or 'int'.
 
     """
-    if not isinstance(__value, (float, int)):
+    if not isinstance(__value, (float, int)):  # type: ignore
         expected = "expected type 'float' or 'int'"
         actual = f"got {type(__value)} instead"
         message = ", ".join([expected, actual])
@@ -270,11 +276,11 @@ def date_from_timestamp(
     return result
 
 
-DEFAULT_CONVERSIONS = {
+DEFAULT_CONVERSIONS: Dict[type, Callable[..., Optional[datetime.date]]] = {
     datetime.date: date_from_date,
     datetime.datetime: date_from_datetime,
     decimal.Decimal: date_from_decimal,
     float: date_from_float,
     int: date_from_int,
     str: date_from_str,
-}  # type: typing.Dict[type, typing.Callable]
+}

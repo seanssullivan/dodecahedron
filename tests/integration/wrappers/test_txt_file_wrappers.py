@@ -18,7 +18,7 @@ from dodecahedron.wrappers.txt_file_wrappers import TxtIOWrapper
 
 def test_raises_error_when_filepath_argument_is_not_path() -> None:
     with pytest.raises(TypeError, match="expected type 'PathLike'"):
-        TxtFileWrapper("failure.txt")
+        TxtFileWrapper("failure.txt")  # type: ignore
 
 
 def test_raises_error_when_encoding_argument_is_not_str(
@@ -26,7 +26,7 @@ def test_raises_error_when_encoding_argument_is_not_str(
 ) -> None:
     with pytest.raises(TypeError, match="expected type 'str'"):
         path = make_txt_file("test.txt", "")
-        TxtFileWrapper(path, encoding=1)
+        TxtFileWrapper(path, encoding=1)  # type: ignore
 
 
 def test_raises_error_when_filepath_argument_is_a_directory(

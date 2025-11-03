@@ -23,7 +23,7 @@ class BaseDispatcher(AbstractDispatcher):
     """
 
     def __init__(self, __bus: AbstractMessageBus, /) -> None:
-        if not isinstance(__bus, AbstractMessageBus):
+        if not isinstance(__bus, AbstractMessageBus):  # type: ignore
             expected = "expected type 'AbstractMessageBus'"
             actual = f"got {type(__bus)} instead"
             message = ", ".join([expected, actual])

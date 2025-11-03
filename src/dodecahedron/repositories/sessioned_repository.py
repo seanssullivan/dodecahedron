@@ -25,7 +25,7 @@ class SessionedRepository(AbstractRepository):
         """Session."""
         raise NotImplementedError
 
-    def close(self, *args, **kwargs) -> Any:
+    def close(self, *args: Any, **kwargs: Any) -> Any:
         """Close connection to repository.
 
         Args:
@@ -36,7 +36,7 @@ class SessionedRepository(AbstractRepository):
         result = self._call_method_on_session("close", *args, **kwargs)
         return result
 
-    def commit(self, *args, **kwargs) -> Any:
+    def commit(self, *args: Any, **kwargs: Any) -> Any:
         """Commit changes to repository.
 
         Args:
@@ -47,7 +47,7 @@ class SessionedRepository(AbstractRepository):
         result = self._call_method_on_session("commit", *args, **kwargs)
         return result
 
-    def rollback(self, *args, **kwargs) -> Any:
+    def rollback(self, *args: Any, **kwargs: Any) -> Any:
         """Rollback changes to repository.
 
         Args:
@@ -58,7 +58,9 @@ class SessionedRepository(AbstractRepository):
         result = self._call_method_on_session("rollback", *args, **kwargs)
         return result
 
-    def _call_method_on_session(self, __name: str, /, *args, **kwargs) -> Any:
+    def _call_method_on_session(
+        self, __name: str, /, *args: Any, **kwargs: Any
+    ) -> Any:
         """Call method on session.
 
         Args:
@@ -68,9 +70,10 @@ class SessionedRepository(AbstractRepository):
 
         """
         try:
-            method = getattr(self.session, __name)  # type: MethodType
+            method: MethodType = getattr(self.session, __name)
             result = method(*args, **kwargs)
+
         except AttributeError:
-            pass
+            return None
 
         return result

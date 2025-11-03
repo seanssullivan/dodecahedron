@@ -9,7 +9,11 @@ Module provides function for converting values to timestamps.
 import datetime
 import decimal
 import time
-import typing
+from typing import Any
+from typing import Callable
+from typing import Dict
+from typing import Literal
+from typing import Optional
 
 # Third-Party Imports
 from dateutil.parser import parse
@@ -21,7 +25,7 @@ from .base_converter import BaseConverter
 __all__ = ["to_timestamp"]
 
 
-def to_timestamp(__value: typing.Any, /, default: float = 0.0) -> float:
+def to_timestamp(__value: Any, /, default: float = 0.0) -> float:
     """Convert date to timestamp.
 
     Args:
@@ -49,7 +53,7 @@ class TimestampConverter(BaseConverter):
         self,
         *,
         default: float = 0.0,
-        on_error: typing.Literal["default", "raise"] = "raise",
+        on_error: Literal["default", "raise"] = "raise",
     ) -> None:
         if not isinstance(default, float):
             message = f"expected type 'float', got {type(default)} instead"
@@ -61,7 +65,7 @@ class TimestampConverter(BaseConverter):
 
 
 def timestamp_from_date(
-    __value: datetime.date, _: typing.Optional[float] = None, /
+    __value: datetime.date, _: Optional[float] = None, /
 ) -> float:
     """Convert date value to timestamp.
 
@@ -75,7 +79,7 @@ def timestamp_from_date(
         TypeError: when value is not type 'date'.
 
     """
-    if not isinstance(__value, datetime.date):
+    if not isinstance(__value, datetime.date):  # type: ignore
         message = f"expected type 'date', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -84,7 +88,7 @@ def timestamp_from_date(
 
 
 def timestamp_from_datetime(
-    __value: datetime.datetime, _: typing.Optional[float] = None, /
+    __value: datetime.datetime, _: Optional[float] = None, /
 ) -> float:
     """Convert datetime value to timestamp.
 
@@ -98,7 +102,7 @@ def timestamp_from_datetime(
         TypeError: when value is not type 'datetime'.
 
     """
-    if not isinstance(__value, datetime.datetime):
+    if not isinstance(__value, datetime.datetime):  # type: ignore
         message = f"expected type 'datetime', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -107,8 +111,8 @@ def timestamp_from_datetime(
 
 
 def timestamp_from_decimal(
-    __value: decimal.Decimal, _: typing.Optional[float] = None, /
-) -> int:
+    __value: decimal.Decimal, _: Optional[float] = None, /
+) -> float:
     """Convert decimal value to timestamp.
 
     Args:
@@ -121,7 +125,7 @@ def timestamp_from_decimal(
         TypeError: when value is not type 'Decimal'.
 
     """
-    if not isinstance(__value, decimal.Decimal):
+    if not isinstance(__value, decimal.Decimal):  # type: ignore
         message = f"expected type 'Decimal', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -130,7 +134,7 @@ def timestamp_from_decimal(
 
 
 def timestamp_from_float(
-    __value: float, _: typing.Optional[float] = None, /
+    __value: float, _: Optional[float] = None, /
 ) -> float:
     """Convert float value to timestamp.
 
@@ -152,9 +156,7 @@ def timestamp_from_float(
     return result
 
 
-def timestamp_from_int(
-    __value: int, _: typing.Optional[float] = None, /
-) -> float:
+def timestamp_from_int(__value: int, _: Optional[float] = None, /) -> float:
     """Convert integer value to timestamp.
 
     Args:
@@ -167,7 +169,7 @@ def timestamp_from_int(
         TypeError: when value is not type 'int'.
 
     """
-    if not isinstance(__value, int):
+    if not isinstance(__value, int):  # type: ignore
         message = f"expected type 'int', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -176,8 +178,8 @@ def timestamp_from_int(
 
 
 def timestamp_from_str(
-    __value: str, default: typing.Optional[float] = None, /
-) -> typing.Optional[float]:
+    __value: str, default: Optional[float] = None, /
+) -> Optional[float]:
     """Convert string value to timestamp.
 
     Args:
@@ -192,7 +194,7 @@ def timestamp_from_str(
         ValueError: when value cannot be converted to timestamp.
 
     """
-    if not isinstance(__value, str):
+    if not isinstance(__value, str):  # type: ignore
         message = f"expected type 'str', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -207,11 +209,11 @@ def timestamp_from_str(
     return result
 
 
-DEFAULT_CONVERSIONS = {
+DEFAULT_CONVERSIONS: Dict[type, Callable[..., Optional[float]]] = {
     datetime.date: timestamp_from_date,
     datetime.datetime: timestamp_from_datetime,
     decimal.Decimal: timestamp_from_decimal,
     float: timestamp_from_float,
     int: timestamp_from_int,
     str: timestamp_from_str,
-}  # type: typing.Dict[type, typing.Callable]
+}

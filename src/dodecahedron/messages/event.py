@@ -10,10 +10,10 @@ Events are always named using past-tense verb phrases.
 """
 
 # Local Imports
-from .message import BaseMessage
+from .message import AbstractMessage
 
 __all__ = ["BaseEvent"]
 
 
-class BaseEvent(BaseMessage):
+class BaseEvent(AbstractMessage):
     """Class implements an event."""

@@ -19,7 +19,8 @@ from typing import Union
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ..queue import MessageQueue
+    from ..messages import AbstractMessage
+    from ..queues import MessageQueue
 
 __all__ = [
     "AbstractModel",
@@ -59,7 +60,7 @@ class AbstractAggregate(AbstractModel):
 
     @property
     @abc.abstractmethod
-    def events(self) -> Union[Deque, "MessageQueue"]:
+    def events(self) -> Union[Deque["AbstractMessage"], "MessageQueue"]:
         """Events raised."""
         raise NotImplementedError
 

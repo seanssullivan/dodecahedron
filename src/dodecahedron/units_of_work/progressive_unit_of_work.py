@@ -3,6 +3,7 @@
 
 # Standard Library Imports
 from __future__ import annotations
+from typing import Any
 
 # Local Imports
 from .abstract_unit_of_work import AbstractUnitOfWork
@@ -29,11 +30,11 @@ class ProgressiveUnitOfWork(AbstractUnitOfWork):
 
     def __init__(
         self,
-        *args,
+        *args: Any,
         progress_bar: AbstractProgressBar,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
-        if not isinstance(progress_bar, AbstractProgressBar):
+        if not isinstance(progress_bar, AbstractProgressBar):  # type: ignore
             expected = "expected type 'ProgressBar'"
             actual = f"got {type(progress_bar)} instead"
             message = ", ".join([expected, actual])
@@ -42,7 +43,7 @@ class ProgressiveUnitOfWork(AbstractUnitOfWork):
         super().__init__(*args, **kwargs)
         self._progress_bar = progress_bar
 
-    def __exit__(self, *args) -> None:
+    def __exit__(self, *args: Any) -> None:
         super().__exit__(*args)
 
         if self._progress_bar.leave is False:

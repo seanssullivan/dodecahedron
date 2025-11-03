@@ -26,8 +26,8 @@ class AbstractSqlAlchemyRepository(SessionedRepository):
 
     """
 
-    def __init__(self, session: Session, /, *args, **kwargs) -> None:
-        if not isinstance(session, Session):
+    def __init__(self, session: Session, /, *args: Any, **kwargs: Any) -> None:
+        if not isinstance(session, Session):  # type: ignore
             message = f"expected type 'Session', got {type(session)} instead"
             raise TypeError(message)
 
@@ -39,7 +39,7 @@ class AbstractSqlAlchemyRepository(SessionedRepository):
         """Session."""
         return self._session
 
-    def execute(self, *args, **kwargs) -> Any:
+    def execute(self, *args: Any, **kwargs: Any) -> Any:
         """Call the execute method directly on the SQLAlchemy session.
 
         Args:

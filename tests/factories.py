@@ -91,7 +91,7 @@ def make_event(*, delay: Union[float, int] = 0) -> messages.BaseEvent:
 
 def make_messages(
     n: int, *, delay: Union[float, int] = 0
-) -> List[messages.BaseMessage]:
+) -> List[messages.AbstractMessage]:
     """Make messages.
 
     Args:
@@ -106,7 +106,7 @@ def make_messages(
     return results
 
 
-def make_message(*, delay: Union[float, int] = 0) -> messages.BaseMessage:
+def make_message(*, delay: Union[float, int] = 0) -> messages.AbstractMessage:
     """Make message.
 
     Args:
@@ -124,5 +124,5 @@ def make_message(*, delay: Union[float, int] = 0) -> messages.BaseMessage:
         raise TypeError(message)
 
     time.sleep(delay)
-    result = messages.BaseMessage()
+    result = messages.AbstractMessage()
     return result

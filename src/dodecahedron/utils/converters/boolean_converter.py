@@ -8,7 +8,10 @@ Module provides function for converting values to booleans.
 # Standard Library Imports
 import datetime
 import decimal
-import typing
+from typing import Any
+from typing import Callable
+from typing import Dict
+from typing import Literal
 
 # Local Imports
 from .base_converter import BaseConverter
@@ -21,7 +24,7 @@ FALSY_VALUES = ("false", "no", "n", "0")
 TRUTHY_VALUES = ("true", "yes", "y", "1")
 
 
-def to_boolean(__value: typing.Any, /, default: bool = False) -> bool:
+def to_boolean(__value: Any, /, default: bool = False) -> bool:
     """Convert value to boolean.
 
     Args:
@@ -50,9 +53,9 @@ class BooleanConverter(BaseConverter):
         self,
         *,
         default: bool = False,
-        on_error: typing.Literal["default", "raise"] = "raise",
+        on_error: Literal["default", "raise"] = "raise",
     ) -> None:
-        if not isinstance(default, bool):
+        if not isinstance(default, bool):  # type: ignore
             message = f"expected type 'bool', got {type(default)} instead"
             raise TypeError(message)
 
@@ -74,7 +77,7 @@ def bool_from_bool(__value: bool, _: bool, /) -> bool:
         TypeError: when value is not type 'bool'.
 
     """
-    if not isinstance(__value, bool):
+    if not isinstance(__value, bool):  # type: ignore
         message = f"expected type 'bool', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -95,7 +98,7 @@ def bool_from_date(__value: datetime.date, _: bool, /) -> bool:
         TypeError: when value is not type 'date'.
 
     """
-    if not isinstance(__value, datetime.date):
+    if not isinstance(__value, datetime.date):  # type: ignore
         message = f"expected type 'date', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -116,7 +119,7 @@ def bool_from_datetime(__value: datetime.datetime, _: bool, /) -> bool:
         TypeError: when value is not type 'datetime'.
 
     """
-    if not isinstance(__value, datetime.datetime):
+    if not isinstance(__value, datetime.datetime):  # type: ignore
         message = f"expected type 'datetime', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -137,7 +140,7 @@ def bool_from_decimal(__value: decimal.Decimal, _: bool, /) -> bool:
         TypeError: when value is not type 'Decimal'.
 
     """
-    if not isinstance(__value, decimal.Decimal):
+    if not isinstance(__value, decimal.Decimal):  # type: ignore
         message = f"expected type 'Decimal', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -179,7 +182,7 @@ def bool_from_int(__value: int, _: bool, /) -> bool:
         TypeError: when value is not type 'int'.
 
     """
-    if not isinstance(__value, int):
+    if not isinstance(__value, int):  # type: ignore
         message = f"expected type 'int', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -202,7 +205,7 @@ def bool_from_str(__value: str, default: bool = False, /) -> bool:
         ValueError: when value cannot be converted to ``bool``.
 
     """
-    if not isinstance(__value, str):
+    if not isinstance(__value, str):  # type: ignore
         message = f"expected type 'str', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -219,7 +222,7 @@ def bool_from_str(__value: str, default: bool = False, /) -> bool:
     raise ValueError(f"'{__value}' cannot be converted to bool")
 
 
-DEFAULT_CONVERSIONS = {
+DEFAULT_CONVERSIONS: Dict[type, Callable[..., bool]] = {
     bool: bool_from_bool,
     datetime.date: bool_from_date,
     datetime.datetime: bool_from_datetime,
@@ -227,4 +230,4 @@ DEFAULT_CONVERSIONS = {
     float: bool_from_float,
     int: bool_from_int,
     str: bool_from_str,
-}  # type: typing.Dict[type, typing.Callable]
+}

@@ -11,18 +11,18 @@ import datetime
 # Local Imports
 from ..metaclasses import MessageMeta
 
-__all__ = ["BaseMessage"]
+__all__ = ["AbstractMessage"]
 
 
-class BaseMessage(abc.ABC, metaclass=MessageMeta):
-    """Class implements a message."""
+class AbstractMessage(abc.ABC, metaclass=MessageMeta):
+    """Class represents an abstract message."""
 
     __created_at__: datetime.datetime
 
     def __gt__(self, other: object) -> bool:
         result = (
             self.__created_at__ > other.__created_at__
-            if isinstance(other, BaseMessage)
+            if isinstance(other, AbstractMessage)
             else False
         )
         return result
@@ -30,7 +30,15 @@ class BaseMessage(abc.ABC, metaclass=MessageMeta):
     def __lt__(self, other: object) -> bool:
         result = (
             self.__created_at__ < other.__created_at__
-            if isinstance(other, BaseMessage)
+            if isinstance(other, AbstractMessage)
             else False
         )
+        return result
+
+    def __repr__(self) -> str:
+        result = self.__class__.__name__
+        return result
+
+    def __str__(self) -> str:
+        result = self.__class__.__name__
         return result

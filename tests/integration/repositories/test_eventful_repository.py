@@ -4,8 +4,10 @@
 # pylint: disable=missing-function-docstring
 
 # Standard Library Imports
-import collections
-import typing
+from typing import Any
+from typing import List
+from typing import Optional
+from typing import Union
 
 # Third-Party Imports
 # import pytest
@@ -13,7 +15,7 @@ import typing
 # Local Imports
 from dodecahedron.models import AbstractAggregate
 from dodecahedron.repositories import EventfulRepository
-from dodecahedron.queue import MessageQueue
+from dodecahedron.queues import MessageQueue
 from ... import factories
 
 
@@ -21,7 +23,7 @@ class ExampleModel(AbstractAggregate):
     """Example model for testing."""
 
     def __init__(self, ref: int) -> None:
-        self._events = collections.deque()
+        self._events = MessageQueue()
         self._reference = ref
 
     def __eq__(self, other: object) -> bool:
@@ -40,26 +42,26 @@ class ExampleModel(AbstractAggregate):
         return self._reference
 
     @property
-    def events(self) -> typing.Deque:
+    def events(self) -> MessageQueue:
         return self._events
 
     def __contains__(self, _: object) -> bool:
         raise NotImplementedError
 
-    def add(self, _: object) -> None:
+    def add(self, obj: object) -> None:
         raise NotImplementedError
 
-    def get(self, _: str) -> object:
+    def get(self, ref: Union[int, str]) -> object:
         raise NotImplementedError
 
-    def remove(self, _: object) -> None:
+    def remove(self, obj: object) -> None:
         raise NotImplementedError
 
 
 class ExampleRepository(EventfulRepository):
     """Example repository for testing."""
 
-    def __init__(self, objects: typing.Optional[list] = None) -> None:
+    def __init__(self, objects: Optional[List[Any]] = None) -> None:
         super().__init__()
         self._objects = set(objects or [])
 
@@ -70,15 +72,15 @@ class ExampleRepository(EventfulRepository):
         """Add object."""
         self._objects.add(obj)
 
-    def get(self, _: str) -> object:
+    def get(self, ref: Union[int, str]) -> object:
         """Get object."""
         raise NotImplementedError
 
-    def list(self) -> list:
+    def list(self) -> List[Any]:
         """List objects."""
         raise NotImplementedError
 
-    def remove(self, _: object) -> None:
+    def remove(self, obj: object) -> None:
         """Remove object."""
         raise NotImplementedError
 

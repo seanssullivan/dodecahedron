@@ -3,9 +3,10 @@
 
 # Standard Library Imports
 from __future__ import annotations
-import io
 import os
-import typing
+from typing import Any
+from typing import IO
+from typing import Optional
 
 # Local Imports
 from .abstract_file_wrappers import AbstractDirectoryWrapper
@@ -21,7 +22,7 @@ __all__ = ["PdfDirectoryWrapper", "PdfFileWrapper"]
 class AbstractPdfWrapper(AbstractFileSystemWrapper):
     """Represents an abstract wrapper class for `.pdf` files."""
 
-    def _init_pdf_io_wrapper(self, __file: typing.IO, /) -> PdfIOWrapper:
+    def _init_pdf_io_wrapper(self, __file: IO[Any], /) -> PdfIOWrapper:
         """Initialize I/O wrapper for `.pdf` file.
 
         Args:
@@ -47,7 +48,7 @@ class PdfDirectoryWrapper(AbstractPdfWrapper, AbstractDirectoryWrapper):
 
     def __init__(
         self,
-        directory: os.PathLike,
+        directory: "os.PathLike[Any]",
         *,
         read_only: bool = False,
     ) -> None:
@@ -57,7 +58,7 @@ class PdfDirectoryWrapper(AbstractPdfWrapper, AbstractDirectoryWrapper):
             read_only=read_only,
         )
 
-    def open(self, filename: str, /, mode: str = "rb") -> typing.IO:
+    def open(self, filename: str, /, mode: str = "rb") -> IO[Any]:
         """Open a `.pdf` file and return a file object.
 
         Args:
@@ -87,14 +88,14 @@ class PdfFileWrapper(AbstractPdfWrapper, AbstractFileWrapper):
 
     def __init__(
         self,
-        filepath: os.PathLike,
+        filepath: "os.PathLike[Any]",
         *,
         read_only: bool = False,
     ) -> None:
         super().__init__(filepath, read_only=read_only)
         utils.raise_for_extension(filepath, settings.PDF_EXTENSION)
 
-    def open(self, mode: str = "rb") -> typing.IO:
+    def open(self, mode: str = "rb") -> IO[Any]:
         """Open the `.pdf` file and return a file object.
 
         Args:
@@ -112,12 +113,12 @@ class PdfFileWrapper(AbstractPdfWrapper, AbstractFileWrapper):
 class PdfIOWrapper:
     """Implements a I/O wrapper for `.pdf` files."""
 
-    def __init__(self, __file: typing.IO) -> None:
+    def __init__(self, __file: IO[Any]) -> None:
         self._file = __file
-        self._context = None  # type: typing.Optional[AbstractPdfWrapper]
+        self._context: Optional[AbstractPdfWrapper] = None
 
     @property
-    def file(self) -> typing.IO:
+    def file(self) -> IO[Any]:
         """File."""
         return self._file
 

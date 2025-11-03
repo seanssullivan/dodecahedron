@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""Queue.
+"""Queues.
 
-This module defines base classes for queues.
+This module defines classes for queues.
 
 """
 
@@ -11,82 +11,43 @@ This module defines base classes for queues.
 from __future__ import annotations
 import abc
 from collections import deque
+from typing import Any
+from typing import Deque
 from typing import Iterable
 from typing import Iterator
+from typing import List
 from typing import Optional
+from typing import Type
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import Self
 
 # Local Imports
-from .messages import BaseMessage
+from .messages import AbstractMessage
 from .helpers import raise_for_instance
 
-__all__ = ["MessageQueue"]
+__all__ = [
+    "AbstractQueue",
+    "MessageQueue",
+]
 
 
 class AbstractQueue(abc.ABC):
-    """Represents an abstract queue."""
-
-    @abc.abstractmethod
-    def __iter__(self) -> Iterator[object]:
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def __len__(self) -> int:
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def __next__(self) -> object:
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def append(self, __obj: object, /) -> None:
-        """Append object to queue.
-
-        Args:
-            __obj: Message to append to queue.
-
-        """
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def extend(self, __iterable: Iterable[object], /) -> None:
-        """Extend queue from iterable object.
-
-        Args:
-            __iterable: Iterable with which to extend queue.
-
-        """
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def popleft(self) -> object:
-        """Pop object from left side of queue."""
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def sort(self) -> None:
-        """Sort objects in queue."""
-        raise NotImplementedError
-
-
-class BaseQueue(AbstractQueue):
-    """Implements a base class for queues.
+    """Represents an abstract queue.
 
     Args:
         __iterable (optional): Iterable of objects. Default ``None``.
 
     """
 
-    def __new__(
-        cls, __iterable: Optional[Iterable[object]] = None
-    ) -> BaseQueue:
-        if __iterable and not isinstance(__iterable, Iterable):
-            raise TypeError("argument is not iterable")
+    def __init__(
+        self: Self,
+        __iterable: Optional[Iterable[object]] = None,
+    ) -> None:
+        raise_for_iterable(__iterable)
 
-        instance = super().__new__(cls)  # type: BaseQueue
-        return instance
-
-    def __init__(self, __iterable: Optional[Iterable[object]] = None) -> None:
-        self._items = deque(__iterable or [])
+        self._items: Deque[Any] = deque(__iterable or [])
         self.sort()
 
     def __iter__(self) -> Iterator[object]:
@@ -95,7 +56,7 @@ class BaseQueue(AbstractQueue):
     def __len__(self) -> int:
         return len(self._items)
 
-    def __next__(self) -> object:
+    def __next__(self) -> Any:
         if len(self._items) == 0:
             raise StopIteration
 
@@ -137,7 +98,7 @@ class BaseQueue(AbstractQueue):
         self._items.clear()
 
 
-class MessageQueue(BaseQueue):
+class MessageQueue(AbstractQueue):
     """Implements a message queue.
 
     Args:
@@ -146,19 +107,20 @@ class MessageQueue(BaseQueue):
     """
 
     def __new__(
-        cls, __iterable: Optional[Iterable[object]] = None
+        cls: Type[Self],
+        __iterable: Optional[Iterable[object]] = None,
     ) -> MessageQueue:
         if __iterable is not None:
             for item in __iterable:
-                raise_for_instance(item, BaseMessage)
+                raise_for_instance(item, AbstractMessage)
 
-        instance = super().__new__(cls)  # type: MessageQueue
+        instance = super().__new__(cls)
         return instance
 
-    def __iter__(self) -> Iterator[BaseMessage]:
+    def __iter__(self) -> Iterator[AbstractMessage]:
         return self
 
-    def __next__(self) -> BaseMessage:
+    def __next__(self) -> AbstractMessage:
         return super().__next__()
 
     def append(self, __item: object, /) -> None:
@@ -168,7 +130,7 @@ class MessageQueue(BaseQueue):
             __item: Message to append to queue.
 
         """
-        raise_for_instance(__item, BaseMessage)
+        raise_for_instance(__item, AbstractMessage)
         super().append(__item)
 
     def extend(self, __iterable: Iterable[object], /) -> None:
@@ -178,13 +140,30 @@ class MessageQueue(BaseQueue):
             __iterable: Messages with which to extend queue.
 
         """
-        messages = []
+        messages: List[AbstractMessage] = []
         for item in __iterable:
-            raise_for_instance(item, BaseMessage)
-            messages.append(item)
+            raise_for_instance(item, AbstractMessage)
+            messages.append(item)  # type: ignore
 
         super().extend(messages)
 
-    def popleft(self) -> BaseMessage:
+    def popleft(self) -> AbstractMessage:
         """Pop message from left side of queue."""
-        return super().popleft()
+        return super().popleft()  # type: ignore
+
+
+# ----------------------------------------------------------------------------
+# Helpers
+# ----------------------------------------------------------------------------
+def raise_for_iterable(__obj: object) -> None:
+    """Raise error when object is not iterable.
+
+    Args:
+        __obj: Object to check.
+
+    Raises:
+        TypeError: when object is not iterable.
+
+    """
+    if __obj and not isinstance(__obj, Iterable):
+        raise TypeError("argument is not iterable")

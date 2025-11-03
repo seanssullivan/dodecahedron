@@ -8,7 +8,12 @@ Module provides function for converting values to datatimes.
 # Standard Library Imports
 import datetime
 import decimal
-import typing
+from typing import Any
+from typing import Callable
+from typing import Dict
+from typing import Literal
+from typing import Optional
+from typing import Union
 
 # Third-Party Imports
 import cachetools
@@ -25,11 +30,11 @@ __all__ = ["to_datetime"]
 
 
 def to_datetime(
-    __value: typing.Any,
+    __value: Any,
     /,
-    default: typing.Optional[datetime.datetime] = None,
-    timezone: typing.Optional[typing.Union[str, datetime.tzinfo]] = tzlocal(),
-) -> typing.Optional[datetime.datetime]:
+    default: Optional[datetime.datetime] = None,
+    timezone: Optional[Union[str, datetime.tzinfo]] = tzlocal(),
+) -> Optional[datetime.datetime]:
     """Convert value to ``datetime``.
 
     Args:
@@ -59,11 +64,11 @@ class DatetimeConverter(BaseConverter):
     def __init__(
         self,
         *,
-        default: typing.Optional[datetime.datetime] = None,
-        timezone: typing.Optional[typing.Union[str, datetime.tzinfo]] = None,
-        on_error: typing.Literal["default", "raise"] = "raise",
+        default: Optional[datetime.datetime] = None,
+        timezone: Optional[Union[str, datetime.tzinfo]] = None,
+        on_error: Literal["default", "raise"] = "raise",
     ) -> None:
-        if default and not isinstance(default, datetime.datetime):
+        if default and not isinstance(default, datetime.datetime):  # type: ignore
             message = f"expected type 'datetime', got {type(default)} instead"
             raise TypeError(message)
 
@@ -72,16 +77,14 @@ class DatetimeConverter(BaseConverter):
         self._conversions = self._conversions.new_child()
         self._timezone = timezone
 
-    def __call__(
-        self, __value: typing.Any, /
-    ) -> typing.Optional[datetime.datetime]:
+    def __call__(self, __value: Any, /) -> Optional[datetime.datetime]:
         dt = super().__call__(__value)
         result = self._add_timezone(dt)
         return result
 
     def _add_timezone(
-        self, __datetime: typing.Optional[datetime.datetime]
-    ) -> typing.Optional[datetime.datetime]:
+        self, __datetime: Optional[datetime.datetime]
+    ) -> Optional[datetime.datetime]:
         """Add timezone.
 
         Args:
@@ -98,12 +101,12 @@ class DatetimeConverter(BaseConverter):
             result = pytz.timezone(self._timezone).localize(__datetime)
             return result
 
-        result = __datetime.astimezone(self._timezone)
+        result = __datetime.astimezone(self._timezone)  # type: ignore
         return result
 
 
 def datetime_from_date(
-    __value: datetime.date, _: typing.Optional[datetime.datetime], /
+    __value: datetime.date, _: Optional[datetime.datetime], /
 ) -> datetime.datetime:
     """Convert date value to ``datetime``.
 
@@ -117,7 +120,7 @@ def datetime_from_date(
         TypeError: when value is not type 'date'.
 
     """
-    if not isinstance(__value, datetime.date):
+    if not isinstance(__value, datetime.date):  # type: ignore
         message = f"expected type 'date', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -127,7 +130,7 @@ def datetime_from_date(
 
 
 def datetime_from_datetime(
-    __value: datetime.datetime, _: typing.Optional[datetime.datetime], /
+    __value: datetime.datetime, _: Optional[datetime.datetime], /
 ) -> datetime.datetime:
     """Convert datetime value to ``datetime``.
 
@@ -141,7 +144,7 @@ def datetime_from_datetime(
         TypeError: when value is not type 'datetime'.
 
     """
-    if not isinstance(__value, datetime.datetime):
+    if not isinstance(__value, datetime.datetime):  # type: ignore
         message = f"expected type 'datetime', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -159,7 +162,7 @@ def datetime_from_datetime(
 
 
 def datetime_from_decimal(
-    __value: decimal.Decimal, _: typing.Optional[datetime.datetime], /
+    __value: decimal.Decimal, _: Optional[datetime.datetime], /
 ) -> datetime.datetime:
     """Convert decimal value to ``datetime``.
 
@@ -173,7 +176,7 @@ def datetime_from_decimal(
         TypeError: when value is not type 'Decimal'.
 
     """
-    if not isinstance(__value, decimal.Decimal):
+    if not isinstance(__value, decimal.Decimal):  # type: ignore
         message = f"expected type 'Decimal', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -182,7 +185,7 @@ def datetime_from_decimal(
 
 
 def datetime_from_float(
-    __value: float, _: typing.Optional[datetime.datetime], /
+    __value: float, _: Optional[datetime.datetime], /
 ) -> datetime.datetime:
     """Convert float value to ``datetime``.
 
@@ -209,7 +212,7 @@ def datetime_from_float(
 
 
 def datetime_from_serial_date(
-    __value: float, _: typing.Optional[datetime.datetime], /
+    __value: float, _: Optional[datetime.datetime], /
 ) -> datetime.datetime:
     """Convert serial date value to ``datetime``.
 
@@ -238,8 +241,8 @@ def datetime_from_serial_date(
 
 
 def datetime_from_int(
-    __value: int, _: typing.Optional[datetime.datetime], /
-) -> datetime.date:
+    __value: int, _: Optional[datetime.datetime], /
+) -> datetime.datetime:
     """Convert integer value to ``datetime``.
 
     Args:
@@ -252,7 +255,7 @@ def datetime_from_int(
         TypeError: when value is not type 'int'.
 
     """
-    if not isinstance(__value, int):
+    if not isinstance(__value, int):  # type: ignore
         message = f"expected type 'int', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -261,7 +264,7 @@ def datetime_from_int(
 
 
 def datetime_from_timestamp(
-    __value: typing.Union[float, int], _: typing.Optional[datetime.datetime], /
+    __value: Union[float, int], _: Optional[datetime.datetime], /
 ) -> datetime.datetime:
     """Convert timestamp value to ``datetime``.
 
@@ -285,8 +288,8 @@ def datetime_from_timestamp(
 
 @cachetools.cached(cachetools.LRUCache(maxsize=1000), hashkey)
 def datetime_from_str(
-    __value: str, default: typing.Optional[datetime.datetime] = None, /
-) -> typing.Optional[datetime.datetime]:
+    __value: str, default: Optional[datetime.datetime] = None, /
+) -> Optional[datetime.datetime]:
     """Convert string value to ``datetime``.
 
     Args:
@@ -301,7 +304,7 @@ def datetime_from_str(
         ValueError: when value cannot be converted to ``datetime``.
 
     """
-    if not isinstance(__value, str):
+    if not isinstance(__value, str):  # type: ignore
         message = f"expected type 'str', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -316,14 +319,14 @@ def datetime_from_str(
     return result
 
 
-DEFAULT_CONVERSIONS = {
+DEFAULT_CONVERSIONS: Dict[type, Callable[..., Optional[datetime.datetime]]] = {
     datetime.date: datetime_from_date,
     datetime.datetime: datetime_from_datetime,
     decimal.Decimal: datetime_from_decimal,
     float: datetime_from_float,
     int: datetime_from_int,
     str: datetime_from_str,
-}  # type: typing.Dict[type, typing.Callable]
+}
 
 
 # ----------------------------------------------------------------------------

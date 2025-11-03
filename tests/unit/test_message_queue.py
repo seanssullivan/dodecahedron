@@ -6,8 +6,8 @@
 import pytest
 
 # Local Imports
-from dodecahedron.messages import BaseMessage
-from dodecahedron.queue import MessageQueue
+from dodecahedron.messages import AbstractMessage
+from dodecahedron.queues import MessageQueue
 from .. import factories
 
 
@@ -26,7 +26,7 @@ def test_instantiates_message_queue_with_iterable() -> None:
 def test_raises_error_when_argument_not_iterable() -> None:
     """Tests that an error is raised when argument is not iterable."""
     with pytest.raises(TypeError):
-        MessageQueue(1)
+        MessageQueue(1)  # type: ignore
 
 
 def test_raises_error_when_argument_not_messages() -> None:
@@ -69,7 +69,7 @@ def test_appends_to_queue() -> None:
     queue = MessageQueue(factories.make_messages(3))
     assert len(queue) == 3
 
-    queue.append(BaseMessage())
+    queue.append(AbstractMessage())
     assert len(queue) == 4
 
 
@@ -83,10 +83,10 @@ def test_sorts_queue_after_appending_message() -> None:
 
 def test_extends_queue() -> None:
     """Tests that the queue can be extended with new messages."""
-    queue = MessageQueue([BaseMessage()])
+    queue = MessageQueue([AbstractMessage()])
     assert len(queue) == 1
 
-    queue.extend([BaseMessage(), BaseMessage()])
+    queue.extend([AbstractMessage(), AbstractMessage()])
     assert len(queue) == 3
 
 

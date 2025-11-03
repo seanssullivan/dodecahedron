@@ -10,7 +10,10 @@ Implementation based on 'Architecture Patterns in Python' repository pattern.
 
 # Standard Library Imports
 import abc
-import typing
+from typing import Any
+from typing import List
+from typing import Set
+from typing import Union
 
 # Local Imports
 from ..metaclasses import RepositoryMeta
@@ -23,12 +26,12 @@ class AbstractRepository(abc.ABC, metaclass=RepositoryMeta):
     """Represents an abstract repository."""
 
     @property
-    def seen(self) -> set:
+    def seen(self) -> Set[Any]:
         """Objects seen."""
         return getattr(self, SEEN_ATTR, set())
 
     @abc.abstractmethod
-    def add(self, obj: typing.Any) -> None:
+    def add(self, obj: Any) -> None:
         """Add object to repository.
 
         Args:
@@ -38,7 +41,7 @@ class AbstractRepository(abc.ABC, metaclass=RepositoryMeta):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get(self, ref: typing.Union[int, str]) -> typing.Any:
+    def get(self, ref: Union[int, str]) -> Any:
         """Get object from repository.
 
         Args:
@@ -51,7 +54,7 @@ class AbstractRepository(abc.ABC, metaclass=RepositoryMeta):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def list(self) -> list:
+    def list(self) -> List[Any]:
         """List objects in repository.
 
         Returns:
@@ -61,7 +64,7 @@ class AbstractRepository(abc.ABC, metaclass=RepositoryMeta):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def remove(self, obj: typing.Any) -> None:
+    def remove(self, obj: Any) -> None:
         """Remove object from repository.
 
         Args:

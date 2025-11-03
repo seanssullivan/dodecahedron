@@ -2,6 +2,7 @@
 """Tqdm Progress Bar."""
 
 # Standard Library Imports
+from typing import Any
 from typing import Optional
 from typing import Union
 
@@ -23,7 +24,7 @@ class TqdmProgressBar(AbstractProgressBar):
         total: Optional[Union[float, int]] = None,
         leave: bool = False,
         miniters: Union[float, int] = 1,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         self._progress_bar = tqdm(
             desc=desc,
@@ -45,7 +46,7 @@ class TqdmProgressBar(AbstractProgressBar):
 
     @leave.setter
     def leave(self, value: bool) -> None:
-        if not isinstance(value, bool):
+        if not isinstance(value, bool):  # type: ignore
             message = f"expected type 'bool', got {type(value)} instead"
             raise TypeError(message)
 
@@ -57,7 +58,7 @@ class TqdmProgressBar(AbstractProgressBar):
         return self._progress_bar.total
 
     @total.setter
-    def total(self, n: Union[float, int]) -> None:
+    def total(self, n: Any) -> None:
         if not isinstance(n, (float, int)):
             expected = "expected type 'float' or 'int'"
             actual = f"got {n} instead"

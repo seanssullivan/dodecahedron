@@ -3,7 +3,7 @@
 
 # Standard Library Imports
 import logging
-import typing
+from typing import Any
 
 # Local Imports
 from .file_system_repository import AbstractFileSystemRepository
@@ -24,7 +24,7 @@ class AbstractTxtRepository(AbstractFileSystemRepository):
 
     """
 
-    def __init__(self, __file: typing.Any, /, *args, **kwargs) -> None:
+    def __init__(self, __file: Any, /, *args: Any, **kwargs: Any) -> None:
         if not isinstance(__file, AbstractTxtWrapper):
             expected = "expected type 'AbstractTxtWrapper'"
             actual = f"got {type(__file)} instead"

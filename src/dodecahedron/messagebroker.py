@@ -11,15 +11,25 @@ from typing import Any
 from typing import Callable
 from typing import Dict
 from typing import List
+from typing import Literal
+from typing import Optional
 
 # Local Imports
 from .metaclasses import SingletonMeta
+from . import config
 
-__all__ = ["BaseMessageBroker"]
+__all__ = ["MessageBroker"]
 
 
 # Initialize logger.
 log = logging.getLogger("dodecahedron")
+
+# Custom types
+Subscriber = Callable[[Dict[str, Any]], None]
+
+# Constants
+IGNORE = "ignore"
+RAISE = "raise"
 
 
 class AbstractMessageBroker(abc.ABC):
@@ -33,7 +43,7 @@ class AbstractMessageBroker(abc.ABC):
 
     @property
     @abc.abstractmethod
-    def subscribers(self) -> Dict[str, List[Callable[[dict], Any]]]:
+    def subscribers(self) -> Dict[str, List[Subscriber]]:
         """Subscribers."""
         raise NotImplementedError
 
@@ -49,9 +59,7 @@ class AbstractMessageBroker(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def subscribe(
-        self, channel: str, subscriber: Callable[[dict], Any]
-    ) -> None:
+    def subscribe(self, channel: str, subscriber: Subscriber) -> None:
         """Add subscriber to channel.
 
         Args:
@@ -62,13 +70,13 @@ class AbstractMessageBroker(abc.ABC):
         raise NotImplementedError
 
 
-class BaseMessageBroker(AbstractMessageBroker, metaclass=SingletonMeta):
+class MessageBroker(AbstractMessageBroker, metaclass=SingletonMeta):
     """Implements a message broker."""
 
     __singleton__ = True
 
     def __init__(self) -> None:
-        self._subscribers = defaultdict(list)
+        self._subscribers: Dict[str, List[Subscriber]] = defaultdict(list)
 
     @property
     def channels(self) -> List[str]:
@@ -76,7 +84,7 @@ class BaseMessageBroker(AbstractMessageBroker, metaclass=SingletonMeta):
         return list(self._subscribers.keys())
 
     @property
-    def subscribers(self) -> Dict[str, List[Callable[[dict], Any]]]:
+    def subscribers(self) -> Dict[str, List[Subscriber]]:
         """Subscribers."""
         return self._subscribers
 
@@ -92,7 +100,7 @@ class BaseMessageBroker(AbstractMessageBroker, metaclass=SingletonMeta):
         self.send_message(channel, message)
 
     @staticmethod
-    def make_message(event: str, /) -> dict:
+    def make_message(event: str, /) -> Dict[str, Any]:
         """Make message to send to subscribers.
 
         Args:
@@ -102,7 +110,7 @@ class BaseMessageBroker(AbstractMessageBroker, metaclass=SingletonMeta):
             Message.
 
         """
-        message = {"data": event, "created_at": datetime.now()}
+        message: Dict[str, Any] = {"data": event, "created_at": datetime.now()}
         return message
 
     def send_message(
@@ -122,11 +130,11 @@ class BaseMessageBroker(AbstractMessageBroker, metaclass=SingletonMeta):
                     {"event": channel, "subscriber": subscriber},
                 )
                 subscriber(message)
-            except Exception:
-                log.exception("Exception handling %s event", channel)
+            except Exception as error:
+                handle_error(channel, error, on_error=IGNORE)
                 continue
 
-    def subscribe(self, channel: str, subscriber: Callable) -> None:
+    def subscribe(self, channel: str, subscriber: Subscriber) -> None:
         """Add subscriber to channel.
 
         Args:
@@ -135,3 +143,26 @@ class BaseMessageBroker(AbstractMessageBroker, metaclass=SingletonMeta):
 
         """
         self.subscribers[channel].append(subscriber)
+
+
+# ----------------------------------------------------------------------------
+# Helpers
+# ----------------------------------------------------------------------------
+def handle_error(
+    event: str,
+    error: Exception,
+    *,
+    on_error: Optional[Literal["ignore", "raise"]],
+) -> None:
+    """Handle error raised when handling event.
+
+    Args:
+        event: Event.
+        error: Error raised when handling event.
+        on_error: Strategy for handling errors.
+
+    """
+    exc_info = not config.is_production_environment()
+    log.error("Error handling %s", event, exc_info=exc_info)
+    if on_error == RAISE:
+        raise error

@@ -2,7 +2,7 @@
 """File-System Repository."""
 
 # Standard Library Imports
-import typing
+from typing import Any
 
 # Local Imports
 from .abstract_repository import AbstractRepository
@@ -19,7 +19,7 @@ class AbstractFileSystemRepository(AbstractRepository):
 
     """
 
-    def __init__(self, __file: typing.Any, /, *args, **kwargs) -> None:
+    def __init__(self, __file: Any, /, *args: Any, **kwargs: Any) -> None:
         if not isinstance(__file, AbstractFileSystemWrapper):
             expected = "expected type 'AbstractFileSystemWrapper'"
             actual = f"got {type(__file)} instead"
