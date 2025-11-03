@@ -6,27 +6,27 @@
 from unittest import mock
 
 # Local Imports
-from dodecahedron.messagebroker import BaseMessageBroker
+from dodecahedron.messagebroker import MessageBroker
 
 
 def test_instantiates_message_broker() -> None:
     """Tests that message broker can be instantiated."""
-    result = BaseMessageBroker()
-    assert isinstance(result, BaseMessageBroker)
+    result = MessageBroker()
+    assert isinstance(result, MessageBroker)
 
 
 def test_message_broker_is_singleton() -> None:
-    broker1 = BaseMessageBroker()
-    broker2 = BaseMessageBroker()
+    broker1 = MessageBroker()
+    broker2 = MessageBroker()
     assert broker1 is broker2
 
 
 def test_message_broker_maintains_subscribers() -> None:
     subscriber = mock.Mock()
 
-    broker1 = BaseMessageBroker()
+    broker1 = MessageBroker()
     broker1.subscribe("test", subscriber)
 
-    broker2 = BaseMessageBroker()
+    broker2 = MessageBroker()
     results = broker2.subscribers["test"]
     assert subscriber in results

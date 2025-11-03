@@ -2,7 +2,9 @@
 """File Extension Utility Functions."""
 
 # Standard Library Imports
-import pathlib
+from os import PathLike
+from pathlib import PurePath
+from typing import Any
 from typing import TypeVar
 from typing import Union
 
@@ -19,7 +21,9 @@ T = TypeVar("T")
 
 
 def raise_for_extension(
-    __file: Union[pathlib.Path, str], /, extension: str
+    __file: Union["PathLike[Any]", PurePath, str],
+    /,
+    extension: str,
 ) -> None:
     """Raise for incorrect file extension.
 
@@ -32,12 +36,16 @@ def raise_for_extension(
 
     """
     if not has_extension(__file, extension):
-        filename = pathlib.Path(__file).name
+        filename = PurePath(__file).name
         message = f"{filename!s} is not a '{extension!s}' file"
         raise ValueError(message)
 
 
-def has_extension(__file: Union[pathlib.Path, str], /, extension: str) -> bool:
+def has_extension(
+    __file: Union["PathLike[Any]", PurePath, str],
+    /,
+    extension: str,
+) -> bool:
     """Check whether file has expected extension.
 
     Args:
@@ -52,15 +60,19 @@ def has_extension(__file: Union[pathlib.Path, str], /, extension: str) -> bool:
         TypeError: when `extension` is not type `str`.
 
     """
-    if not isinstance(__file, (pathlib.Path, str)):
-        message = f"expected type 'Path' or 'str', got {type(__file)} instead"
+    if not isinstance(__file, (PathLike, PurePath, str)):  # type: ignore
+        expected = "expected type 'PathLike', 'Path' or 'str'"
+        actual = f"got {type(__file)} instead"
+        message = ", ".join([expected, actual])
         raise TypeError(message)
 
-    if isinstance(__file, pathlib.Path):
+    if isinstance(__file, PurePath):
         return filepath_has_extension(__file, extension)
 
-    if isinstance(__file, str):
+    if isinstance(__file, str):  # type: ignore
         return filename_has_extension(__file, extension)
+
+    return False
 
 
 def filename_has_extension(__filename: str, /, extension: str) -> bool:
@@ -78,11 +90,11 @@ def filename_has_extension(__filename: str, /, extension: str) -> bool:
         TypeError: when `extension` is not type `str`.
 
     """
-    if not isinstance(__filename, str):
+    if not isinstance(__filename, str):  # type: ignore
         message = f"expected type 'str', got {type(__filename)} instead"
         raise TypeError(message)
 
-    if not isinstance(extension, str):
+    if not isinstance(extension, str):  # type: ignore
         message = f"expected type 'str', got {type(extension)} instead"
         raise TypeError(message)
 
@@ -91,9 +103,7 @@ def filename_has_extension(__filename: str, /, extension: str) -> bool:
     return result
 
 
-def filepath_has_extension(
-    __filepath: pathlib.Path, /, extension: str
-) -> bool:
+def filepath_has_extension(__filepath: PurePath, /, extension: str) -> bool:
     """Check whether filepath has expected extension.
 
     Args:
@@ -108,11 +118,11 @@ def filepath_has_extension(
         TypeError: when `extension` is not type `str`.
 
     """
-    if not isinstance(__filepath, pathlib.Path):
+    if not isinstance(__filepath, PurePath):  # type: ignore
         message = f"expected type 'Path', got {type(__filepath)} instead"
         raise TypeError(message)
 
-    if not isinstance(extension, str):
+    if not isinstance(extension, str):  # type: ignore
         message = f"expected type 'str', got {type(extension)} instead"
         raise TypeError(message)
 
@@ -137,14 +147,14 @@ def set_extension(__file: T, extension: str) -> T:
         TypeError: when `extension` is not type `str`.
 
     """
-    if not isinstance(__file, (pathlib.Path, str)):
+    if not isinstance(__file, (PurePath, str)):
         message = f"expected type 'Path' or 'str', got {type(__file)} instead"
         raise TypeError(message)
 
-    if isinstance(__file, pathlib.Path):
+    if isinstance(__file, PurePath):
         return set_extension_on_filepath(__file, extension)
 
-    if isinstance(__file, str):
+    if isinstance(__file, str):  # type: ignore
         return set_extension_on_filename(__file, extension)
 
 
@@ -163,11 +173,11 @@ def set_extension_on_filename(filename: str, extension: str) -> str:
         TypeError: when `extension` is not type `str`.
 
     """
-    if not isinstance(filename, str):
+    if not isinstance(filename, str):  # type: ignore
         message = f"expected type 'str', got {type(filename)} instead"
         raise TypeError(message)
 
-    if not isinstance(extension, str):
+    if not isinstance(extension, str):  # type: ignore
         message = f"expected type 'str', got {type(extension)} instead"
         raise TypeError(message)
 
@@ -180,9 +190,7 @@ def set_extension_on_filename(filename: str, extension: str) -> str:
     return result
 
 
-def set_extension_on_filepath(
-    filepath: pathlib.Path, extension: str
-) -> pathlib.Path:
+def set_extension_on_filepath(filepath: PurePath, extension: str) -> PurePath:
     """Set extension on filepath.
 
     Args:
@@ -197,11 +205,11 @@ def set_extension_on_filepath(
         TypeError: when `extension` is not type `str`.
 
     """
-    if not isinstance(filepath, pathlib.Path):
+    if not isinstance(filepath, PurePath):  # type: ignore
         message = f"expected type 'Path', got {type(filepath)} instead"
         raise TypeError(message)
 
-    if not isinstance(extension, str):
+    if not isinstance(extension, str):  # type: ignore
         message = f"expected type 'str', got {type(extension)} instead"
         raise TypeError(message)
 
@@ -224,7 +232,7 @@ def standardize_file_extension(extension: str) -> str:
         TypeError: when `extension` is not type `str`.
 
     """
-    if not isinstance(extension, str):
+    if not isinstance(extension, str):  # type: ignore
         message = f"expected type 'str', got {type(extension)} instead"
         raise TypeError(message)
 

@@ -4,10 +4,18 @@
 # Standard Library Imports
 from __future__ import annotations
 import abc
-import collections
 import csv
 import os
-import typing
+from typing import Any
+from typing import Collection
+from typing import Dict
+from typing import IO
+from typing import Iterable
+from typing import Iterator
+from typing import List
+from typing import Optional
+from typing import Sequence
+from typing import Union
 
 # Local Imports
 from .abstract_file_wrappers import AbstractDirectoryWrapper
@@ -22,6 +30,7 @@ __all__ = [
     "AbstractCsvWrapper",
     "CsvDirectoryWrapper",
     "CsvFileWrapper",
+    "CsvIOWrapper",
 ]
 
 
@@ -36,13 +45,13 @@ class AbstractCsvWrapper(AbstractTextWrapper):
 
     @property
     @abc.abstractmethod
-    def dialect(self) -> typing.Union[csv.Dialect, str]:
+    def dialect(self) -> Union[csv.Dialect, str]:
         """Dialect."""
         raise NotImplementedError
 
     @property
     @abc.abstractmethod
-    def fieldnames(self) -> typing.Optional[typing.Sequence]:
+    def fieldnames(self) -> Sequence[str]:
         """Fieldnames."""
         raise NotImplementedError
 
@@ -52,7 +61,7 @@ class AbstractCsvWrapper(AbstractTextWrapper):
         """Quote character."""
         raise NotImplementedError
 
-    def _init_csv_io_wrapper(self, __file: typing.IO, /) -> CsvIOWrapper:
+    def _init_csv_io_wrapper(self, __file: IO[Any], /) -> CsvIOWrapper:
         """Initialize I/O wrapper for `.csv` file.
 
         Args:
@@ -84,12 +93,12 @@ class CsvDirectoryWrapper(AbstractCsvWrapper, AbstractDirectoryWrapper):
 
     def __init__(
         self,
-        directory: os.PathLike,
+        directory: "os.PathLike[Any]",
         *,
         delimiter: str = settings.DEFAULT_CSV_DELIMITER,
-        dialect: typing.Union[csv.Dialect, str] = settings.DEFAULT_CSV_DIALECT,
+        dialect: Union[csv.Dialect, str] = settings.DEFAULT_CSV_DIALECT,
         encoding: str = settings.DEFAULT_FILE_ENCODING,
-        fieldnames: typing.Optional[typing.Sequence] = None,
+        fieldnames: Optional[Sequence[str]] = None,
         newline: str = settings.DEFAULT_CSV_NEWLINE,
         quotechar: str = settings.DEFAULT_CSV_QUOTECHAR,
         read_only: bool = False,
@@ -103,7 +112,7 @@ class CsvDirectoryWrapper(AbstractCsvWrapper, AbstractDirectoryWrapper):
         )
         self._delimiter = delimiter
         self._dialect = dialect
-        self._fieldnames = fieldnames
+        self._fieldnames = fieldnames or []
         self._quotechar = quotechar
 
     @property
@@ -112,12 +121,12 @@ class CsvDirectoryWrapper(AbstractCsvWrapper, AbstractDirectoryWrapper):
         return self._delimiter
 
     @property
-    def dialect(self) -> typing.Union[csv.Dialect, str]:
+    def dialect(self) -> Union[csv.Dialect, str]:
         """Dialect."""
         return self._dialect
 
     @property
-    def fieldnames(self) -> typing.Optional[typing.Sequence]:
+    def fieldnames(self) -> Sequence[str]:
         """Fieldnames."""
         return self._fieldnames
 
@@ -165,12 +174,12 @@ class CsvFileWrapper(AbstractCsvWrapper, AbstractFileWrapper):
 
     def __init__(
         self,
-        filepath: os.PathLike,
+        filepath: "os.PathLike[Any]",
         *,
         delimiter: str = settings.DEFAULT_CSV_DELIMITER,
-        dialect: typing.Union[csv.Dialect, str] = settings.DEFAULT_CSV_DIALECT,
+        dialect: Union[csv.Dialect, str] = settings.DEFAULT_CSV_DIALECT,
         encoding: str = settings.DEFAULT_FILE_ENCODING,
-        fieldnames: typing.Optional[typing.Sequence] = None,
+        fieldnames: Optional[Sequence[str]] = None,
         newline: str = settings.DEFAULT_CSV_NEWLINE,
         quotechar: str = settings.DEFAULT_CSV_QUOTECHAR,
         read_only: bool = False,
@@ -185,7 +194,7 @@ class CsvFileWrapper(AbstractCsvWrapper, AbstractFileWrapper):
 
         self._delimiter = delimiter
         self._dialect = dialect
-        self._fieldnames = fieldnames
+        self._fieldnames = fieldnames or []
         self._quotechar = quotechar
 
     @property
@@ -194,12 +203,12 @@ class CsvFileWrapper(AbstractCsvWrapper, AbstractFileWrapper):
         return self._delimiter
 
     @property
-    def dialect(self) -> typing.Union[csv.Dialect, str]:
+    def dialect(self) -> Union[csv.Dialect, str]:
         """Dialect."""
         return self._dialect
 
     @property
-    def fieldnames(self) -> typing.Optional[typing.Sequence]:
+    def fieldnames(self) -> Sequence[str]:
         """Fieldnames."""
         return self._fieldnames
 
@@ -226,12 +235,12 @@ class CsvFileWrapper(AbstractCsvWrapper, AbstractFileWrapper):
 class CsvIOWrapper(AbstractIOWrapper):
     """Implements a I/O wrapper for `.csv` files."""
 
-    def __init__(self, __file: typing.IO) -> None:
+    def __init__(self, __file: IO[Any]) -> None:
         self._file = __file
-        self._context = None  # type: typing.Optional[AbstractCsvWrapper]
+        self._context: Optional[AbstractCsvWrapper] = None
 
     @property
-    def file(self) -> typing.IO:
+    def file(self) -> IO[Any]:
         """File."""
         return self._file
 
@@ -241,14 +250,14 @@ class CsvIOWrapper(AbstractIOWrapper):
         return self._file.closed
 
     @property
-    def delimiter(self) -> typing.Optional[str]:
+    def delimiter(self) -> Optional[str]:
         """Delimiter."""
         default = getattr(self._context, "delimiter", None)
         result = getattr(self, "_delimiter", default)
         return result
 
     @delimiter.setter
-    def delimiter(self, value: typing.Any) -> None:
+    def delimiter(self, value: Any) -> None:
         if not isinstance(value, str):
             message = f"expected type 'str', got {type(value)} instead"
             raise TypeError(message)
@@ -256,14 +265,14 @@ class CsvIOWrapper(AbstractIOWrapper):
         setattr(self, "_delimiter", value)
 
     @property
-    def dialect(self) -> typing.Optional[typing.Union[csv.Dialect, str]]:
+    def dialect(self) -> Optional[Union[csv.Dialect, str]]:
         """Dialect."""
         default = getattr(self._context, "dialect", None)
         result = getattr(self, "_dialect", default)
         return result
 
     @dialect.setter
-    def dialect(self, value: typing.Any) -> None:
+    def dialect(self, value: Any) -> None:
         if not isinstance(value, (csv.Dialect, str)):
             expected = "expected type 'Dialect' or 'str'"
             actual = f"got {type(value)} instead"
@@ -273,29 +282,29 @@ class CsvIOWrapper(AbstractIOWrapper):
         setattr(self, "_dialect", value)
 
     @property
-    def fieldnames(self) -> typing.Optional[typing.Sequence]:
+    def fieldnames(self) -> Sequence[str]:
         """Fieldnames."""
-        default = getattr(self._context, "fieldnames", None)
+        default = getattr(self._context, "fieldnames", [])
         result = getattr(self, "_fieldnames", default)
         return result
 
     @fieldnames.setter
-    def fieldnames(self, value: typing.Any) -> None:
-        if not isinstance(value, typing.Sequence):
+    def fieldnames(self, value: Any) -> None:
+        if not isinstance(value, Sequence):
             message = f"expected type 'Sequence', got {type(value)} instead"
             raise TypeError(message)
 
         setattr(self, "_fieldnames", value)
 
     @property
-    def quotechar(self) -> typing.Optional[str]:
+    def quotechar(self) -> Optional[str]:
         """Delimiter."""
         default = getattr(self._context, "quotechar", None)
         result = getattr(self, "_quotechar", default)
         return result
 
     @quotechar.setter
-    def quotechar(self, value: typing.Any) -> None:
+    def quotechar(self, value: Any) -> None:
         if not isinstance(value, str):
             message = f"expected type 'str', got {type(value)} instead"
             raise TypeError(message)
@@ -318,7 +327,7 @@ class CsvIOWrapper(AbstractIOWrapper):
         """Close `.csv` file."""
         self._file.close()
 
-    def read(self, size: typing.Optional[int] = None, /) -> str:
+    def read(self, size: int = -1, /) -> str:
         """Read content of `.csv` file.
 
         Returns:
@@ -338,7 +347,7 @@ class CsvIOWrapper(AbstractIOWrapper):
         result = self._file.readline(size)
         return result
 
-    def readlines(self, hint: int = -1, /) -> str:
+    def readlines(self, hint: int = -1, /) -> List[Any]:
         """Read lines from `.csv` file.
 
         Returns:
@@ -348,7 +357,7 @@ class CsvIOWrapper(AbstractIOWrapper):
         result = self._file.readlines(hint)
         return result
 
-    def read_record(self) -> dict:
+    def read_record(self) -> Dict[str, Any]:
         """Read record from `.csv` file.
 
         Returns:
@@ -356,14 +365,18 @@ class CsvIOWrapper(AbstractIOWrapper):
 
         """
         reader = self._get_record_reader()
-        result = reader.read_record()
+        result: Dict[str, Any] = reader.read_record()
+
+        print(self.fieldnames)
+        print(reader.fieldnames)
+        print(result)
 
         if not self.fieldnames:
             self.fieldnames = reader.fieldnames
 
         return result
 
-    def read_records(self) -> typing.List[dict]:
+    def read_records(self) -> List[Dict[str, Any]]:
         """Read records from `.csv` file.
 
         Returns:
@@ -388,7 +401,7 @@ class CsvIOWrapper(AbstractIOWrapper):
         if not hasattr(self, "_record_reader"):
             self._start_record_reader()
 
-        result = getattr(self, "_record_reader")  # type: _CsvRecordReader
+        result: _CsvRecordReader = getattr(self, "_record_reader")
         return result
 
     def _start_record_reader(self) -> None:
@@ -396,7 +409,7 @@ class CsvIOWrapper(AbstractIOWrapper):
         reader = _CsvRecordReader(self)
         setattr(self, "_record_reader", reader)
 
-    def read_row(self) -> list:
+    def read_row(self) -> List[str]:
         """Read row from `.csv` file.
 
         Returns:
@@ -411,7 +424,7 @@ class CsvIOWrapper(AbstractIOWrapper):
 
         return result
 
-    def read_rows(self) -> typing.List[list]:
+    def read_rows(self) -> List[List[str]]:
         """Read rows from `.csv` file.
 
         Returns:
@@ -436,7 +449,7 @@ class CsvIOWrapper(AbstractIOWrapper):
         if not hasattr(self, "_row_reader"):
             self._start_row_reader()
 
-        result = getattr(self, "_row_reader")  # type: _CsvRowReader
+        result: _CsvRowReader = getattr(self, "_row_reader")
         return result
 
     def _start_row_reader(self) -> None:
@@ -444,7 +457,7 @@ class CsvIOWrapper(AbstractIOWrapper):
         reader = _CsvRowReader(self)
         setattr(self, "_row_reader", reader)
 
-    def write(self, content: str, /) -> None:
+    def write(self, content: str, /) -> int:  # type: ignore
         """Write content to `.txt` file.
 
         Args:
@@ -454,7 +467,7 @@ class CsvIOWrapper(AbstractIOWrapper):
         result = self._file.write(content)
         return result
 
-    def writelines(self, lines: typing.Iterable[str], /) -> None:
+    def writelines(self, lines: Iterable[str], /) -> None:  # type: ignore
         """Write lines to `.txt` file.
 
         Args:
@@ -469,7 +482,7 @@ class CsvIOWrapper(AbstractIOWrapper):
         writer = self._get_record_writer()
         writer.write_header()
 
-    def write_record(self, record: dict, /) -> None:
+    def write_record(self, record: Dict[str, Any], /) -> None:
         """Write record to `.csv` file.
 
         Args:
@@ -479,7 +492,7 @@ class CsvIOWrapper(AbstractIOWrapper):
         writer = self._get_record_writer()
         writer.write_record(record)
 
-    def write_records(self, records: typing.Iterable[dict], /) -> None:
+    def write_records(self, records: Iterable[Dict[str, Any]], /) -> None:
         """Write records to `.csv` file.
 
         Args:
@@ -499,7 +512,7 @@ class CsvIOWrapper(AbstractIOWrapper):
         if not hasattr(self, "_record_writer"):
             self._start_record_writer()
 
-        result = getattr(self, "_record_writer")  # type: _CsvRecordWriter
+        result: _CsvRecordWriter = getattr(self, "_record_writer")
         return result
 
     def _start_record_writer(self) -> None:
@@ -507,7 +520,7 @@ class CsvIOWrapper(AbstractIOWrapper):
         writer = _CsvRecordWriter(self)
         setattr(self, "_record_writer", writer)
 
-    def write_row(self, row: typing.Iterable, /) -> None:
+    def write_row(self, row: Iterable[Any], /) -> None:
         """Write row to `.csv` file.
 
         Args:
@@ -517,7 +530,7 @@ class CsvIOWrapper(AbstractIOWrapper):
         writer = self._get_row_writer()
         writer.write_row(row)
 
-    def write_rows(self, rows: typing.Iterable[typing.Iterable], /) -> None:
+    def write_rows(self, rows: Iterable[Iterable[Any]], /) -> None:
         """Write rows to `.csv` file.
 
         Args:
@@ -537,7 +550,7 @@ class CsvIOWrapper(AbstractIOWrapper):
         if not hasattr(self, "_writer"):
             self._start_row_writer()
 
-        result = getattr(self, "_writer")  # type: _CsvRowWriter
+        result: _CsvRowWriter = getattr(self, "_writer")
         return result
 
     def _start_row_writer(self) -> None:
@@ -546,25 +559,25 @@ class CsvIOWrapper(AbstractIOWrapper):
         setattr(self, "_writer", writer)
 
 
-class _CsvRecordReader(collections.abc.Iterator):
+class _CsvRecordReader(Iterator[Any]):
     """Implements a record reader for `.csv` files."""
 
     def __init__(self, __wrapper: "CsvIOWrapper", /) -> None:
         self._reader = csv.DictReader(
             __wrapper.file,
-            fieldnames=__wrapper.fieldnames,
-            dialect=__wrapper.dialect,
-            delimiter=__wrapper.delimiter,
+            fieldnames=__wrapper.fieldnames or None,
+            dialect=__wrapper.dialect or settings.DEFAULT_CSV_DIALECT,
+            delimiter=__wrapper.delimiter or settings.DEFAULT_CSV_DELIMITER,
             quotechar=__wrapper.quotechar,
         )
 
     @property
-    def fieldnames(self) -> typing.Optional[typing.Sequence]:
+    def fieldnames(self) -> Sequence[str]:
         """Fieldnames."""
-        return self._reader.fieldnames
+        return self._reader.fieldnames or []
 
     @fieldnames.setter
-    def fieldnames(self, fieldnames: typing.Sequence) -> None:
+    def fieldnames(self, fieldnames: Sequence[str]) -> None:
         self._reader.fieldnames = fieldnames
 
     @property
@@ -572,11 +585,11 @@ class _CsvRecordReader(collections.abc.Iterator):
         """Row number."""
         return self._reader.line_num
 
-    def __next__(self) -> typing.List[dict]:
+    def __next__(self) -> Dict[str, Any]:
         result = self.read_record()
         return result
 
-    def read_record(self) -> None:
+    def read_record(self) -> Dict[str, Any]:
         """Read record from `.csv` file.
 
         Returns
@@ -586,7 +599,7 @@ class _CsvRecordReader(collections.abc.Iterator):
         result = next(self._reader)
         return result
 
-    def read_records(self) -> typing.List[typing.List[str]]:
+    def read_records(self) -> List[Dict[str, Any]]:
         """Read records from `.csv` file.
 
         Returns:
@@ -604,19 +617,19 @@ class _CsvRecordWriter:
         self._writer = csv.DictWriter(
             __wrapper.file,
             fieldnames=__wrapper.fieldnames,
-            dialect=__wrapper.dialect,
-            delimiter=__wrapper.delimiter,
+            dialect=__wrapper.dialect or settings.DEFAULT_CSV_DIALECT,
+            delimiter=__wrapper.delimiter or settings.DEFAULT_CSV_DELIMITER,
             quotechar=__wrapper.quotechar,
         )
         self._row_num = 0
 
     @property
-    def fieldnames(self) -> typing.Optional[typing.Sequence]:
+    def fieldnames(self) -> Collection[str]:
         """Fieldnames."""
         return self._writer.fieldnames
 
     @fieldnames.setter
-    def fieldnames(self, fieldnames: typing.Sequence) -> None:
+    def fieldnames(self, fieldnames: Collection[str]) -> None:
         self._writer.fieldnames = fieldnames
 
     @property
@@ -629,7 +642,7 @@ class _CsvRecordWriter:
         self._writer.writeheader()
         self._row_num += 1
 
-    def write_record(self, __record: dict, /) -> None:
+    def write_record(self, __record: Dict[str, Any], /) -> None:
         """Write record to `.csv` file.
 
         Args:
@@ -639,7 +652,7 @@ class _CsvRecordWriter:
         self._writer.writerow(__record)
         self._row_num += 1
 
-    def write_records(self, __records: typing.Iterable[dict], /) -> None:
+    def write_records(self, __records: Iterable[Dict[str, Any]], /) -> None:
         """Write records to `.csv` file.
 
         Args:
@@ -647,28 +660,28 @@ class _CsvRecordWriter:
 
         """
         self._writer.writerows(__records)
-        self._row_num += len(__records)
+        self._row_num += len(list(__records))
 
 
-class _CsvRowReader(collections.abc.Iterator):
+class _CsvRowReader(Iterator[Any]):
     """Implements a row reader for `.csv` files."""
 
     def __init__(self, __wrapper: "CsvIOWrapper") -> None:
         self._reader = csv.reader(
             __wrapper.file,
-            __wrapper.dialect,
-            delimiter=__wrapper.delimiter,
+            __wrapper.dialect or settings.DEFAULT_CSV_DIALECT,
+            delimiter=__wrapper.delimiter or settings.DEFAULT_CSV_DELIMITER,
             quotechar=__wrapper.quotechar,
         )
         self._fieldnames = __wrapper.fieldnames
 
     @property
-    def fieldnames(self) -> typing.Optional[typing.Sequence]:
+    def fieldnames(self) -> Sequence[str]:
         """Fieldnames."""
-        return self._fieldnames
+        return self._fieldnames or []
 
     @fieldnames.setter
-    def fieldnames(self, fieldnames: typing.Sequence) -> None:
+    def fieldnames(self, fieldnames: Sequence[str]) -> None:
         self._fieldnames = fieldnames
 
     @property
@@ -676,11 +689,11 @@ class _CsvRowReader(collections.abc.Iterator):
         """Row number."""
         return self._reader.line_num
 
-    def __next__(self) -> typing.List[str]:
+    def __next__(self) -> List[str]:
         result = self.read_row()
         return result
 
-    def read_row(self) -> None:
+    def read_row(self) -> List[str]:
         """Read row from `.csv` file.
 
         Returns
@@ -697,7 +710,7 @@ class _CsvRowReader(collections.abc.Iterator):
         result = next(self._reader)
         return result
 
-    def read_rows(self) -> typing.List[typing.List[str]]:
+    def read_rows(self) -> List[List[str]]:
         """Read rows from `.csv` file.
 
         Returns:
@@ -732,7 +745,7 @@ class _CsvRowReader(collections.abc.Iterator):
 
         self.fieldnames = next(self._reader)
 
-    def _read_first_row(self) -> typing.List[str]:
+    def _read_first_row(self) -> List[str]:
         """Read first row.
 
         Args:
@@ -753,7 +766,7 @@ class _CsvRowReader(collections.abc.Iterator):
         result = next(self._reader)
         return result
 
-    def _is_header(self, row: typing.Sequence) -> bool:
+    def _is_header(self, row: Sequence[Any]) -> bool:
         """Check whether row is header.
 
         Args:
@@ -780,20 +793,20 @@ class _CsvRowWriter:
     def __init__(self, __wrapper: "CsvIOWrapper") -> None:
         self._writer = csv.writer(
             __wrapper.file,
-            __wrapper.dialect,
-            delimiter=__wrapper.delimiter,
+            __wrapper.dialect or settings.DEFAULT_CSV_DIALECT,
+            delimiter=__wrapper.delimiter or settings.DEFAULT_CSV_DELIMITER,
             quotechar=__wrapper.quotechar,
         )
         self._fieldnames = __wrapper.fieldnames
         self._row_num = 0
 
     @property
-    def fieldnames(self) -> typing.Optional[typing.Sequence]:
+    def fieldnames(self) -> Sequence[str]:
         """Fieldnames."""
-        return self._fieldnames
+        return self._fieldnames or []
 
     @fieldnames.setter
-    def fieldnames(self, fieldnames: typing.Sequence) -> None:
+    def fieldnames(self, fieldnames: Sequence[str]) -> None:
         self._fieldnames = fieldnames
 
     @property
@@ -805,7 +818,7 @@ class _CsvRowWriter:
         """Write header."""
         self.write_row(self.fieldnames)
 
-    def write_row(self, __row: typing.Iterable, /) -> None:
+    def write_row(self, __row: Iterable[Any], /) -> None:
         """Write row to `.csv` file.
 
         Args:
@@ -815,7 +828,7 @@ class _CsvRowWriter:
         self._writer.writerow(__row)
         self._row_num += 1
 
-    def write_rows(self, __rows: typing.Iterable[typing.Iterable], /) -> None:
+    def write_rows(self, __rows: Iterable[Iterable[Any]], /) -> None:
         """Write rows to `.csv` file.
 
         Args:
@@ -823,4 +836,4 @@ class _CsvRowWriter:
 
         """
         self._writer.writerows(__rows)
-        self._row_num += len(__rows)
+        self._row_num += len(list(__rows))

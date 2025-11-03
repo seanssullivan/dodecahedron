@@ -19,7 +19,7 @@ from dodecahedron.wrappers.json_file_wrappers import JsonIOWrapper
 
 def test_raises_error_when_filepath_argument_is_not_path() -> None:
     with pytest.raises(TypeError, match="expected type 'PathLike'"):
-        JsonFileWrapper("failure.json")
+        JsonFileWrapper("failure.json")  # type: ignore
 
 
 def test_raises_error_when_encoding_argument_is_not_str(
@@ -27,7 +27,7 @@ def test_raises_error_when_encoding_argument_is_not_str(
 ) -> None:
     with pytest.raises(TypeError, match="expected type 'str'"):
         path = make_json_file("test.json", "")
-        JsonFileWrapper(path, encoding=1)
+        JsonFileWrapper(path, encoding=1)  # type: ignore
 
 
 def test_raises_error_when_filepath_argument_is_a_directory(

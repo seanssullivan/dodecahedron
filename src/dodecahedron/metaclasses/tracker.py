@@ -7,7 +7,10 @@ from types import FunctionType
 from types import MethodType
 from typing import Any
 from typing import Callable
+from typing import Dict
 from typing import Sequence
+from typing import Set
+from typing import Tuple
 from typing import Type
 from typing import TypeVar
 import warnings
@@ -29,17 +32,23 @@ T = TypeVar("T")
 class TrackerMeta(abc.ABCMeta):
     """Metaclass for tracking child objects."""
 
-    def __new__(meta, name: str, bases, namespace: dict, **kwargs) -> type:
+    def __new__(
+        meta,  # type: ignore
+        name: str,
+        bases: Tuple[type, ...],
+        namespace: Dict[str, Any],
+        **kwargs: Any,
+    ) -> type:
         wrapped_attrs = meta.wrap_attributes(namespace)
         return super().__new__(meta, name, bases, wrapped_attrs, **kwargs)
 
-    def __call__(cls: Type[T], *args, **kwargs) -> T:
+    def __call__(cls: Type[T], *args: Any, **kwargs: Any) -> T:
         instance = super().__call__(*args, **kwargs)
         setattr(instance, SEEN_ATTR, set())
         return instance
 
     @classmethod
-    def wrap_attributes(cls, attrs: dict) -> dict:
+    def wrap_attributes(cls, attrs: Dict[str, Any]) -> Dict[str, Any]:
         """Wrap attributes.
 
          Args:
@@ -60,7 +69,7 @@ class TrackerMeta(abc.ABCMeta):
         return results
 
     @classmethod
-    def wrap_method(cls, name: str, method: Any) -> Callable:
+    def wrap_method(cls, name: str, method: Any) -> Callable[..., Any]:
         """Wrap method.
 
         Args:
@@ -89,7 +98,9 @@ class TrackerMeta(abc.ABCMeta):
         return method
 
 
-def track_first_positional_argument(method: Callable, /) -> Callable:
+def track_first_positional_argument(
+    method: Callable[..., Any], /
+) -> Callable[..., Any]:
     """Track first positional argument passed to method.
 
     Args:
@@ -107,7 +118,7 @@ def track_first_positional_argument(method: Callable, /) -> Callable:
         raise TypeError(message)
 
     @functools.wraps(method)
-    def wrapper(self, obj: object, /, *args, **kwargs) -> Any:
+    def wrapper(self: Any, obj: object, /, *args: Any, **kwargs: Any) -> Any:
         """Wrapper applied to decorated method.
 
         Args:
@@ -130,7 +141,9 @@ def track_first_positional_argument(method: Callable, /) -> Callable:
     return wrapper
 
 
-def track_multiple_return_values(method: Callable, /) -> Callable:
+def track_multiple_return_values(
+    method: Callable[..., Any], /
+) -> Callable[..., Any]:
     """Track all values returned from method.
 
     Args:
@@ -148,7 +161,7 @@ def track_multiple_return_values(method: Callable, /) -> Callable:
         raise TypeError(message)
 
     @functools.wraps(method)
-    def wrapper(self, *args, **kwargs) -> Sequence:
+    def wrapper(self: Any, *args: Any, **kwargs: Any) -> Sequence[Any]:
         """Wrapper applied to decorated method.
 
         Args:
@@ -169,7 +182,9 @@ def track_multiple_return_values(method: Callable, /) -> Callable:
     return wrapper
 
 
-def track_single_return_value(method: Callable, /) -> Callable:
+def track_single_return_value(
+    method: Callable[..., Any], /
+) -> Callable[..., Any]:
     """Track each value returned from method.
 
     Args:
@@ -187,7 +202,7 @@ def track_single_return_value(method: Callable, /) -> Callable:
         raise TypeError(message)
 
     @functools.wraps(method)
-    def wrapper(self, *args, **kwargs) -> Any:
+    def wrapper(self: Any, *args: Any, **kwargs: Any) -> Any:
         """Wrapper applied to decorated method.
 
         Args:
@@ -221,14 +236,15 @@ def add_seen_object(parent: Any, child: Any) -> None:
     """
     try:
         set_default_attr(parent, SEEN_ATTR, set())
-        seen = getattr(parent, SEEN_ATTR)  # type: set
+        seen: Set[Any] = getattr(parent, SEEN_ATTR)
         seen.add(child)
+
     except TypeError:
         message = "Tracking decorator does not support unhashable objects"
         warnings.warn(message)
 
 
-def update_seen_objects(parent: Any, children: Sequence) -> None:
+def update_seen_objects(parent: Any, children: Sequence[Any]) -> None:
     """Add results to seen objects.
 
     Args:
@@ -238,8 +254,9 @@ def update_seen_objects(parent: Any, children: Sequence) -> None:
     """
     try:
         set_default_attr(parent, SEEN_ATTR, set())
-        seen = getattr(parent, SEEN_ATTR)  # type: set
+        seen: Set[Any] = getattr(parent, SEEN_ATTR)
         seen.update(children)
+
     except TypeError:
         message = "Tracking decorator does not support unhashable objects"
         warnings.warn(message)

@@ -6,7 +6,10 @@ from __future__ import annotations
 import logging
 import io
 import os
-import typing
+from typing import Any
+from typing import Iterable
+from typing import List
+from typing import Optional
 
 # Local Imports
 from .abstract_file_wrappers import AbstractDirectoryWrapper
@@ -71,10 +74,10 @@ class TxtDirectoryWrapper(AbstractTxtWrapper, AbstractDirectoryWrapper):
 
     def __init__(
         self,
-        directory: os.PathLike,
+        directory: "os.PathLike[Any]",
         *,
         encoding: str = settings.DEFAULT_FILE_ENCODING,
-        newline: typing.Optional[str] = None,
+        newline: Optional[str] = None,
         read_only: bool = False,
     ) -> None:
         super().__init__(
@@ -120,10 +123,10 @@ class TxtFileWrapper(AbstractTxtWrapper, AbstractFileWrapper):
 
     def __init__(
         self,
-        filepath: os.PathLike,
+        filepath: "os.PathLike[Any]",
         *,
         encoding: str = settings.DEFAULT_FILE_ENCODING,
-        newline: typing.Optional[str] = None,
+        newline: Optional[str] = None,
         read_only: bool = False,
     ) -> None:
         super().__init__(
@@ -155,9 +158,9 @@ class TxtIOWrapper(io.TextIOWrapper):
     def __init__(
         self,
         buffer: memoryview,
-        encoding: typing.Optional[str] = None,
-        errors: typing.Optional[str] = None,
-        newline: typing.Optional[str] = None,
+        encoding: Optional[str] = None,
+        errors: Optional[str] = None,
+        newline: Optional[str] = None,
         line_buffering: bool = False,
         write_through: bool = False,
     ) -> None:
@@ -169,39 +172,39 @@ class TxtIOWrapper(io.TextIOWrapper):
             line_buffering=line_buffering,
             write_through=write_through,
         )
-        self._context = None  # type: typing.Optional[AbstractTxtWrapper]
+        self._context: Optional[AbstractTxtWrapper] = None
 
-    def read(self) -> str:
+    def read(self, size: Optional[int] = -1) -> str:
         """Read content of `.txt` file.
 
         Returns:
             Content.
 
         """
-        result = super().read()
+        result = super().read(size)
         return result
 
-    def readline(self) -> str:
+    def readline(self, size: int = -1) -> str:
         """Read line from `.txt` file.
 
         Returns:
             Line.
 
         """
-        result = super().readline()
+        result = super().readline(size)
         return result
 
-    def readlines(self) -> str:
+    def readlines(self, hint: int = -1) -> List[str]:
         """Read lines from `.txt` file.
 
         Returns:
             Lines.
 
         """
-        result = super().readlines()
+        result = super().readlines(hint)
         return result
 
-    def write(self, content: str, /) -> None:
+    def write(self, content: str, /) -> int:
         """Write content to `.txt` file.
 
         Args:
@@ -211,7 +214,7 @@ class TxtIOWrapper(io.TextIOWrapper):
         result = super().write(content)
         return result
 
-    def writelines(self, lines: typing.Iterable[str], /) -> None:
+    def writelines(self, lines: Iterable[str], /) -> None:
         """Write lines to `.txt` file.
 
         Args:

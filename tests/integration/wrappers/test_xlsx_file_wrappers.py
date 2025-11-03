@@ -5,7 +5,9 @@
 
 # Standard Library Imports
 import pathlib
+from typing import Any
 from typing import Callable
+from typing import List
 from typing import Optional
 from typing import Sequence
 
@@ -21,7 +23,7 @@ from dodecahedron.wrappers.xlsx_file_wrappers import XlsxIOWrapper
 
 def test_raises_error_when_filepath_argument_is_not_path() -> None:
     with pytest.raises(TypeError, match="expected type 'PathLike'"):
-        XlsxFileWrapper("failure.txt")
+        XlsxFileWrapper("failure.txt")  # type: ignore
 
 
 def test_raises_error_when_filepath_argument_is_a_directory(
@@ -39,7 +41,7 @@ def test_raises_error_when_does_not_have_xlsx_extension(tempdir: str) -> None:
 
 
 def test_opening_file_returns_xlsx_io_wrapper(
-    make_xlsx_file: Callable[[str, list], pathlib.Path],
+    make_xlsx_file: Callable[[str, List[Any]], pathlib.Path],
 ) -> None:
     path = make_xlsx_file("test.xlsx", [])
     wrapper = XlsxFileWrapper(path.resolve())
@@ -48,7 +50,7 @@ def test_opening_file_returns_xlsx_io_wrapper(
 
 
 def test_returned_io_wrapper_is_not_closed(
-    make_xlsx_file: Callable[[str, list], pathlib.Path],
+    make_xlsx_file: Callable[[str, List[Any]], pathlib.Path],
 ) -> None:
     path = make_xlsx_file("test.xlsx", [])
     wrapper = XlsxFileWrapper(path.resolve())
@@ -57,7 +59,7 @@ def test_returned_io_wrapper_is_not_closed(
 
 
 def test_can_be_passed_to_builtin_open_function(
-    make_xlsx_file: Callable[[str, list], pathlib.Path],
+    make_xlsx_file: Callable[[str, List[Any]], pathlib.Path],
 ) -> None:
     path = make_xlsx_file("test.xlsx", [])
     wrapper = XlsxFileWrapper(path.resolve())
@@ -183,7 +185,7 @@ def test_can_read_row_from_xlsx_file(
 @pytest.mark.parametrize("fieldnames", [None, ["id", "value"]])
 def test_reading_row_does_not_return_fieldnames(
     make_xlsx_file: Callable[..., pathlib.Path],
-    fieldnames: Optional[Sequence],
+    fieldnames: Optional[Sequence[str]],
 ) -> None:
     rows = [
         ["id", "value"],
@@ -202,7 +204,7 @@ def test_reading_row_does_not_return_fieldnames(
 
 
 def test_reading_row_sets_fieldnames(
-    make_xlsx_file: Callable[..., pathlib.Path]
+    make_xlsx_file: Callable[..., pathlib.Path],
 ) -> None:
     rows = [
         ["id", "value"],
@@ -241,7 +243,7 @@ def test_can_read_rows_from_xlsx_file(
 @pytest.mark.parametrize("fieldnames", [None, ["id", "value"]])
 def test_reading_rows_does_not_return_headers(
     make_xlsx_file: Callable[..., pathlib.Path],
-    fieldnames: Optional[Sequence],
+    fieldnames: Optional[Sequence[str]],
 ) -> None:
     rows = [
         ["id", "value"],
@@ -288,7 +290,7 @@ def test_can_write_header_to_xlsx_file(
 
     expected = [("id", "value")]
     worksheet = load_workbook(path).active
-    results = [row for row in worksheet.iter_rows(values_only=True)]
+    results = [row for row in worksheet.iter_rows(values_only=True)]  # type: ignore
     assert results == expected
 
 
@@ -303,7 +305,7 @@ def test_can_write_record_to_xlsx_file(
 
     expected = [("id", "value"), ("1", "One")]
     worksheet = load_workbook(path).active
-    results = [row for row in worksheet.iter_rows(values_only=True)]
+    results = [row for row in worksheet.iter_rows(values_only=True)]  # type: ignore
     assert results == expected
 
 
@@ -324,7 +326,7 @@ def test_can_write_records_to_xlsx_file(
 
     expected = [("id", "value"), ("1", "One"), ("2", "Two"), ("3", "Three")]
     worksheet = load_workbook(path).active
-    results = [row for row in worksheet.iter_rows(values_only=True)]
+    results = [row for row in worksheet.iter_rows(values_only=True)]  # type: ignore
     assert results == expected
 
 
@@ -338,7 +340,7 @@ def test_can_write_row_to_xlsx_file(
 
     expected = [("1", "One")]
     worksheet = load_workbook(path).active
-    results = [row for row in worksheet.iter_rows(values_only=True)]
+    results = [row for row in worksheet.iter_rows(values_only=True)]  # type: ignore
     assert results == expected
 
 
@@ -352,5 +354,5 @@ def test_can_write_rows_to_csv_file(
 
     expected = [("1", "One"), ("2", "Two"), ("3", "Three")]
     worksheet = load_workbook(path).active
-    results = [row for row in worksheet.iter_rows(values_only=True)]
+    results = [row for row in worksheet.iter_rows(values_only=True)]  # type: ignore
     assert results == expected

@@ -3,9 +3,17 @@
 
 # Standard Library Imports
 from __future__ import annotations
-import collections
 import os
-import typing
+from typing import Any
+from typing import Dict
+from typing import IO
+from typing import Iterable
+from typing import Iterator
+from typing import List
+from typing import Optional
+from typing import Sequence
+from typing import Tuple
+from typing import TypeVar
 
 # Third-Party Imports
 from openpyxl import load_workbook
@@ -29,14 +37,14 @@ __all__ = [
 
 
 # Custom type
-T = typing.TypeVar("T")
+T = TypeVar("T")
 
 
 class AbstractXlsxWrapper(AbstractFileSystemWrapper):
     """Represents an abstract wrapper class for `.xlsx` files."""
 
     def _init_xlsx_io_wrapper(
-        self, __file: typing.IO, /, mode: str
+        self, __file: IO[Any], /, mode: str
     ) -> XlsxIOWrapper:
         """Initialize I/O wrapper for `.xlsx` file.
 
@@ -65,9 +73,9 @@ class XlsxDirectoryWrapper(AbstractXlsxWrapper, AbstractDirectoryWrapper):
 
     def __init__(
         self,
-        directory: os.PathLike,
+        directory: "os.PathLike[Any]",
         *,
-        fieldnames: typing.Optional[typing.Sequence] = None,
+        fieldnames: Optional[Sequence[str]] = None,
         read_only: bool = False,
     ) -> None:
         super().__init__(
@@ -78,9 +86,9 @@ class XlsxDirectoryWrapper(AbstractXlsxWrapper, AbstractDirectoryWrapper):
         self._fieldnames = fieldnames
 
     @property
-    def fieldnames(self) -> typing.Optional[typing.Sequence]:
+    def fieldnames(self) -> Sequence[str]:
         """Fieldnames."""
-        return self._fieldnames
+        return self._fieldnames or []
 
     def open(self, filename: str, /, mode: str = "rb") -> XlsxIOWrapper:
         """Open a `.xlsx` file and return a file object.
@@ -117,18 +125,18 @@ class XlsxFileWrapper(AbstractXlsxWrapper, AbstractFileWrapper):
 
     def __init__(
         self,
-        filepath: os.PathLike,
+        filepath: "os.PathLike[Any]",
         *,
-        fieldnames: typing.Optional[typing.Sequence] = None,
+        fieldnames: Optional[Sequence[str]] = None,
         read_only: bool = False,
     ) -> None:
         super().__init__(filepath, read_only=read_only)
         utils.raise_for_extension(filepath, settings.XLSX_EXTENSION)
 
-        self._fieldnames = fieldnames
+        self._fieldnames = fieldnames or []
 
     @property
-    def fieldnames(self) -> typing.Optional[typing.Sequence]:
+    def fieldnames(self) -> Sequence[Any]:
         """Fieldnames."""
         return self._fieldnames
 
@@ -150,11 +158,11 @@ class XlsxFileWrapper(AbstractXlsxWrapper, AbstractFileWrapper):
 class OpenPyXLMixin:
     """Implements an OpenPyXL mixin."""
 
-    _file: typing.IO
+    _file: IO[Any]
     _mode: str
 
-    def __exit__(self, *_) -> None:
-        read_only = getattr(self, "read_only")  # type: bool
+    def __exit__(self, *_: Any) -> None:
+        read_only: bool = getattr(self, "read_only")
         if "w" in self._mode and not read_only:
             self.save()
 
@@ -168,7 +176,7 @@ class OpenPyXLMixin:
         workbook = self.get_workbook()
         sheetname = getattr(self, "sheetname", None)
         result = workbook[sheetname] if sheetname else workbook.active
-        return result
+        return result  # type: ignore
 
     def get_workbook(self) -> Workbook:
         """Get workbook.
@@ -184,7 +192,7 @@ class OpenPyXLMixin:
         if not result and "w" in self._mode:
             result = self.make_workbook()
 
-        return result
+        return result  # type: ignore
 
     def load_workbook(self) -> Workbook:
         """Load workbook.
@@ -193,7 +201,7 @@ class OpenPyXLMixin:
             Workbook.
 
         """
-        read_only = getattr(self, "read_only")  # type: bool
+        read_only: bool = getattr(self, "read_only")
         result = load_workbook(self._file, read_only=read_only)
         setattr(self, "_workbook", result)
         return result
@@ -218,13 +226,13 @@ class OpenPyXLMixin:
 class XlsxIOWrapper(OpenPyXLMixin, AbstractIOWrapper):
     """Implements a I/O wrapper for `.xlsx` files."""
 
-    def __init__(self, __file: typing.IO, /, mode: str) -> None:
+    def __init__(self, __file: IO[Any], /, mode: str) -> None:
         self._file = __file
         self._mode = mode
-        self._context = None  # type: typing.Optional[AbstractXlsxWrapper]
+        self._context: Optional[AbstractXlsxWrapper] = None
 
     @property
-    def file(self) -> typing.IO:
+    def file(self) -> IO[Any]:
         """File."""
         return self._file
 
@@ -234,28 +242,28 @@ class XlsxIOWrapper(OpenPyXLMixin, AbstractIOWrapper):
         return self._file.closed
 
     @property
-    def fieldnames(self) -> typing.Optional[typing.Sequence]:
+    def fieldnames(self) -> Sequence[str]:
         """Fieldnames."""
-        default = getattr(self._context, "fieldnames", None)
+        default = getattr(self._context, "fieldnames", [])
         result = getattr(self, "_fieldnames", default)
         return result
 
     @fieldnames.setter
-    def fieldnames(self, value: typing.Any) -> None:
-        if not isinstance(value, typing.Sequence):
+    def fieldnames(self, value: Any) -> None:
+        if not isinstance(value, Sequence):
             message = f"expected type 'Sequence', got {type(value)} instead"
             raise TypeError(message)
 
         setattr(self, "_fieldnames", value)
 
     @property
-    def sheetname(self) -> typing.Optional[str]:
+    def sheetname(self) -> Optional[str]:
         """Sheetname."""
         result = getattr(self, "_sheetname", None)
         return result
 
     @sheetname.setter
-    def sheetname(self, value: typing.Any) -> None:
+    def sheetname(self, value: Any) -> None:
         if value is not None and not isinstance(value, str):
             message = f"expected type 'str', got {type(value)} instead"
             raise TypeError(message)
@@ -270,7 +278,7 @@ class XlsxIOWrapper(OpenPyXLMixin, AbstractIOWrapper):
     def __enter__(self) -> XlsxIOWrapper:
         return self
 
-    def __exit__(self, *_) -> None:
+    def __exit__(self, *_: Any) -> None:
         super().__exit__(*_)
         self.close()
         return
@@ -279,7 +287,7 @@ class XlsxIOWrapper(OpenPyXLMixin, AbstractIOWrapper):
         """Close `.xlsx` file."""
         self._file.close()
 
-    def read(self, size: typing.Optional[int] = None, /) -> bytes:
+    def read(self, size: int = -1, /) -> bytes:
         """Read content of `.xlsx` file.
 
         Returns:
@@ -289,7 +297,7 @@ class XlsxIOWrapper(OpenPyXLMixin, AbstractIOWrapper):
         result = self._file.read(size)
         return result
 
-    def read_record(self) -> list:
+    def read_record(self) -> Dict[str, Any]:
         """Read record from `.xlsx` file.
 
         Returns:
@@ -297,14 +305,14 @@ class XlsxIOWrapper(OpenPyXLMixin, AbstractIOWrapper):
 
         """
         reader = self._get_record_reader()
-        result = reader.read_record()
+        result: Dict[str, Any] = reader.read_record()
 
         if not self.fieldnames:
             self.fieldnames = reader.fieldnames
 
         return result
 
-    def read_records(self) -> typing.List[list]:
+    def read_records(self) -> List[Dict[str, Any]]:
         """Read records from `.xlsx` file.
 
         Returns:
@@ -329,7 +337,7 @@ class XlsxIOWrapper(OpenPyXLMixin, AbstractIOWrapper):
         if not hasattr(self, "_record_reader"):
             self._start_record_reader()
 
-        result = getattr(self, "_record_reader")  # type: _OpenPyXLRecordReader
+        result: _OpenPyXLRecordReader = getattr(self, "_record_reader")
         return result
 
     def _start_record_reader(self) -> None:
@@ -337,7 +345,7 @@ class XlsxIOWrapper(OpenPyXLMixin, AbstractIOWrapper):
         reader = _OpenPyXLRecordReader(self)
         setattr(self, "_record_reader", reader)
 
-    def read_row(self) -> list:
+    def read_row(self) -> List[str]:
         """Read row from `.xlsx` file.
 
         Returns:
@@ -352,7 +360,7 @@ class XlsxIOWrapper(OpenPyXLMixin, AbstractIOWrapper):
 
         return result
 
-    def read_rows(self) -> typing.List[list]:
+    def read_rows(self) -> List[List[str]]:
         """Read rows from `.xlsx` file.
 
         Returns:
@@ -377,7 +385,7 @@ class XlsxIOWrapper(OpenPyXLMixin, AbstractIOWrapper):
         if not hasattr(self, "_row_reader"):
             self._start_row_reader()
 
-        result = getattr(self, "_row_reader")  # type: _OpenPyXLRowReader
+        result: _OpenPyXLRowReader = getattr(self, "_row_reader")
         return result
 
     def _start_row_reader(self) -> None:
@@ -385,7 +393,7 @@ class XlsxIOWrapper(OpenPyXLMixin, AbstractIOWrapper):
         reader = _OpenPyXLRowReader(self)
         setattr(self, "_row_reader", reader)
 
-    def write(self, buffer: memoryview, /) -> None:
+    def write(self, buffer: memoryview, /) -> int:  # type: ignore
         """Write buffer to `.xlsx` file.
 
         Args:
@@ -400,7 +408,7 @@ class XlsxIOWrapper(OpenPyXLMixin, AbstractIOWrapper):
         writer = self._get_record_writer()
         writer.write_header()
 
-    def write_record(self, record: dict, /) -> None:
+    def write_record(self, record: Dict[str, Any], /) -> None:
         """Write record to `.xlsx` file.
 
         Args:
@@ -410,7 +418,7 @@ class XlsxIOWrapper(OpenPyXLMixin, AbstractIOWrapper):
         writer = self._get_record_writer()
         writer.write_record(record)
 
-    def write_records(self, records: typing.Iterable[dict], /) -> None:
+    def write_records(self, records: Iterable[Dict[str, Any]], /) -> None:
         """Write records to `.xlsx` file.
 
         Args:
@@ -430,7 +438,7 @@ class XlsxIOWrapper(OpenPyXLMixin, AbstractIOWrapper):
         if not hasattr(self, "_record_writer"):
             self._start_record_writer()
 
-        result = getattr(self, "_record_writer")  # type: _OpenPyXLRecordWriter
+        result: _OpenPyXLRecordWriter = getattr(self, "_record_writer")
         return result
 
     def _start_record_writer(self) -> None:
@@ -438,7 +446,7 @@ class XlsxIOWrapper(OpenPyXLMixin, AbstractIOWrapper):
         writer = _OpenPyXLRecordWriter(self)
         setattr(self, "_record_writer", writer)
 
-    def write_row(self, row: typing.Iterable, /) -> None:
+    def write_row(self, row: Iterable[Any], /) -> None:
         """Write row to `.xlsx` file.
 
         Args:
@@ -448,7 +456,7 @@ class XlsxIOWrapper(OpenPyXLMixin, AbstractIOWrapper):
         writer = self._get_row_writer()
         writer.write_row(row)
 
-    def write_rows(self, rows: typing.Iterable[typing.Iterable], /) -> None:
+    def write_rows(self, rows: Iterable[Iterable[Any]], /) -> None:
         """Write rows to `.xlsx` file.
 
         Args:
@@ -468,7 +476,7 @@ class XlsxIOWrapper(OpenPyXLMixin, AbstractIOWrapper):
         if not hasattr(self, "_writer"):
             self._start_row_writer()
 
-        result = getattr(self, "_writer")  # type: _OpenPyXLRowWriter
+        result: _OpenPyXLRowWriter = getattr(self, "_writer")
         return result
 
     def _start_row_writer(self) -> None:
@@ -477,7 +485,7 @@ class XlsxIOWrapper(OpenPyXLMixin, AbstractIOWrapper):
         setattr(self, "_writer", writer)
 
 
-class _OpenPyXLRecordReader(collections.abc.Iterator):
+class _OpenPyXLRecordReader(Iterator[Any]):
     """Implements an OpenPyXL record reader for `.xlsx` files."""
 
     def __init__(self, __wrapper: "XlsxIOWrapper") -> None:
@@ -487,12 +495,12 @@ class _OpenPyXLRecordReader(collections.abc.Iterator):
         self._row_num = 0
 
     @property
-    def fieldnames(self) -> typing.Optional[typing.Sequence]:
+    def fieldnames(self) -> Sequence[str]:
         """Fieldnames."""
         return self._fieldnames
 
     @fieldnames.setter
-    def fieldnames(self, fieldnames: typing.Sequence) -> None:
+    def fieldnames(self, fieldnames: Sequence[str]) -> None:
         self._fieldnames = fieldnames
 
     @property
@@ -500,11 +508,11 @@ class _OpenPyXLRecordReader(collections.abc.Iterator):
         """Row number."""
         return self._row_num
 
-    def __next__(self) -> typing.List[typing.Any]:
+    def __next__(self) -> Dict[str, Any]:
         result = self.read_record()
         return result
 
-    def read_record(self) -> None:
+    def read_record(self) -> Dict[str, Any]:
         """Read record from `.csv` file.
 
         Returns
@@ -521,7 +529,7 @@ class _OpenPyXLRecordReader(collections.abc.Iterator):
         result = self._read_next_record()
         return result
 
-    def read_records(self) -> typing.List[typing.List[str]]:
+    def read_records(self) -> List[Dict[str, Any]]:
         """Read rows from `.xlsx` file.
 
         Returns:
@@ -560,7 +568,7 @@ class _OpenPyXLRecordReader(collections.abc.Iterator):
 
         self.fieldnames = self._read_next_row()
 
-    def _read_next_row(self) -> typing.List[str]:
+    def _read_next_row(self) -> List[str]:
         """Read next row.
 
         Returns:
@@ -572,7 +580,7 @@ class _OpenPyXLRecordReader(collections.abc.Iterator):
         self._row_num += 1
         return result
 
-    def _make_row(self, __row: tuple, /) -> typing.List[typing.Any]:
+    def _make_row(self, __row: Tuple[Any, ...], /) -> List[Any]:
         """Make row.
 
         Returns:
@@ -582,7 +590,7 @@ class _OpenPyXLRecordReader(collections.abc.Iterator):
         result = list(__row)
         return result
 
-    def _read_first_record(self) -> None:
+    def _read_first_record(self) -> Dict[str, Any]:
         """Read first row.
 
         Args:
@@ -597,13 +605,13 @@ class _OpenPyXLRecordReader(collections.abc.Iterator):
             raise RuntimeError(message)
 
         first_record = self._read_next_record()
-        if not self._is_header(first_record.values()):
+        if not self._is_header(list(first_record.values())):
             return first_record
 
         result = self._read_next_record()
         return result
 
-    def _read_next_record(self) -> typing.Dict[str, str]:
+    def _read_next_record(self) -> Dict[str, str]:
         """Read next record.
 
         Returns:
@@ -615,7 +623,7 @@ class _OpenPyXLRecordReader(collections.abc.Iterator):
         self._row_num += 1
         return result
 
-    def _make_record(self, __row: tuple, /) -> dict:
+    def _make_record(self, __row: Tuple[Any, ...], /) -> Dict[str, Any]:
         """Make record from row.
 
         Args:
@@ -628,7 +636,7 @@ class _OpenPyXLRecordReader(collections.abc.Iterator):
         result = {key: value for key, value in zip(self.fieldnames, __row)}
         return result
 
-    def _is_header(self, row: typing.Sequence) -> bool:
+    def _is_header(self, row: Sequence[str]) -> bool:
         """Check whether row is header.
 
         Args:
@@ -658,12 +666,12 @@ class _OpenPyXLRecordWriter:
         self._row_num = 0
 
     @property
-    def fieldnames(self) -> typing.Optional[typing.Sequence]:
+    def fieldnames(self) -> Sequence[str]:
         """Fieldnames."""
         return self._fieldnames
 
     @fieldnames.setter
-    def fieldnames(self, fieldnames: typing.Sequence) -> None:
+    def fieldnames(self, fieldnames: Sequence[str]) -> None:
         self._fieldnames = fieldnames
 
     @property
@@ -679,7 +687,7 @@ class _OpenPyXLRecordWriter:
 
         self._row_num += 1
 
-    def write_record(self, __record: dict, /) -> None:
+    def write_record(self, __record: Dict[str, Any], /) -> None:
         """Write record to `.xlsx` file.
 
         Args:
@@ -692,7 +700,7 @@ class _OpenPyXLRecordWriter:
 
         self._row_num += 1
 
-    def write_records(self, __records: typing.Iterable[dict], /) -> None:
+    def write_records(self, __records: Iterable[Dict[str, Any]], /) -> None:
         """Write records to `.csv` file.
 
         Args:
@@ -704,10 +712,10 @@ class _OpenPyXLRecordWriter:
             for col, key in enumerate(self.fieldnames, start=1):
                 self._worksheet.cell(row, col, value=record[key])
 
-        self._row_num += len(__records)
+        self._row_num += len(list(__records))
 
 
-class _OpenPyXLRowReader(collections.abc.Iterator):
+class _OpenPyXLRowReader(Iterator[Any]):
     """Implements an OpenPyXL row reader for `.xlsx` files."""
 
     def __init__(self, __wrapper: "XlsxIOWrapper") -> None:
@@ -717,12 +725,12 @@ class _OpenPyXLRowReader(collections.abc.Iterator):
         self._row_num = 0
 
     @property
-    def fieldnames(self) -> typing.Optional[typing.Sequence]:
+    def fieldnames(self) -> Sequence[str]:
         """Fieldnames."""
         return self._fieldnames
 
     @fieldnames.setter
-    def fieldnames(self, fieldnames: typing.Sequence) -> None:
+    def fieldnames(self, fieldnames: Sequence[str]) -> None:
         self._fieldnames = fieldnames
 
     @property
@@ -730,11 +738,11 @@ class _OpenPyXLRowReader(collections.abc.Iterator):
         """Row number."""
         return self._row_num
 
-    def __next__(self) -> typing.List[typing.Any]:
+    def __next__(self) -> List[Any]:
         result = self.read_row()
         return result
 
-    def read_row(self) -> None:
+    def read_row(self) -> List[str]:
         """Read row from `.csv` file.
 
         Returns
@@ -751,7 +759,7 @@ class _OpenPyXLRowReader(collections.abc.Iterator):
         result = self._read_next_row()
         return result
 
-    def read_rows(self) -> typing.List[typing.List[str]]:
+    def read_rows(self) -> List[List[str]]:
         """Read rows from `.csv` file.
 
         Returns:
@@ -762,7 +770,7 @@ class _OpenPyXLRowReader(collections.abc.Iterator):
             first_row = self._read_first_row()
             remainder = [self._make_row(row) for row in self._reader]
             self._row_num += len(remainder)
-            results = [first_row, *remainder]
+            results: List[List[Any]] = [first_row, *remainder]
             return results
 
         if self.row_num == 0 and not self.fieldnames:
@@ -790,7 +798,7 @@ class _OpenPyXLRowReader(collections.abc.Iterator):
 
         self.fieldnames = self._read_next_row()
 
-    def _read_first_row(self) -> dict:
+    def _read_first_row(self) -> List[str]:
         """Read first row.
 
         Args:
@@ -811,7 +819,7 @@ class _OpenPyXLRowReader(collections.abc.Iterator):
         result = self._read_next_row()
         return result
 
-    def _read_next_row(self) -> typing.List[str]:
+    def _read_next_row(self) -> List[str]:
         """Reqad next row.
 
         Returns:
@@ -823,7 +831,7 @@ class _OpenPyXLRowReader(collections.abc.Iterator):
         self._row_num += 1
         return result
 
-    def _make_row(self, __row: tuple, /) -> typing.List[typing.Any]:
+    def _make_row(self, __row: Tuple[Any, ...], /) -> List[Any]:
         """Make row.
 
         Returns:
@@ -833,7 +841,7 @@ class _OpenPyXLRowReader(collections.abc.Iterator):
         result = list(__row)
         return result
 
-    def _is_header(self, row: typing.Sequence) -> bool:
+    def _is_header(self, row: Sequence[str]) -> bool:
         """Check whether row is header.
 
         Args:
@@ -863,12 +871,12 @@ class _OpenPyXLRowWriter:
         self._row_num = 0
 
     @property
-    def fieldnames(self) -> typing.Optional[typing.Sequence]:
+    def fieldnames(self) -> Sequence[str]:
         """Fieldnames."""
         return self._fieldnames
 
     @fieldnames.setter
-    def fieldnames(self, fieldnames: typing.Sequence) -> None:
+    def fieldnames(self, fieldnames: Sequence[str]) -> None:
         self._fieldnames = fieldnames
 
     @property
@@ -880,7 +888,7 @@ class _OpenPyXLRowWriter:
         """Write header."""
         self.write_row(self.fieldnames)
 
-    def write_row(self, __row: typing.Iterable, /) -> None:
+    def write_row(self, __row: Iterable[Any], /) -> None:
         """Write row to `.xlsx` file.
 
         Args:
@@ -893,7 +901,7 @@ class _OpenPyXLRowWriter:
 
         self._row_num += 1
 
-    def write_rows(self, __rows: typing.Iterable[typing.Iterable], /) -> None:
+    def write_rows(self, __rows: Iterable[Iterable[Any]], /) -> None:
         """Write rows to `.xlsx` file.
 
         Args:
@@ -905,4 +913,4 @@ class _OpenPyXLRowWriter:
             for col, value in enumerate(data, start=1):
                 self._worksheet.cell(row, col, value=value)
 
-        self._row_num += len(__rows)
+        self._row_num += len(list(__rows))

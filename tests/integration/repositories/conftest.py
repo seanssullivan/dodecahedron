@@ -2,7 +2,10 @@
 
 # Standard Library Imports
 import pathlib
-import typing
+from typing import Any
+from typing import Callable
+from typing import List
+from typing import Optional
 
 # Third-Party Imports
 import pytest
@@ -13,7 +16,7 @@ from dodecahedron import wrappers
 
 @pytest.fixture
 def csv_file_wrapper(
-    make_csv_file: typing.Callable[[str, typing.Optional[list]], pathlib.Path],
+    make_csv_file: Callable[[str, Optional[List[Any]]], pathlib.Path],
 ) -> wrappers.CsvFileWrapper:
     """Fixture to make `txt` IO wrapper."""
     path = make_csv_file("test.csv", [])
@@ -23,7 +26,7 @@ def csv_file_wrapper(
 
 @pytest.fixture
 def txt_file_wrapper(
-    make_txt_file: typing.Callable[[str, typing.Optional[str]], pathlib.Path],
+    make_txt_file: Callable[[str, Optional[str]], pathlib.Path],
 ) -> wrappers.TxtFileWrapper:
     """Fixture to make `txt` IO wrapper."""
     path = make_txt_file("test.txt", "")
@@ -33,9 +36,7 @@ def txt_file_wrapper(
 
 @pytest.fixture
 def xlsx_file_wrapper(
-    make_xlsx_file: typing.Callable[
-        [str, typing.Optional[list]], pathlib.Path
-    ],
+    make_xlsx_file: Callable[[str, Optional[List[Any]]], pathlib.Path],
 ) -> wrappers.XlsxFileWrapper:
     """Fixture to make `txt` IO wrapper."""
     path = make_xlsx_file("test.xlsx", [])

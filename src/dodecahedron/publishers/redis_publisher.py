@@ -2,6 +2,7 @@
 
 # Standard Library Imports
 from __future__ import annotations
+from typing import Any
 
 # Third-Party Imports
 import redis
@@ -20,7 +21,7 @@ class RedisPublisher(AbstractPublisher):
 
     """
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         self._connection = redis.Redis(**kwargs)
 
     @property

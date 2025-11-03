@@ -11,6 +11,7 @@ Based on 'Architecture Patterns in Python' unit-of-work pattern.
 # Standard Library Imports
 from __future__ import annotations
 import abc
+from typing import Any
 from typing import Optional
 from typing import Type
 
@@ -37,7 +38,7 @@ class AbstractUnitOfWork(abc.ABC):
 
     @auto_commit.setter
     def auto_commit(self, value: bool) -> None:
-        if not isinstance(value, bool):
+        if not isinstance(value, bool):  # type: ignore
             message = f"expected type 'bool', got {type(value)} instead"
             raise TypeError(message)
 
@@ -46,16 +47,12 @@ class AbstractUnitOfWork(abc.ABC):
     def __enter__(self) -> AbstractUnitOfWork:
         return self
 
-    def __exit__(self, exc: Optional[Type[Exception]], *_) -> None:
+    def __exit__(self, exc: Optional[Type[Exception]], *_: Any) -> None:
         if self.auto_commit is True and not exc:
             self.commit()
 
-    @abc.abstractmethod
     def commit(self) -> None:
         """Commit changes."""
-        raise NotImplementedError
 
-    @abc.abstractmethod
     def rollback(self) -> None:
         """Rollback changes."""
-        raise NotImplementedError

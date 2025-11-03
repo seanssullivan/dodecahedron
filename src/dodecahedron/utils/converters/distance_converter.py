@@ -6,185 +6,20 @@ Module provides functions for converting values to distances.
 """
 
 # Standard Library Imports
-import datetime
 import decimal
 import re
-import typing
+from typing import Any
+from typing import Callable
+from typing import Dict
+from typing import Literal
 
 # Local Imports
-from .abstract_converter import AbstractConverter
+from .base_converter import BaseConverter
 
 __all__ = ["to_distance"]
 
 
-class DistanceConverter(AbstractConverter):
-    """Class implements a distance converter.
-
-    Args:
-        default (optional): Default value. Default ``0.0``.
-
-    """
-
-    def __init__(self, *, default: float = 0.0) -> None:
-        if not isinstance(default, float):
-            message = f"expected type 'float', got {type(default)} instead"
-            raise TypeError(message)
-
-        super().__init__(default=default)
-
-    def __call__(self, __value: typing.Any, /) -> float:
-        if __value is None:
-            return self.default
-
-        if isinstance(__value, decimal.Decimal):
-            return self.from_decimal(__value)
-
-        if isinstance(__value, float):
-            return self.from_float(__value)
-
-        if isinstance(__value, int):
-            return self.from_int(__value)
-
-        if isinstance(__value, str):
-            return self.from_str(__value)
-
-        raise TypeError(f"{type(__value)} cannot be converted to distance")
-
-    def from_bool(self, __value: bool, /) -> float:
-        """Convert boolean value to distance.
-
-        Args:
-            __value: Value to convert to distance.
-
-        Returns:
-            Distance.
-
-        """
-        if not isinstance(__value, bool):
-            message = f"expected type 'bool', got {type(__value)} instead"
-            raise TypeError(message)
-
-        raise TypeError("'bool' cannot be converted to distance")
-
-    def from_date(self, __value: datetime.date, /) -> float:
-        """Convert date value to distance.
-
-        Args:
-            __value: Value to convert to distance.
-
-        Returns:
-            Distance.
-
-        """
-        if not isinstance(__value, datetime.date):
-            message = f"expected type 'date', got {type(__value)} instead"
-            raise TypeError(message)
-
-        raise TypeError("'date' cannot be converted to distance")
-
-    def from_datetime(self, __value: datetime.datetime, /) -> float:
-        """Convert datetime value to distance.
-
-        Args:
-            __value: Value to convert to distance.
-
-        Returns:
-            Distance.
-
-        """
-        if not isinstance(__value, datetime.datetime):
-            message = f"expected type 'datetime', got {type(__value)} instead"
-            raise TypeError(message)
-
-        raise TypeError("'datetime' cannot be converted to distance")
-
-    def from_decimal(self, __value: decimal.Decimal, /) -> float:
-        """Convert decimal value to distance.
-
-        Args:
-            __value: Value to convert to distance.
-
-        Returns:
-            Distance.
-
-        """
-        if not isinstance(__value, decimal.Decimal):
-            message = f"expected type 'Decimal', got {type(__value)} instead"
-            raise TypeError(message)
-
-        result = float(__value)
-        return result
-
-    def from_float(self, __value: float, /) -> float:
-        """Convert float value to distance.
-
-        Args:
-            __value: Value to convert to distance.
-
-        Returns:
-            Distance.
-
-        """
-        if not isinstance(__value, float):
-            message = f"expected type 'float', got {type(__value)} instead"
-            raise TypeError(message)
-
-        result = float(__value)
-        return result
-
-    def from_int(self, __value: int, /) -> float:
-        """Convert integer value to distance.
-
-        Args:
-            __value: Value to convert to distance.
-
-        Returns:
-            Distance.
-
-        """
-        if not isinstance(__value, int):
-            message = f"expected type 'int', got {type(__value)} instead"
-            raise TypeError(message)
-
-        result = self.from_float(float(__value))
-        return result
-
-    def from_str(self, __value: str, /) -> float:
-        """Convert string value to distance.
-
-        Args:
-            __value: String representation of distance value.
-
-        Returns:
-            Distance.
-
-        Raises:
-            TypeError: when value is not type 'str'.
-            ValueError: when value cannot be converted to distance.
-
-        """
-        if not isinstance(__value, str):
-            message = f"expected type 'str', got {type(__value)} instead"
-            raise TypeError(message)
-
-        value = __value.replace("  ", " ").strip()
-        if not value:
-            return self.default
-
-        try:
-            representation = re.sub(r"[^0-9a-zA-Z.]+", r"", value)
-            number = re.sub(r"(\d+)\s?m?", r"\1", representation, flags=re.I)
-            result = float(number)
-
-        except ValueError:
-            message = f"{type(__value)} cannot be converted to distance"
-            raise ValueError(message)
-
-        else:
-            return result
-
-
-def to_distance(__value: typing.Any, /, default: float = 0.0) -> float:
+def to_distance(__value: Any, /, default: float = 0.0) -> float:
     """Convert value to distance.
 
     Args:
@@ -198,3 +33,133 @@ def to_distance(__value: typing.Any, /, default: float = 0.0) -> float:
     converter = DistanceConverter(default=default)
     result = converter(__value)
     return result
+
+
+class DistanceConverter(BaseConverter):
+    """Class implements a distance converter.
+
+    Args:
+        default (optional): Default value. Default ``0.0``.
+        on_error (optional): Whether to raise error or return default. Default ``raise``.
+
+    """
+
+    def __init__(
+        self,
+        *,
+        default: float = 0.0,
+        on_error: Literal["default", "raise"] = "raise",
+    ) -> None:
+        if not isinstance(default, float):
+            message = f"expected type 'float', got {type(default)} instead"
+            raise TypeError(message)
+
+        super().__init__(default=default, on_error=on_error)
+        self._conversions.update(DEFAULT_CONVERSIONS)
+        self._conversions = self._conversions.new_child()
+
+
+def distance_from_decimal(__value: decimal.Decimal, _: float, /) -> float:
+    """Convert decimal value to distance.
+
+    Args:
+        __value: Value to convert to distance.
+
+    Returns:
+        Distance.
+
+    Raises:
+        TypeError: when value is not type 'Decimal'.
+
+    """
+    if not isinstance(__value, decimal.Decimal):  # type: ignore
+        message = f"expected type 'Decimal', got {type(__value)} instead"
+        raise TypeError(message)
+
+    result = float(__value)
+    return result
+
+
+def distance_from_float(__value: float, _: float, /) -> float:
+    """Convert float value to distance.
+
+    Args:
+        __value: Value to convert to distance.
+
+    Returns:
+        Distance.
+
+    Raises:
+        TypeError: when value is not type 'float'.
+
+    """
+    if not isinstance(__value, float):
+        message = f"expected type 'float', got {type(__value)} instead"
+        raise TypeError(message)
+
+    result = float(__value)
+    return result
+
+
+def distance_from_int(__value: int, _: float, /) -> float:
+    """Convert integer value to distance.
+
+    Args:
+        __value: Value to convert to distance.
+
+    Returns:
+        Distance.
+
+    Raises:
+        TypeError: when value is not type 'int'.
+
+    """
+    if not isinstance(__value, int):  # type: ignore
+        message = f"expected type 'int', got {type(__value)} instead"
+        raise TypeError(message)
+
+    result = float(__value)
+    return result
+
+
+def distance_from_str(__value: str, default: float = 0.0, /) -> float:
+    """Convert string value to distance.
+
+    Args:
+        __value: String representation of distance value.
+
+    Returns:
+        Distance.
+
+    Raises:
+        TypeError: when value is not type 'str'.
+        ValueError: when value cannot be converted to distance.
+
+    """
+    if not isinstance(__value, str):  # type: ignore
+        message = f"expected type 'str', got {type(__value)} instead"
+        raise TypeError(message)
+
+    value = __value.replace("  ", " ").strip()
+    if not value:
+        return default
+
+    try:
+        representation = re.sub(r"[^0-9a-zA-Z.]+", r"", value)
+        number = re.sub(r"(\d+)\s?m?", r"\1", representation, flags=re.I)
+        result = float(number)
+
+    except ValueError:
+        message = f"{type(__value)} cannot be converted to distance"
+        raise ValueError(message)
+
+    else:
+        return result
+
+
+DEFAULT_CONVERSIONS: Dict[type, Callable[..., float]] = {
+    decimal.Decimal: distance_from_decimal,
+    float: distance_from_float,
+    int: distance_from_int,
+    str: distance_from_str,
+}

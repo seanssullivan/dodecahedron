@@ -5,7 +5,9 @@
 
 # Standard Library Imports
 import pathlib
+from typing import Any
 from typing import Callable
+from typing import List
 from typing import Optional
 from typing import Sequence
 
@@ -13,25 +15,25 @@ from typing import Sequence
 import pytest
 
 # Local Imports
-from dodecahedron.wrappers.csv_file_wrappers import CsvFileWrapper
+from dodecahedron.wrappers import CsvFileWrapper
 from dodecahedron.wrappers.csv_file_wrappers import CsvIOWrapper
 
 
 def test_raises_error_when_filepath_argument_is_not_path() -> None:
     with pytest.raises(TypeError, match="expected type 'PathLike'"):
-        CsvFileWrapper("failure.txt")
+        CsvFileWrapper("failure.txt")  # type: ignore
 
 
 def test_raises_error_when_encoding_argument_is_not_str(
-    make_csv_file: Callable[[str, list], pathlib.Path],
+    make_csv_file: Callable[[str, List[Any]], pathlib.Path],
 ) -> None:
     with pytest.raises(TypeError, match="expected type 'str'"):
         path = make_csv_file("test.txt", [])
-        CsvFileWrapper(path, encoding=1)
+        CsvFileWrapper(path, encoding=1)  # type: ignore
 
 
 def test_raises_error_when_filepath_argument_is_a_directory(
-    make_csv_file: Callable[[str, list], pathlib.Path],
+    make_csv_file: Callable[[str, List[Any]], pathlib.Path],
 ) -> None:
     with pytest.raises(IsADirectoryError):
         path = make_csv_file("test.txt", [])
@@ -47,7 +49,7 @@ def test_raises_error_when_file_does_not_have_csv_extension(
 
 
 def test_opening_file_returns_csv_io_wrapper(
-    make_csv_file: Callable[[str, list], pathlib.Path],
+    make_csv_file: Callable[[str, List[Any]], pathlib.Path],
 ) -> None:
     path = make_csv_file("test.csv", [])
     wrapper = CsvFileWrapper(path.resolve())
@@ -56,7 +58,7 @@ def test_opening_file_returns_csv_io_wrapper(
 
 
 def test_returned_io_wrapper_is_not_closed(
-    make_csv_file: Callable[[str, list], pathlib.Path],
+    make_csv_file: Callable[[str, List[Any]], pathlib.Path],
 ) -> None:
     path = make_csv_file("test.csv", [])
     wrapper = CsvFileWrapper(path.resolve())
@@ -65,7 +67,7 @@ def test_returned_io_wrapper_is_not_closed(
 
 
 def test_can_be_passed_to_builtin_open_function(
-    make_csv_file: Callable[[str, list], pathlib.Path],
+    make_csv_file: Callable[[str, List[Any]], pathlib.Path],
 ) -> None:
     path = make_csv_file("test.csv", [])
     wrapper = CsvFileWrapper(path.resolve())
@@ -228,7 +230,7 @@ def test_can_read_row_from_csv_file(
 @pytest.mark.parametrize("fieldnames", [None, ["id", "value"]])
 def test_reading_row_does_not_return_fieldnames(
     make_csv_file: Callable[..., pathlib.Path],
-    fieldnames: Optional[Sequence],
+    fieldnames: Optional[Sequence[str]],
 ) -> None:
     rows = [
         ["id", "value"],
@@ -247,7 +249,7 @@ def test_reading_row_does_not_return_fieldnames(
 
 
 def test_reading_row_sets_fieldnames(
-    make_csv_file: Callable[..., pathlib.Path]
+    make_csv_file: Callable[..., pathlib.Path],
 ) -> None:
     rows = [
         ["id", "value"],
@@ -286,7 +288,7 @@ def test_can_read_rows_from_csv_file(
 @pytest.mark.parametrize("fieldnames", [None, ["id", "value"]])
 def test_reading_rows_does_not_return_headers(
     make_csv_file: Callable[..., pathlib.Path],
-    fieldnames: Optional[Sequence],
+    fieldnames: Optional[Sequence[str]],
 ) -> None:
     rows = [
         ["id", "value"],

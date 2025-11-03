@@ -10,6 +10,7 @@ Based on 'Architecture Patterns in Python' unit-of-work pattern.
 
 # Standard Library Imports
 from __future__ import annotations
+from typing import Any
 from typing import Callable
 from typing import Optional
 from typing import TypeVar
@@ -39,13 +40,16 @@ class SessionedUnitOfWork(AbstractUnitOfWork):
     """
 
     def __init__(
-        self, *args, session_factory: Callable[..., T], **kwargs
+        self,
+        *args: Any,
+        session_factory: Callable[..., T],
+        **kwargs: Any,
     ) -> None:
         super().__init__(*args, **kwargs)
         self._session_factory = session_factory
 
     @property
-    def session(self) -> Optional[T]:
+    def session(self) -> Optional[T]:  # type: ignore
         """Session."""
         return getattr(self, SESSION_ATTR, None)
 
@@ -54,7 +58,7 @@ class SessionedUnitOfWork(AbstractUnitOfWork):
         super().__enter__()
         return self
 
-    def __exit__(self, *args) -> None:
+    def __exit__(self, *args: Any) -> None:
         super().__exit__(*args)
         self.close()
 
@@ -65,15 +69,16 @@ class SessionedUnitOfWork(AbstractUnitOfWork):
             method()
 
     def commit(self) -> None:
-        """Commit changes to repository."""
-        super().commit()
+        """Commit changes."""
+        super().commit()  # type: ignore
         method = getattr(self.session, "commit", None)
         if method is not None:
             method()
 
     def rollback(self) -> None:
-        """Rollback changes to repository."""
-        super().rollback()
+        """Rollback changes."""
+        super().rollback()  # type: ignore
+
         method = getattr(self.session, "rollback", None)
         if method is not None:
             method()

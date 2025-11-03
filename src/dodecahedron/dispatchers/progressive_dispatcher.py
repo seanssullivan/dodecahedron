@@ -11,7 +11,16 @@ __all__ = ["ProgressiveDispatcher"]
 
 
 class ProgressiveDispatcher(BaseDispatcher):
-    """Implements a progressive dispatcher."""
+    """Implements a progressive dispatcher.
+
+    Args:
+        __bus: Message bus.
+
+    Attributes:
+        messagebus: Message bus.
+        progress: Progress bar.
+
+    """
 
     def __init__(self, __bus: AbstractMessageBus, /) -> None:
         if not isinstance(__bus.uow, ProgressiveUnitOfWork):

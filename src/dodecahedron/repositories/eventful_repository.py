@@ -10,6 +10,7 @@ Implementation based on 'Architecture Patterns in Python' repository pattern.
 
 # Standard Library Imports
 from collections import deque
+from typing import Any
 from typing import Deque
 from typing import Generator
 from typing import Iterable
@@ -18,8 +19,9 @@ from typing import Union
 
 # Local Imports
 from .abstract_repository import AbstractRepository
+from ..messages import AbstractMessage
 from ..messages import BaseEvent
-from ..queue import MessageQueue
+from ..queues import MessageQueue
 
 __all__ = ["EventfulRepository"]
 
@@ -32,7 +34,7 @@ class EventfulRepository(AbstractRepository):
 
     """
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self._events = MessageQueue()
 
@@ -41,7 +43,7 @@ class EventfulRepository(AbstractRepository):
         """Events."""
         return self._events
 
-    def collect_events(self) -> Generator[BaseEvent, None, None]:
+    def collect_events(self) -> Generator[AbstractMessage, None, None]:
         """Collect events.
 
         Yields:
@@ -58,7 +60,7 @@ class EventfulRepository(AbstractRepository):
         self.events.extend(events)
         self.events.sort()
 
-    def _get_child_events(self) -> List[BaseEvent]:
+    def _get_child_events(self) -> List[AbstractMessage]:
         """Get events from child objects.
 
         Returns:
@@ -72,7 +74,9 @@ class EventfulRepository(AbstractRepository):
 # ----------------------------------------------------------------------------
 # Helper Functions
 # ----------------------------------------------------------------------------
-def collect_events_from_objects(objs: Iterable) -> List[BaseEvent]:
+def collect_events_from_objects(
+    objs: Iterable[AbstractMessage],
+) -> List[AbstractMessage]:
     """Collect events from objects.
 
     Args:
@@ -82,7 +86,7 @@ def collect_events_from_objects(objs: Iterable) -> List[BaseEvent]:
         Events.
 
     """
-    results = []
+    results: List[AbstractMessage] = []
     for obj in objs:
         events = collect_events_from_object(obj)
         results.extend(events)
@@ -90,7 +94,7 @@ def collect_events_from_objects(objs: Iterable) -> List[BaseEvent]:
     return results
 
 
-def collect_events_from_object(obj: object) -> List[BaseEvent]:
+def collect_events_from_object(obj: object) -> List[AbstractMessage]:
     """Collect events from object.
 
     Args:
@@ -102,9 +106,9 @@ def collect_events_from_object(obj: object) -> List[BaseEvent]:
     """
     events = get_events(obj)
 
-    results = []
+    results: List[AbstractMessage] = []
     while events:
-        event = events.popleft()  # type: BaseEvent
+        event: AbstractMessage = events.popleft()
         results.append(event)
 
     return results

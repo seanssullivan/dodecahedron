@@ -10,10 +10,12 @@ Implementation based on 'Architecture Patterns in Python' repository pattern.
 
 # Standard Library Imports
 import logging
-import typing
+from typing import Any
+from typing import Optional
+from typing import Sequence
 
 # Local Imports
-from .file_repository import AbstractFileRepository
+from .file_system_repository import AbstractFileSystemRepository
 from ..wrappers.csv_file_wrappers import AbstractCsvWrapper
 
 __all__ = ["AbstractCsvRepository"]
@@ -23,7 +25,7 @@ __all__ = ["AbstractCsvRepository"]
 log = logging.getLogger("dodecahedron")
 
 
-class AbstractCsvRepository(AbstractFileRepository):
+class AbstractCsvRepository(AbstractFileSystemRepository):
     """Represents an abstract `.csv` file repository.
 
     Args:
@@ -34,7 +36,7 @@ class AbstractCsvRepository(AbstractFileRepository):
 
     """
 
-    def __init__(self, __file: typing.Any, /, *args, **kwargs) -> None:
+    def __init__(self, __file: Any, /, *args: Any, **kwargs: Any) -> None:
         if not isinstance(__file, AbstractCsvWrapper):
             expected = "expected type 'AbstractCsvWrapper'"
             actual = f"got {type(__file)} instead"
@@ -44,7 +46,7 @@ class AbstractCsvRepository(AbstractFileRepository):
         super().__init__(__file, *args, **kwargs)
 
     @property
-    def columns(self) -> typing.Optional[typing.Sequence]:
+    def columns(self) -> Optional[Sequence[Any]]:
         """Column names."""
         results = getattr(self._file, "fieldnames", None)
         return results

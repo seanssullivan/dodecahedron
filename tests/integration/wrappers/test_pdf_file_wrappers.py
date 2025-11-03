@@ -17,11 +17,11 @@ from dodecahedron.wrappers.pdf_file_wrappers import PdfIOWrapper
 
 def test_raises_error_when_filepath_argument_is_not_path() -> None:
     with pytest.raises(TypeError, match="expected type 'PathLike'"):
-        PdfFileWrapper("failure.pdf")
+        PdfFileWrapper("failure.pdf")  # type: ignore
 
 
 def test_raises_error_when_filepath_argument_is_a_directory(
-    make_pdf_file: Callable[[str, str], pathlib.Path]
+    make_pdf_file: Callable[[str, str], pathlib.Path],
 ) -> None:
     with pytest.raises(IsADirectoryError):
         path = make_pdf_file("test.pdf", "")
@@ -56,7 +56,7 @@ def test_returned_io_wrapper_is_not_closed(
 
 
 def test_can_be_passed_to_builtin_open_function(
-    make_pdf_file: Callable[[str, str], pathlib.Path]
+    make_pdf_file: Callable[[str, str], pathlib.Path],
 ) -> None:
     path = make_pdf_file("test.pdf", "")
     wrapper = PdfFileWrapper(path.resolve())
@@ -65,9 +65,9 @@ def test_can_be_passed_to_builtin_open_function(
 
 @pytest.mark.skip
 def test_reading_file_returns_string(
-    make_pdf_file: Callable[[str, str], pathlib.Path]
+    make_pdf_file: Callable[[str, str], pathlib.Path],
 ) -> None:
     path = make_pdf_file("test.pdf", "")
     wrapper = PdfFileWrapper(path.resolve())
-    result = wrapper.read()
+    result = wrapper.read()  # type: ignore
     assert isinstance(result, str)

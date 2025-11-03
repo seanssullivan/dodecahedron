@@ -6,7 +6,10 @@ import abc
 import logging
 import os
 import pathlib
-import typing
+from typing import Any
+from typing import IO
+from typing import Optional
+from typing import TypeVar
 
 # Local Imports
 from .. import settings
@@ -22,13 +25,13 @@ __all__ = [
 log = logging.getLogger("dodecahedron")
 
 # Custom types
-T = typing.TypeVar("T")
+T = TypeVar("T")
 
 
 class AbstractFileSystemWrapper(abc.ABC):
     """Represents an abstract file-system wrapper."""
 
-    def __init__(self, read_only: bool = False) -> None:
+    def __init__(self, *, read_only: bool = False) -> None:
         self.read_only = read_only
 
     @property
@@ -44,18 +47,22 @@ class AbstractFileSystemWrapper(abc.ABC):
 
     @read_only.setter
     def read_only(self, value: bool) -> None:
-        if not isinstance(value, bool):
+        if not isinstance(value, bool):  # type: ignore
             message = f"expected type 'bool', got {type(value)} instead"
             raise TypeError(message)
 
         self._read_only = value
 
     @abc.abstractmethod
-    def open(self, *args, **kwargs) -> typing.IO:
+    def open(self, *args: Any, **kwargs: Any) -> "IO[Any]":
         """Open file."""
         raise NotImplementedError
 
-    def _open_file(self, filepath: os.PathLike, mode: str) -> typing.IO:
+    def _open_file(
+        self,
+        filepath: "os.PathLike[Any]",
+        mode: str,
+    ) -> "IO[Any]":
         """Open a file and return a file object.
 
         Args:
@@ -93,25 +100,25 @@ class AbstractDirectoryWrapper(AbstractFileSystemWrapper):
         read_only (optional): Whether directory is read only. Default ``False``.
 
     Raises:
-        TypeError: when `directory` is not type ``Path``.
+        TypeError: when `directory` is not type ``PathLike``.
         NotADirectoryError: when `directory` is not a valid directory.
 
     """
 
     def __init__(
         self,
-        directory: os.PathLike,
+        directory: "os.PathLike[Any]",
         *,
-        extension: typing.Optional[str] = None,
+        extension: Optional[str] = None,
         read_only: bool = False,
     ) -> None:
-        if not isinstance(directory, os.PathLike):
+        if not isinstance(directory, os.PathLike):  # type: ignore
             expected = "expected type 'PathLike'"
             actual = f"got {type(directory)} instead"
             message = ", ".join([expected, actual])
             raise TypeError(message)
 
-        if extension and not isinstance(extension, str):
+        if extension and not isinstance(extension, str):  # type: ignore
             message = f"expected type 'str', got {type(extension)} instead"
             raise TypeError(message)
 
@@ -119,7 +126,7 @@ class AbstractDirectoryWrapper(AbstractFileSystemWrapper):
             message = f"{directory!s} is not a valid directory"
             raise NotADirectoryError(message)
 
-        super().__init__(read_only)
+        super().__init__(read_only=read_only)
         self._directory = pathlib.Path(directory)
         self._extension = utils.standardize_file_extension(extension or "*")
 
@@ -139,7 +146,7 @@ class AbstractDirectoryWrapper(AbstractFileSystemWrapper):
     def __str__(self) -> str:
         return str(self.directory)
 
-    def open(self, filename: str, /, mode: str = "r") -> typing.IO:
+    def open(self, filename: str, /, mode: str = "r") -> "IO[Any]":
         """Open a file and return a file object.
 
         Args:
@@ -194,17 +201,38 @@ class AbstractDirectoryWrapper(AbstractFileSystemWrapper):
             "Searching for %(ref)s in %(dir)s",
             {"ref": ref, "dir": self._directory},
         )
+        filename = utils.set_extension(ref, self.extension)
+        result = self._find_file_in_directory(filename)
+        log.debug(
+            "Found %(file)s in %(dir)s",
+            {"file": result, "dir": self._directory},
+        )
+        return result
+
+    def _find_file_in_directory(self, __filename: str) -> pathlib.Path:
+        """Find path for file in directory.
+
+        Finds the filepath for a file in the source directory where the
+        filename contains the provided substring.
+
+        Args:
+            __filename: Name of file.
+
+        Returns:
+            Path for file.
+
+        Raises:
+            FileNotFoundError: When no files match provided filename.
+
+        """
         try:
-            filename = utils.set_extension(ref, self.extension)
-            filepath = next(path for path in self._directory.rglob(filename))
+            filepath = next(path for path in self._directory.rglob(__filename))
 
         except StopIteration as err:
-            message = f"{self._directory / filename} not found"
+            message = f"{self._directory / __filename} not found"
             raise FileNotFoundError(message) from err
 
-        else:
-            log.debug("Found %s", filepath)
-            return filepath
+        return filepath
 
 
 class AbstractFileWrapper(AbstractFileSystemWrapper):
@@ -221,17 +249,22 @@ class AbstractFileWrapper(AbstractFileSystemWrapper):
     """
 
     def __init__(
-        self, filepath: os.PathLike, *, read_only: bool = False
+        self,
+        filepath: "os.PathLike[Any]",
+        *,
+        read_only: bool = False,
     ) -> None:
-        if not isinstance(filepath, os.PathLike):
-            message = f"expected type 'PathLike', got {type(filepath)} instead"
+        if not isinstance(filepath, os.PathLike):  # type: ignore
+            expected = "expected type 'PathLike'"
+            actual = f"got {type(filepath)} instead"
+            message = ", ".join([expected, actual])
             raise TypeError(message)
 
         if os.path.isdir(filepath):
             message = f"{filepath!s} is a directory"
             raise IsADirectoryError(message)
 
-        super().__init__(read_only)
+        super().__init__(read_only=read_only)
         self._filepath = pathlib.Path(filepath)
 
     @property
@@ -250,7 +283,7 @@ class AbstractFileWrapper(AbstractFileSystemWrapper):
     def __str__(self) -> str:
         return str(self.filepath)
 
-    def open(self, mode: str = "rb") -> typing.IO:
+    def open(self, mode: str = "rb") -> "IO[Any]":
         """Open file and return a file object.
 
         Args:
@@ -280,14 +313,14 @@ class AbstractTextWrapper(AbstractFileSystemWrapper):
 
     def __init__(
         self,
-        *args,
+        *args: Any,
         encoding: str = settings.DEFAULT_FILE_ENCODING,
-        newline: typing.Optional[str] = None,
-        **kwargs,
+        newline: Optional[str] = None,
+        **kwargs: Any,
     ) -> None:
         super().__init__(*args, **kwargs)
 
-        if not isinstance(encoding, str):
+        if not isinstance(encoding, str):  # type: ignore
             message = f"expected type 'str', got {type(encoding)} instead"
             raise TypeError(message)
 
@@ -300,11 +333,15 @@ class AbstractTextWrapper(AbstractFileSystemWrapper):
         return self._encoding
 
     @property
-    def newline(self) -> typing.Optional[str]:
+    def newline(self) -> Optional[str]:
         """Newline character."""
         return self._newline
 
-    def _open_file(self, filepath: os.PathLike, mode: str) -> typing.IO:
+    def _open_file(
+        self,
+        filepath: "os.PathLike[Any]",
+        mode: str,
+    ) -> IO[Any]:
         """Open a file and return a file object.
 
         Args:
@@ -325,7 +362,7 @@ class AbstractTextWrapper(AbstractFileSystemWrapper):
         )
         return result
 
-    def _get_encoding_for_file_mode(self, mode: str) -> typing.Optional[str]:
+    def _get_encoding_for_file_mode(self, mode: str) -> Optional[str]:
         """Get encoding for file mode.
 
         Args:
@@ -338,7 +375,7 @@ class AbstractTextWrapper(AbstractFileSystemWrapper):
         result = self._encoding if "b" not in mode else None
         return result
 
-    def _get_newline_for_file_mode(self, mode: str) -> typing.Optional[str]:
+    def _get_newline_for_file_mode(self, mode: str) -> Optional[str]:
         """Get newline for file mode.
 
         Args:
@@ -352,7 +389,7 @@ class AbstractTextWrapper(AbstractFileSystemWrapper):
         return result
 
 
-class AbstractIOWrapper(typing.IO):
+class AbstractIOWrapper(IO[Any]):  # type: ignore
     """Represents an abstract I/O wrapper class for files.
 
     Args:
@@ -362,7 +399,7 @@ class AbstractIOWrapper(typing.IO):
 
     @property
     @abc.abstractmethod
-    def file(self) -> typing.IO:
+    def file(self) -> IO[Any]:
         """File."""
         raise NotImplementedError
 

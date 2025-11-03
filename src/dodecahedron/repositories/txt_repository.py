@@ -3,10 +3,10 @@
 
 # Standard Library Imports
 import logging
-import typing
+from typing import Any
 
 # Local Imports
-from .file_repository import AbstractFileRepository
+from .file_system_repository import AbstractFileSystemRepository
 from ..wrappers.txt_file_wrappers import AbstractTxtWrapper
 
 __all__ = ["AbstractTxtRepository"]
@@ -16,7 +16,7 @@ __all__ = ["AbstractTxtRepository"]
 log = logging.getLogger("dodecahedron")
 
 
-class AbstractTxtRepository(AbstractFileRepository):
+class AbstractTxtRepository(AbstractFileSystemRepository):
     """Represents an abstract `.txt` file repository.
 
     Args:
@@ -24,7 +24,7 @@ class AbstractTxtRepository(AbstractFileRepository):
 
     """
 
-    def __init__(self, __file: typing.Any, /, *args, **kwargs) -> None:
+    def __init__(self, __file: Any, /, *args: Any, **kwargs: Any) -> None:
         if not isinstance(__file, AbstractTxtWrapper):
             expected = "expected type 'AbstractTxtWrapper'"
             actual = f"got {type(__file)} instead"

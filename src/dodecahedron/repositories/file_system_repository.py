@@ -1,25 +1,25 @@
 # -*- coding: utf-8 -*-
-"""File Repository."""
+"""File-System Repository."""
 
 # Standard Library Imports
-import typing
+from typing import Any
 
 # Local Imports
 from .abstract_repository import AbstractRepository
 from ..wrappers import AbstractFileSystemWrapper
 
-__all__ = ["AbstractFileRepository"]
+__all__ = ["AbstractFileSystemRepository"]
 
 
-class AbstractFileRepository(AbstractRepository):
-    """Represents an abstract file repository.
+class AbstractFileSystemRepository(AbstractRepository):
+    """Represents an abstract file-system repository.
 
     Args:
         __file: File.
 
     """
 
-    def __init__(self, __file: typing.Any, /, *args, **kwargs) -> None:
+    def __init__(self, __file: Any, /, *args: Any, **kwargs: Any) -> None:
         if not isinstance(__file, AbstractFileSystemWrapper):
             expected = "expected type 'AbstractFileSystemWrapper'"
             actual = f"got {type(__file)} instead"

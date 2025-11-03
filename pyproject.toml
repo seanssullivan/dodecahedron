@@ -1,6 +1,54 @@
 [build-system]
-requires = ["setuptools >= 44.0.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "dodecahedron"
+version = "0.0.1"
+authors = [
+  { name="Sean Sullivan", email="seansullivan@seanmedia.ca" },
+]
+description = "Collection of classes and functions to support domain driven design and hexagonal architecture."
+readme = {file = "README.md", content-type = "text/markdown"}
+requires-python = ">=3.9"
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+	"Programming Language :: Python :: 3.8",
+	"Programming Language :: Python :: 3.9",
+	"Programming Language :: Python :: 3.10",
+  "Natural Language :: English",
+  "Operating System :: OS Independent",
+]
+license = "CC0-1.0"
+license-files = ["LICEN[CS]E*"]
+dependencies = [
+  "cachetools",
+	"python-dateutil",
+]
+
+[project.urls]
+Homepage = "https://github.com/seanssullivan/dodecahedron"
+Repository = "https://github.com/seanssullivan/dodecahedron.git"
+Issues = "https://github.com/seanssullivan/dodecahedron/issues"
+
+[project.optional-dependencies]
+database = ["SQLAlchemy"]
+pandas = ["pandas"]
+progress = ["tqdm"]
+redis = ["redis"]
+testing = [
+  "coverage",
+  "fpdf",
+  "pytest",
+  "pytest-cov",
+  "pytest-env",
+  "tox",
+  "XlsxWriter",
+]
+xlsx = ["openpyxl"]
 
 [dev-dependencies]
 black = { version = "^22.10.0", python = "^3.9" }
@@ -23,3 +71,21 @@ exclude = '''
   )/
 )
 '''
+
+[tool.coverage.report]
+show_missing = true
+exclude_lines = [
+    'pragma: no cover',
+    '\.\.\.',
+    'if TYPE_CHECKING:',
+    "if __name__ == '__main__':",
+]
+
+[tool.hatch.build.targets.sdist]
+include = ["src"]
+exclude = [
+  "dodecahedron.mappers*",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]

@@ -1,69 +1,39 @@
 # -*- coding: utf-8 -*-
 """Abstract Converter.
 
-Module defines a class for converting values to boolean.
+Module defines an abstract class for converting values between data types.
 
 """
 
 # Standard Library Imports
 import abc
-import datetime
-import decimal
-import typing
+from typing import Any
+from typing import Callable
 
 __all__ = ["AbstractConverter"]
-
-
-# Custom type
-T = typing.TypeVar("T")
 
 
 class AbstractConverter(abc.ABC):
     """Class represents an abstract converter."""
 
-    def __init__(self, *, default: typing.Optional[T] = None) -> None:
-        self._default = default
-
-    @property
-    def default(self) -> typing.Optional[T]:
-        """Default."""
-        return self._default
-
     @abc.abstractmethod
-    def __call__(self, __value: typing.Any, /) -> typing.Any:
+    def __call__(self, __value: Any, /) -> Any:
         raise NotImplementedError
 
     @abc.abstractmethod
-    def from_bool(self, __value: bool, /) -> typing.Any:
-        """Make value from boolean."""
+    def set_conversion(
+        self, __type: type, func: Callable[..., Any], /
+    ) -> None:
+        """Set conversion for type.
+
+        Args:
+            __type: Type.
+            func: Function for converting between types.
+
+        """
         raise NotImplementedError
 
     @abc.abstractmethod
-    def from_date(self, __value: datetime.date, /) -> typing.Any:
-        """Make value from date."""
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def from_datetime(self, __value: datetime.datetime, /) -> typing.Any:
-        """Make value from datetime."""
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def from_decimal(self, __value: decimal.Decimal, /) -> typing.Any:
-        """Make value from decimal."""
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def from_float(self, __value: float, /) -> typing.Any:
-        """Make value from float."""
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def from_int(self, __value: int, /) -> typing.Any:
-        """Make value from integer."""
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def from_str(self, __value: str, /) -> typing.Any:
-        """Make value from string."""
+    def reset(self) -> None:
+        """Reset converter."""
         raise NotImplementedError

@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import List
 from typing import Optional
 from typing import Set
+from typing import Union
 
 # Third-Party Imports
 from ..models import AbstractModel
@@ -32,7 +33,7 @@ class FakeRepository(AbstractRepository):
         key: str = DEFAULT_KEY,
     ) -> None:
         super().__init__()
-        self._objects = set(objects or [])  # type: Set[AbstractModel]
+        self._objects: Set[AbstractModel] = set(objects or [])
         self._key = key
 
     @property
@@ -60,7 +61,7 @@ class FakeRepository(AbstractRepository):
         """Add object."""
         self._objects.add(obj)
 
-    def get(self, ref: str) -> Optional[AbstractModel]:
+    def get(self, ref: Union[int, str]) -> Optional[AbstractModel]:
         """Get object.
 
         Args:
