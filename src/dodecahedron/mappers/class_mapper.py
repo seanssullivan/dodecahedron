@@ -3,7 +3,14 @@
 
 # Standard Library Imports
 from contextlib import contextmanager
-import typing
+from typing import Any
+from typing import Dict
+from typing import Generator
+from typing import Hashable
+from typing import List
+from typing import Optional
+from typing import Type
+from typing import TypeVar
 
 # Local Imports
 from .abstract_mapper import AbstractMapper
@@ -12,7 +19,7 @@ __all__ = ["ClassMapper"]
 
 
 # Custom types
-T = typing.TypeVar("T")
+T = TypeVar("T")
 
 
 class ClassMapper(AbstractMapper):
@@ -20,10 +27,10 @@ class ClassMapper(AbstractMapper):
 
     def __init__(
         self,
-        __class: typing.Type[T],
+        __class: Type[T],
         /,
-        schema: typing.Dict[str, typing.Any],
-        properties: typing.Optional[typing.Dict[str, typing.Any]] = None,
+        schema: Dict[Hashable, Any],
+        properties: Optional[Dict[Hashable, Any]] = None,
     ) -> None:
         super().__init__(schema)
         self._class = __class
@@ -32,17 +39,17 @@ class ClassMapper(AbstractMapper):
         setattr(self._class, "__mapper__", self)
 
     @property
-    def cls(self) -> typing.Type[T]:
+    def cls(self) -> Type[Any]:
         """Mapped class."""
         return self._class
 
     @property
-    def properties(self) -> typing.Dict[str, typing.Any]:
+    def properties(self) -> Dict[Hashable, Any]:
         """Mapped properties."""
         results = self._properties or self._get_attribute_names()
         return results
 
-    def from_dict(self, __dict: dict, /) -> T:
+    def from_dict(self, __dict: Dict[str, Any], /) -> Any:
         """Instantiate class from dictionary.
 
         Args:
@@ -57,11 +64,11 @@ class ClassMapper(AbstractMapper):
             for attr, key in self.properties.items():
                 converter = self._get_converter(key, direction="outward")
                 value = converter(__dict[key]) if converter else __dict[key]
-                setattr(result, attr, value)
+                setattr(result, str(attr), value)
 
         return result
 
-    def from_list(self, __list: list, /) -> T:
+    def from_list(self, __list: List[Any], /) -> Any:
         """Instantiate class from list.
 
         Args:
@@ -76,11 +83,11 @@ class ClassMapper(AbstractMapper):
             for attr, idx in self.properties.items():
                 converter = self._get_converter(idx, direction="outward")
                 value = converter(__list[idx]) if converter else __list[idx]
-                setattr(result, attr, value)
+                setattr(result, str(attr), value)
 
         return result
 
-    def to_dict(self, __instance: T, /) -> dict:
+    def to_dict(self, __instance: Any, /) -> Dict[str, Any]:
         """Convert instance of class to dictionary.
 
         Args:
@@ -90,19 +97,19 @@ class ClassMapper(AbstractMapper):
             Dictionary.
 
         """
-        result = {}
+        result: Dict[str, Any] = {}
         for attr, key in self.properties.items():
             converter = self._get_converter(key, direction="inward")
             value = (
-                converter(getattr(__instance, attr))
+                converter(getattr(__instance, str(attr)))
                 if converter
-                else getattr(__instance, attr)
+                else getattr(__instance, str(attr))
             )
             result[key] = value
 
         return result
 
-    def to_list(self, __instance: T, /) -> list:
+    def to_list(self, __instance: Any, /) -> List[Any]:
         """Convert instance of class to list.
 
         Args:
@@ -112,13 +119,13 @@ class ClassMapper(AbstractMapper):
             List.
 
         """
-        result = []
+        result: List[Any] = []
         for attr, key in sorted(self.properties.items(), key=lambda i: i[1]):
             converter = self._get_converter(key, direction="inward")
             value = (
-                converter(getattr(__instance, attr))
+                converter(getattr(__instance, str(attr)))
                 if converter
-                else getattr(__instance, attr)
+                else getattr(__instance, str(attr))
             )
             result.append(value)
 
@@ -129,7 +136,7 @@ class ClassMapper(AbstractMapper):
 # Helpers
 # ----------------------------------------------------------------------------
 @contextmanager
-def replace_init(__class: type) -> typing.Generator[type, None, None]:
+def replace_init(__class: type) -> Generator[type, None, None]:
     """Temporarily replace the ``__init__`` method on a class.
 
     Args:

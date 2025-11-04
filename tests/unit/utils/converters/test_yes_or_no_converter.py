@@ -3,6 +3,9 @@
 # pylint: disable=arguments-renamed
 # pylint: disable=missing-function-docstring
 
+# Standard Library Imports
+from typing import Any
+
 # Third-Party Imports
 import pytest
 
@@ -11,13 +14,13 @@ from dodecahedron.utils import converters
 
 
 @pytest.mark.parametrize("value", [True, 1, "true", "yes", "y", "1"])
-def test_returns_yes(value) -> None:
+def test_returns_yes(value: Any) -> None:
     result = converters.to_yes_or_no(value)
     assert result == "Yes"
 
 
 @pytest.mark.parametrize("value", [False, 0, "false", "no", "n", "0"])
-def test_returns_no(value) -> None:
+def test_returns_no(value: Any) -> None:
     result = converters.to_yes_or_no(value)
     assert result == "No"
 

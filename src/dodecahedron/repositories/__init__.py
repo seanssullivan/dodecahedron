@@ -1,4 +1,10 @@
 # -*- coding: utf-8 -*-
+"""Repositories.
+
+Todo:
+    * Add 'sqlite3' repository.
+
+"""
 
 # Standard Library Imports
 import importlib

@@ -3,7 +3,9 @@
 # pylint: disable=missing-function-docstring
 
 # Standard Library Imports
-import typing
+from typing import Any
+from typing import Dict
+from typing import Hashable
 
 # Third-Party Imports
 import pytest
@@ -23,14 +25,14 @@ class ExampleClass:
 
     """
 
-    def __init__(self, value: typing.Any = None) -> None:
+    def __init__(self, value: Any = None) -> None:
         if value is None:
             raise ValueError("argument cannot be 'None'")
 
         self._value = value
 
     @property
-    def value(self) -> typing.Any:
+    def value(self) -> Any:
         """Value"""
         return self._value
 
@@ -44,8 +46,8 @@ class ExampleClass:
     ],
 )
 def test_instantiates_class_from_dictionary(
-    schema: dict,
-    properties: dict,
+    schema: Dict[Hashable, Any],
+    properties: Dict[Hashable, Any],
 ) -> None:
     mapper = ClassMapper(ExampleClass, schema, properties)
     result = mapper.from_dict({"value": "success"})
@@ -62,8 +64,8 @@ def test_instantiates_class_from_dictionary(
     ],
 )
 def test_instantiates_class_from_list(
-    schema: dict,
-    properties: dict,
+    schema: Dict[Hashable, Any],
+    properties: Dict[Hashable, Any],
 ) -> None:
     mapper = ClassMapper(ExampleClass, schema, properties)
     result = mapper.from_list(["success"])

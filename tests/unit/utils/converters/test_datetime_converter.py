@@ -45,7 +45,7 @@ def test_returns_datetime_from_integer() -> None:
         NOW.strftime("%m/%d/%Y %H:%M:%S"),
     ],
 )
-def test_returns_datetime_from_string(value) -> None:
+def test_returns_datetime_from_string(value: str) -> None:
     result = converters.to_datetime(value)
     expected = NOW.replace(microsecond=0).astimezone(tzlocal())
     assert result == expected
