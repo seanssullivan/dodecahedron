@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "dodecahedron"
-version = "0.0.1"
+version = "0.0.2"
 authors = [
   { name="Sean Sullivan", email="seansullivan@seanmedia.ca" },
 ]
@@ -19,6 +19,8 @@ classifiers = [
 	"Programming Language :: Python :: 3.8",
 	"Programming Language :: Python :: 3.9",
 	"Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
   "Natural Language :: English",
   "Operating System :: OS Independent",
 ]
@@ -82,10 +84,11 @@ exclude_lines = [
 ]
 
 [tool.hatch.build.targets.sdist]
-include = ["src"]
+include = ["src/dodecahedron"]
 exclude = [
-  "dodecahedron.mappers*",
+  "src/dodecahedron/mappers*",
+  "tests/*",
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src"]
+packages = ["src/dodecahedron"]

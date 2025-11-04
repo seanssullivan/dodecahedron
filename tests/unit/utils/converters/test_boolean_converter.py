@@ -38,13 +38,13 @@ def test_returns_boolean_from_integer(value: int, expected: bool) -> None:
 
 
 @pytest.mark.parametrize("value", ["true", "yes", "y", "1"])
-def test_returns_true_from_string_for_truthy_values(value) -> None:
+def test_returns_true_from_string_for_truthy_values(value: str) -> None:
     result = converters.to_boolean(value)
     assert result is True
 
 
 @pytest.mark.parametrize("value", ["false", "no", "n", "0"])
-def test_returns_false_from_string_for_falsey_values(value) -> None:
+def test_returns_false_from_string_for_falsey_values(value: str) -> None:
     result = converters.to_boolean(value)
     assert result is False
 

@@ -16,13 +16,13 @@ def test_returns_amount_from_integer() -> None:
 
 
 @pytest.mark.parametrize("value", ["2.000", "2.00", "2.0", "2.", "2"])
-def test_returns_amount_from_string(value) -> None:
+def test_returns_amount_from_string(value: str) -> None:
     result = converters.to_currency(value)
     assert result == 2.00
 
 
 @pytest.mark.parametrize("value", ["4,000.00", "4,000.0", "4,000.", "4,000"])
-def test_returns_amount_from_string_with_comma(value) -> None:
+def test_returns_amount_from_string_with_comma(value: str) -> None:
     result = converters.to_currency(value)
     assert result == 4000.00
 

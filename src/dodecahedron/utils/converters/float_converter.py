@@ -1,42 +1,45 @@
 # -*- coding: utf-8 -*-
-"""Distance Converter.
+"""Float Converter.
 
-Module provides functions for converting values to distances.
+Module provides functions for converting values to floats.
 
 """
 
 # Standard Library Imports
+import datetime
 import decimal
 import re
+import time
 from typing import Any
 from typing import Callable
 from typing import Dict
 from typing import Literal
+from typing import Optional
 
 # Local Imports
 from .base_converter import BaseConverter
 
-__all__ = ["to_distance"]
+__all__ = ["to_float"]
 
 
-def to_distance(__value: Any, /, default: float = 0.0) -> float:
-    """Convert value to distance.
+def to_float(__value: Any, /, default: float = 0.0) -> float:
+    """Convert value to float.
 
     Args:
-        __value: Value to convert to distance.
+        __value: Value to convert to float.
         default (optional): Default value. Default ``0.0``.
 
     Returns:
-        Distance.
+        Float.
 
     """
-    converter = DistanceConverter(default=default)
+    converter = FloatConverter(default=default)
     result = converter(__value)
     return result
 
 
-class DistanceConverter(BaseConverter):
-    """Class implements a distance converter.
+class FloatConverter(BaseConverter):
+    """Class implements a float converter.
 
     Args:
         default (optional): Default value. Default ``0.0``.
@@ -59,14 +62,60 @@ class DistanceConverter(BaseConverter):
         self._conversions = self._conversions.new_child()
 
 
-def distance_from_decimal(__value: decimal.Decimal, _: float, /) -> float:
-    """Convert decimal value to distance.
+def float_from_date(
+    __value: datetime.date, _: Optional[float] = None, /
+) -> float:
+    """Convert date value to float.
 
     Args:
-        __value: Value to convert to distance.
+        __value: Value to convert to float.
 
     Returns:
-        Distance.
+        Float.
+
+    Raises:
+        TypeError: when value is not type 'date'.
+
+    """
+    if not isinstance(__value, datetime.date):  # type: ignore
+        message = f"expected type 'date', got {type(__value)} instead"
+        raise TypeError(message)
+
+    result = time.mktime(__value.timetuple())
+    return result
+
+
+def float_from_datetime(
+    __value: datetime.datetime, _: Optional[float] = None, /
+) -> float:
+    """Convert datetime value to float.
+
+    Args:
+        __value: Value to convert to float.
+
+    Returns:
+        Float.
+
+    Raises:
+        TypeError: when value is not type 'datetime'.
+
+    """
+    if not isinstance(__value, datetime.datetime):  # type: ignore
+        message = f"expected type 'datetime', got {type(__value)} instead"
+        raise TypeError(message)
+
+    result = __value.timestamp()
+    return result
+
+
+def float_from_decimal(__value: decimal.Decimal, _: float, /) -> float:
+    """Convert decimal value to float.
+
+    Args:
+        __value: Value to convert to float.
+
+    Returns:
+        Float.
 
     Raises:
         TypeError: when value is not type 'Decimal'.
@@ -80,14 +129,14 @@ def distance_from_decimal(__value: decimal.Decimal, _: float, /) -> float:
     return result
 
 
-def distance_from_float(__value: float, _: float, /) -> float:
-    """Convert float value to distance.
+def float_from_float(__value: float, _: float, /) -> float:
+    """Convert float value to float.
 
     Args:
-        __value: Value to convert to distance.
+        __value: Value to convert to float.
 
     Returns:
-        Distance.
+        Float.
 
     Raises:
         TypeError: when value is not type 'float'.
@@ -101,14 +150,14 @@ def distance_from_float(__value: float, _: float, /) -> float:
     return result
 
 
-def distance_from_int(__value: int, _: float, /) -> float:
-    """Convert integer value to distance.
+def float_from_int(__value: int, _: float, /) -> float:
+    """Convert integer value to float.
 
     Args:
-        __value: Value to convert to distance.
+        __value: Value to convert to float.
 
     Returns:
-        Distance.
+        Float.
 
     Raises:
         TypeError: when value is not type 'int'.
@@ -122,18 +171,18 @@ def distance_from_int(__value: int, _: float, /) -> float:
     return result
 
 
-def distance_from_str(__value: str, default: float = 0.0, /) -> float:
-    """Convert string value to distance.
+def float_from_str(__value: str, default: float = 0.0, /) -> float:
+    """Convert string value to float.
 
     Args:
-        __value: String representation of distance value.
+        __value: String representation of float value.
 
     Returns:
-        Distance.
+        Float.
 
     Raises:
         TypeError: when value is not type 'str'.
-        ValueError: when value cannot be converted to distance.
+        ValueError: when value cannot be converted to float.
 
     """
     if not isinstance(__value, str):  # type: ignore
@@ -146,11 +195,11 @@ def distance_from_str(__value: str, default: float = 0.0, /) -> float:
 
     try:
         representation = re.sub(r"[^0-9a-zA-Z.]+", r"", value)
-        number = re.sub(r"(\d+)\s?m?", r"\1", representation, flags=re.I)
+        number = re.sub(r"(\d+)\s?[a-z]+?", r"\1", representation, flags=re.I)
         result = float(number)
 
     except ValueError:
-        message = f"{type(__value)} cannot be converted to distance"
+        message = f"{type(__value)} cannot be converted to float"
         raise ValueError(message)
 
     else:
@@ -158,8 +207,10 @@ def distance_from_str(__value: str, default: float = 0.0, /) -> float:
 
 
 DEFAULT_CONVERSIONS: Dict[type, Callable[..., float]] = {
-    decimal.Decimal: distance_from_decimal,
-    float: distance_from_float,
-    int: distance_from_int,
-    str: distance_from_str,
+    datetime.date: float_from_date,
+    datetime.datetime: float_from_datetime,
+    decimal.Decimal: float_from_decimal,
+    float: float_from_float,
+    int: float_from_int,
+    str: float_from_str,
 }

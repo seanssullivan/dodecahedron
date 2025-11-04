@@ -42,7 +42,7 @@ def test_returns_date_from_integer() -> None:
         TODAY.strftime("%m/%d/%Y"),
     ],
 )
-def test_returns_date_from_string(value) -> None:
+def test_returns_date_from_string(value: str) -> None:
     result = converters.to_date(value)
     assert result == TODAY
 

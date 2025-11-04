@@ -35,7 +35,7 @@ def test_passes_command_to_command_handler() -> None:
     uow = EventfulUnitOfWork()
     bus = MessageBus(uow, {TestCommand: handler}, {})  # type: ignore
     bus.handle(TestCommand())
-    assert handler.assert_called()
+    handler.assert_called()
 
 
 def test_does_not_pass_command_to_event_handler() -> None:
@@ -48,7 +48,7 @@ def test_does_not_pass_command_to_event_handler() -> None:
     uow = EventfulUnitOfWork()
     bus = MessageBus(uow, command_handlers, event_handlers)  # type: ignore
     bus.handle(TestCommand())
-    assert event_handler.assert_not_called()
+    event_handler.assert_not_called()
 
 
 def test_raises_error_from_command_handler() -> None:
@@ -71,7 +71,7 @@ def test_executes_callback_after_passing_command_to_handler() -> None:
     uow = EventfulUnitOfWork()
     bus = MessageBus(uow, {TestCommand: handler}, {})  # type: ignore
     bus.handle(TestCommand(), callback=callback)
-    assert callback.assert_called()
+    callback.assert_called()
 
 
 def test_passes_event_to_event_handler() -> None:
@@ -80,7 +80,7 @@ def test_passes_event_to_event_handler() -> None:
     uow = EventfulUnitOfWork()
     bus = MessageBus(uow, {}, {TestEvent: [handler]})  # type: ignore
     bus.handle(TestEvent())
-    assert handler.assert_called()
+    handler.assert_called()
 
 
 def test_does_not_pass_event_to_command_handler() -> None:
@@ -93,7 +93,7 @@ def test_does_not_pass_event_to_command_handler() -> None:
     uow = EventfulUnitOfWork()
     bus = MessageBus(uow, command_handlers, event_handlers)  # type: ignore
     bus.handle(TestEvent())
-    assert command_handler.assert_not_called()
+    command_handler.assert_not_called()
 
 
 def test_does_not_raise_error_from_event_handler() -> None:
@@ -114,7 +114,7 @@ def test_executes_callback_after_passing_event_to_handler() -> None:
     uow = EventfulUnitOfWork()
     bus = MessageBus(uow, {}, {TestEvent: [handler]})  # type: ignore
     bus.handle(TestEvent(), callback=callback)
-    assert callback.assert_called()
+    callback.assert_called()
 
 
 def test_subscribes_handler_to_command() -> None:
@@ -124,7 +124,7 @@ def test_subscribes_handler_to_command() -> None:
     bus = MessageBus(uow, {}, {})  # type: ignore
     bus.subscribe(TestCommand, handler)
     bus.handle(TestCommand())
-    assert handler.assert_called()
+    handler.assert_called()
 
 
 def test_subscribes_handler_to_event() -> None:
@@ -134,4 +134,4 @@ def test_subscribes_handler_to_event() -> None:
     bus = MessageBus(uow, {}, {})  # type: ignore
     bus.subscribe(TestEvent, handler)
     bus.handle(TestEvent())
-    assert handler.assert_called()
+    handler.assert_called()
