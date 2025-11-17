@@ -32,7 +32,7 @@ class AbstractFileSystemRepository(AbstractRepository):
         self._file = __file
 
     @property
-    def filepath(self) -> Optional[pathlib.Path]:
-        """Path to file."""
-        result = getattr(self._file, "filepath", None)
+    def path(self) -> Optional[pathlib.Path]:
+        """Path."""
+        result = getattr(self._file, "path", None)
         return result
