@@ -41,6 +41,12 @@ class AbstractFileSystemWrapper(abc.ABC):
         raise NotImplementedError
 
     @property
+    @abc.abstractmethod
+    def path(self) -> pathlib.Path:
+        """File-system path."""
+        raise NotImplementedError
+        
+    @property
     def read_only(self) -> bool:
         """Whether read only."""
         return self._read_only
@@ -131,10 +137,15 @@ class AbstractDirectoryWrapper(AbstractFileSystemWrapper):
         self._extension = utils.standardize_file_extension(extension or "*")
 
     @property
+    def path(self) -> pathlib.Path:
+        """Path to directory."""
+        return self.directory
+
+    @property
     def directory(self) -> pathlib.Path:
         """Path to directory."""
         return self._directory
-
+        
     @property
     def extension(self) -> str:
         """File extension."""
@@ -268,6 +279,11 @@ class AbstractFileWrapper(AbstractFileSystemWrapper):
         self._filepath = pathlib.Path(filepath)
 
     @property
+    def path(self) -> pathlib.Path:
+        """Path to file."""
+        return self.filepath
+        
+    @property
     def filepath(self) -> pathlib.Path:
         """Path to file."""
         return self._filepath
@@ -297,7 +313,7 @@ class AbstractFileWrapper(AbstractFileSystemWrapper):
         return result
 
 
-class AbstractTextWrapper(AbstractFileSystemWrapper):
+class AbstractTextWrapper(AbstractFileWrapper):
     """Represents an abstract wrapper class for text files.
 
     Args:
