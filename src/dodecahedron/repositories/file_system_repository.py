@@ -2,7 +2,9 @@
 """File-System Repository."""
 
 # Standard Library Imports
+import pathlib
 from typing import Any
+from typing import Optional
 
 # Local Imports
 from .abstract_repository import AbstractRepository
@@ -28,3 +30,9 @@ class AbstractFileSystemRepository(AbstractRepository):
 
         super().__init__(*args, **kwargs)
         self._file = __file
+
+    @property
+    def filepath(self) -> Optional[pathlib.Path]:
+        """Path to file."""
+        result = getattr(self._file, "filepath", None)
+        return result
