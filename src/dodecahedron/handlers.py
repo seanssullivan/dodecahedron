@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Standard Library Imports
+import collections
 import functools
 import inspect
 from typing import Any
@@ -161,4 +162,23 @@ def inject_dependencies(
         if name in params
     }
     result = functools.partial(__handler, **kwargs)
+    return result
+
+
+def merge_event_handlers(*groups: EventHandlers) -> EventHandlers:
+    """Merge event handlers.
+
+    Args:
+        *groups: Groups of event handlers.
+
+    Returns:
+        Merged event handlers.
+
+    """
+    collection: EventHandlers = collections.defaultdict(list)
+    for group in groups:
+        for event_type, handlers in group.items():
+            collection[event_type].extend(handlers)
+
+    result = dict(collection)
     return result
