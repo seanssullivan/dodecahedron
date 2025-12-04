@@ -7,16 +7,20 @@ import json
 import pathlib
 import shutil
 import tempfile
-import typing
+from typing import Any
+from typing import Callable
+from typing import Generator
+from typing import List
+from typing import Optional
 import zipfile
 
 # Third-Party Imports
 import pytest
-import xlsxwriter
+import xlsxwriter  # type: ignore
 
 
 @pytest.fixture
-def tempdir() -> typing.Generator[str, None, None]:
+def tempdir() -> Generator[str, None, None]:
     """Fixture to make a temporary directory.
 
     Yields:
@@ -31,7 +35,7 @@ def tempdir() -> typing.Generator[str, None, None]:
 @pytest.fixture
 def make_csv_file(
     tempdir: str,
-) -> typing.Generator[typing.Callable[..., pathlib.Path], None, None]:
+) -> Generator[Callable[..., pathlib.Path], None, None]:
     """Fixture to make a temporary `.csv` file.
 
     Args:
@@ -40,9 +44,9 @@ def make_csv_file(
     """
 
     def _make_file(
-        filename: str, lines: typing.Optional[list] = None
+        filename: str, lines: Optional[List[Any]] = None
     ) -> pathlib.Path:
-        if not isinstance(filename, str):
+        if not isinstance(filename, str):  # type: ignore
             message = f"expected type 'str', got {type(filename)} instead"
             raise TypeError(message)
 
@@ -60,7 +64,7 @@ def make_csv_file(
 @pytest.fixture
 def make_json_file(
     tempdir: str,
-) -> typing.Generator[typing.Callable[..., pathlib.Path], None, None]:
+) -> Generator[Callable[..., pathlib.Path], None, None]:
     """Fixture to make a temporary `.json` file.
 
     Args:
@@ -68,8 +72,8 @@ def make_json_file(
 
     """
 
-    def _make_file(filename: str, content: typing.Any = None) -> pathlib.Path:
-        if not isinstance(filename, str):
+    def _make_file(filename: str, content: Any = None) -> pathlib.Path:
+        if not isinstance(filename, str):  # type: ignore
             message = f"expected type 'str', got {type(filename)} instead"
             raise TypeError(message)
 
@@ -85,7 +89,7 @@ def make_json_file(
 @pytest.fixture
 def make_pdf_file(
     tempdir: str,
-) -> typing.Generator[typing.Callable[..., pathlib.Path], None, None]:
+) -> Generator[Callable[..., pathlib.Path], None, None]:
     """Fixture to make a temporary `.pdf` file.
 
     Args:
@@ -94,7 +98,7 @@ def make_pdf_file(
     """
 
     def _make_file(filename: str, content: str = "") -> pathlib.Path:
-        if not isinstance(filename, str):
+        if not isinstance(filename, str):  # type: ignore
             message = f"expected type 'str', got {type(filename)} instead"
             raise TypeError(message)
 
@@ -103,7 +107,7 @@ def make_pdf_file(
         pdf.add_page()
         pdf.set_font("Arial", "", 16)
         pdf.cell(0, 0, content)
-        pdf.output(path, "F")
+        pdf.output(path, "F")  # type: ignore
         return path
 
     yield _make_file
@@ -112,7 +116,7 @@ def make_pdf_file(
 @pytest.fixture
 def make_txt_file(
     tempdir: str,
-) -> typing.Generator[typing.Callable[..., pathlib.Path], None, None]:
+) -> Generator[Callable[..., pathlib.Path], None, None]:
     """Fixture to make a temporary `.txt` file.
 
     Args:
@@ -121,9 +125,9 @@ def make_txt_file(
     """
 
     def _make_file(
-        filename: str, content: typing.Optional[str] = None
+        filename: str, content: Optional[str] = None
     ) -> pathlib.Path:
-        if not isinstance(filename, str):
+        if not isinstance(filename, str):  # type: ignore
             message = f"expected type 'str', got {type(filename)} instead"
             raise TypeError(message)
 
@@ -139,7 +143,7 @@ def make_txt_file(
 @pytest.fixture
 def make_xlsx_file(
     tempdir: str,
-) -> typing.Generator[typing.Callable[..., pathlib.Path], None, None]:
+) -> Generator[Callable[..., pathlib.Path], None, None]:
     """Fixture to make a temporary `.xlsx` file.
 
     Args:
@@ -149,21 +153,21 @@ def make_xlsx_file(
 
     def _make_file(
         filename: str,
-        lines: typing.Optional[list] = None,
+        lines: Optional[List[Any]] = None,
         *,
-        sheet: typing.Optional[str] = None,
+        sheet: Optional[str] = None,
     ) -> pathlib.Path:
-        if not isinstance(filename, str):
+        if not isinstance(filename, str):  # type: ignore
             message = f"expected type 'str', got {type(filename)} instead"
             raise TypeError(message)
 
         path = pathlib.Path(tempdir) / filename
         workbook = xlsxwriter.Workbook(path)
-        worksheet = workbook.add_worksheet(sheet)
+        worksheet = workbook.add_worksheet(sheet)  # type: ignore
 
         for row, line in enumerate(lines or []):
             for col, item in enumerate(line):
-                worksheet.write(row, col, item)
+                worksheet.write(row, col, item)  # type: ignore
 
         workbook.close()
         return path
@@ -174,7 +178,7 @@ def make_xlsx_file(
 @pytest.fixture
 def make_zip_file(
     tempdir: str,
-) -> typing.Generator[typing.Callable[..., pathlib.Path], None, None]:
+) -> Generator[Callable[..., pathlib.Path], None, None]:
     """Fixture to make a temporary `.zip` file.
 
     Args:
@@ -183,11 +187,11 @@ def make_zip_file(
     """
 
     def _make_file(zipname: str, filepath: pathlib.Path) -> pathlib.Path:
-        if not isinstance(zipname, str):
+        if not isinstance(zipname, str):  # type: ignore
             message = f"expected type 'str', got {type(zipname)} instead"
             raise TypeError(message)
 
-        if not isinstance(filepath, pathlib.Path):
+        if not isinstance(filepath, pathlib.Path):  # type: ignore
             message = f"expected type 'Path', got {type(filepath)} instead"
             raise TypeError(message)
 

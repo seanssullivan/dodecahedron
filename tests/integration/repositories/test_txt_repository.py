@@ -5,20 +5,20 @@
 
 # Standard Library Imports
 from typing import Any
+from typing import Hashable
 from typing import List
 from typing import Optional
-from typing import Union
 
 # Third-Party Imports
 import pytest
 
 # Local Imports
-from dodecahedron.repositories import AbstractTxtRepository
+from dodecahedron.repositories import AbstractTxtFileRepository
 from dodecahedron.wrappers import AbstractFileWrapper
 
 
-class ExampleRepository(AbstractTxtRepository):
-    """Example repository for testing."""
+class ExampleFileRepository(AbstractTxtFileRepository):
+    """Example file repository for testing."""
 
     def __init__(
         self,
@@ -35,7 +35,7 @@ class ExampleRepository(AbstractTxtRepository):
         """Add object."""
         self._objects.add(obj)
 
-    def get(self, ref: Union[int, str]) -> object:
+    def get(self, ref: Hashable) -> object:
         """Get object."""
         raise NotImplementedError
 
@@ -58,6 +58,6 @@ class ExampleRepository(AbstractTxtRepository):
 def test_raises_error_when_not_a_txt_file(
     name: str, request: pytest.FixtureRequest
 ) -> None:
-    with pytest.raises(TypeError, match="expected type 'AbstractTxtWrapper'"):
+    with pytest.raises(TypeError, match="expected type 'TxtFileWrapper'"):
         wrapper: AbstractFileWrapper = request.getfixturevalue(name)
-        ExampleRepository(wrapper)
+        ExampleFileRepository(wrapper)

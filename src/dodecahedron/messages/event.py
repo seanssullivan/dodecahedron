@@ -12,8 +12,8 @@ Events are always named using past-tense verb phrases.
 # Local Imports
 from .message import AbstractMessage
 
-__all__ = ["BaseEvent"]
+__all__ = ["AbstractEvent"]
 
 
-class BaseEvent(AbstractMessage):
-    """Class implements an event."""
+class AbstractEvent(AbstractMessage):
+    """Class represents an abstract event."""

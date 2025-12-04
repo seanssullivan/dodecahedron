@@ -11,9 +11,9 @@ Implementation based on 'Architecture Patterns in Python' repository pattern.
 # Standard Library Imports
 import abc
 from typing import Any
+from typing import Hashable
 from typing import List
 from typing import Set
-from typing import Union
 
 # Local Imports
 from ..metaclasses import RepositoryMeta
@@ -41,7 +41,7 @@ class AbstractRepository(abc.ABC, metaclass=RepositoryMeta):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get(self, ref: Union[int, str]) -> Any:
+    def get(self, ref: Hashable) -> Any:
         """Get object from repository.
 
         Args:
