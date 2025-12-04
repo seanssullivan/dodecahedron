@@ -166,19 +166,19 @@ def inject_dependencies(
     return result
 
 
-def merge_event_handlers(*groups: EventHandlers) -> EventHandlers:
+def merge_event_handlers(*args: EventHandlers) -> EventHandlers:
     """Merge event handlers.
 
     Args:
-        *groups: Groups of event handlers.
+        *args: Groups of event handlers.
 
     Returns:
         Merged event handlers.
 
     """
     collection: EventHandlers = collections.defaultdict(list)
-    for group in groups:
-        for event_type, handlers in group.items():
+    for arg in args:
+        for event_type, handlers in arg.items():
             collection[event_type].extend(handlers)
 
     result = dict(collection)
