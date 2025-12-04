@@ -19,6 +19,7 @@ from .messages import AbstractEvent
 __all__ = [
     "inject_handler_dependencies",
     "inject_dependencies",
+    "merge_event_handlers",
 ]
 
 
