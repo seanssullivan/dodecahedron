@@ -7,28 +7,30 @@ from typing import Any
 
 # Local Imports
 from .file_system_repository import AbstractFileSystemRepository
-from ..wrappers.txt_file_wrappers import AbstractTxtWrapper
+from ..wrappers.txt_file_wrappers import TxtFileWrapper
 
-__all__ = ["AbstractTxtRepository"]
+__all__ = ["AbstractTxtFileRepository"]
 
 
 # Initiate logger.
 log = logging.getLogger("dodecahedron")
 
 
-class AbstractTxtRepository(AbstractFileSystemRepository):
+class AbstractTxtFileRepository(AbstractFileSystemRepository):
     """Represents an abstract `.txt` file repository.
 
     Args:
-        __file: Text file.
+        wrapper: Text file wrapper.
+        *args (optional): Positional arguments.
+        **kwargs (optional): Keyword arguments.
 
     """
 
-    def __init__(self, __file: Any, /, *args: Any, **kwargs: Any) -> None:
-        if not isinstance(__file, AbstractTxtWrapper):
-            expected = "expected type 'AbstractTxtWrapper'"
-            actual = f"got {type(__file)} instead"
+    def __init__(self, wrapper: Any, /, *args: Any, **kwargs: Any) -> None:
+        if not isinstance(wrapper, TxtFileWrapper):
+            expected = "expected type 'TxtFileWrapper'"
+            actual = f"got {type(wrapper)} instead"
             message = ", ".join([expected, actual])
             raise TypeError(message)
 
-        super().__init__(__file, *args, **kwargs)
+        super().__init__(wrapper, *args, **kwargs)

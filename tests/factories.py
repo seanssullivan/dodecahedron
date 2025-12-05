@@ -13,7 +13,7 @@ from dodecahedron import messages
 
 def make_commands(
     n: int, *, delay: Union[float, int] = 0
-) -> List[messages.BaseCommand]:
+) -> List[messages.AbstractCommand]:
     """Make commands.
 
     Args:
@@ -28,7 +28,7 @@ def make_commands(
     return results
 
 
-def make_commands(*, delay: Union[float, int] = 0) -> messages.BaseCommand:
+def make_commands(*, delay: Union[float, int] = 0) -> messages.AbstractCommand:
     """Make commands.
 
     Args:
@@ -46,13 +46,13 @@ def make_commands(*, delay: Union[float, int] = 0) -> messages.BaseCommand:
         raise TypeError(message)
 
     time.sleep(delay)
-    result = messages.BaseEvent()
+    result = messages.AbstractEvent()
     return result
 
 
 def make_events(
     n: int, *, delay: Union[float, int] = 0
-) -> List[messages.BaseEvent]:
+) -> List[messages.AbstractEvent]:
     """Make events.
 
     Args:
@@ -67,7 +67,7 @@ def make_events(
     return results
 
 
-def make_event(*, delay: Union[float, int] = 0) -> messages.BaseEvent:
+def make_event(*, delay: Union[float, int] = 0) -> messages.AbstractEvent:
     """Make event.
 
     Args:
@@ -85,7 +85,7 @@ def make_event(*, delay: Union[float, int] = 0) -> messages.BaseEvent:
         raise TypeError(message)
 
     time.sleep(delay)
-    result = messages.BaseEvent()
+    result = messages.AbstractEvent()
     return result
 
 

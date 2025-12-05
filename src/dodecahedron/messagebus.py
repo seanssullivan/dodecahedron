@@ -38,8 +38,8 @@ from typing import Optional
 from typing import Type
 
 # Local Imports
-from .messages import BaseCommand
-from .messages import BaseEvent
+from .messages import AbstractCommand
+from .messages import AbstractEvent
 from .messages import AbstractMessage
 from .queues import MessageQueue
 from .units_of_work import AbstractUnitOfWork
@@ -56,8 +56,8 @@ log = logging.getLogger("dodecahedron")
 
 # Custom types
 Handler = Callable[..., None]
-CommandHandlers = Dict[Type[BaseCommand], Handler]
-EventHandlers = Dict[Type[BaseEvent], List[Handler]]
+CommandHandlers = Dict[Type[AbstractCommand], Handler]
+EventHandlers = Dict[Type[AbstractEvent], List[Handler]]
 
 # Constants
 eventcollector = methodcaller("collect_events")
@@ -194,14 +194,14 @@ class MessageBus(AbstractMessageBus):
             handler: Handler function to subscribe.
 
         """
-        if not issubclass(message, (BaseCommand, BaseEvent)):
+        if not issubclass(message, (AbstractCommand, AbstractEvent)):
             msg = f"{type(message)} was not a 'Command' or an 'Event'"
             raise TypeError(msg)
 
-        if issubclass(message, BaseCommand):
+        if issubclass(message, AbstractCommand):
             self._command_handlers[message] = handler
 
-        if issubclass(message, BaseEvent):
+        if issubclass(message, AbstractEvent):
             self._event_handlers.setdefault(message, [])
             self._event_handlers[message].append(handler)
 
@@ -218,14 +218,14 @@ class MessageBus(AbstractMessageBus):
             error = ", ".join([expected, actual])
             raise TypeError(error)
 
-        if not isinstance(message, (BaseCommand, BaseEvent)):
+        if not isinstance(message, (AbstractCommand, AbstractEvent)):
             msg = f"{type(message)} was not a 'Command' or an 'Event'"
             raise TypeError(msg)
 
-        if isinstance(message, BaseCommand):
+        if isinstance(message, AbstractCommand):
             self._pass_message_to_command_handler(message, on_error=RAISE)
 
-        if isinstance(message, BaseEvent):
+        if isinstance(message, AbstractEvent):
             self._pass_message_to_event_handlers(message, on_error=IGNORE)
 
     def _pass_message_to_command_handler(
@@ -241,7 +241,7 @@ class MessageBus(AbstractMessageBus):
             on_error (optional): Strategy for handling errors. Default ``raise``.
 
         """
-        if not isinstance(message, BaseCommand):  # type: ignore
+        if not isinstance(message, AbstractCommand):  # type: ignore
             expected = "expected type 'BaseCommand'"
             actual = f"got {type(message)} instead"
             msg = ", ".join([expected, actual])
@@ -270,7 +270,7 @@ class MessageBus(AbstractMessageBus):
             on_error (optional): Strategy for handling errors. Default ``ignore``.
 
         """
-        if not isinstance(message, BaseEvent):  # type: ignore
+        if not isinstance(message, AbstractEvent):  # type: ignore
             expected = "expected type 'BaseEvent'"
             actual = f"got {type(message)} instead"
             msg = ", ".join([expected, actual])

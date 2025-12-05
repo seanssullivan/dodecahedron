@@ -57,6 +57,19 @@ def test_instantiates_class_from_dictionary(
 
 @pytest.mark.parametrize(
     "schema,properties",
+    [({"value": {"map_to": "_value", "converter": str}}, {})],
+)
+def test_converts_value_when_instantiating_from_dictionary(
+    schema: Dict[Hashable, Any],
+    properties: Dict[Hashable, Any],
+) -> None:
+    mapper = ClassMapper(ExampleClass, schema, properties)
+    result = mapper.from_dict({"value": 1})
+    assert isinstance(result.value, str)
+
+
+@pytest.mark.parametrize(
+    "schema,properties",
     [
         ({}, {"_value": 0}),
         ({0: "_value"}, {}),

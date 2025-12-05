@@ -27,7 +27,7 @@ class AbstractPublisher(abc.ABC):
         """Connection."""
         raise NotImplementedError
 
-    def publish(self, channel: str, event: event.BaseEvent, /) -> None:
+    def publish(self, channel: str, event: event.AbstractEvent, /) -> None:
         """publishes an event to an external message broker.
 
         Args:

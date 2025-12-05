@@ -2,10 +2,11 @@
 
 # Standard Library Imports
 from __future__ import annotations
+from typing import Any
+from typing import Hashable
 from typing import List
 from typing import Optional
 from typing import Set
-from typing import Union
 
 # Third-Party Imports
 from ..models import AbstractModel
@@ -29,12 +30,19 @@ class FakeRepository(AbstractRepository):
 
     def __init__(
         self,
+        *args: Any,
         objects: Optional[List[AbstractModel]] = None,
         key: str = DEFAULT_KEY,
+        **kwargs: Any,
     ) -> None:
-        super().__init__()
+        super().__init__(*args, **kwargs)
         self._objects: Set[AbstractModel] = set(objects or [])
         self._key = key
+
+    @property
+    def objects(self) -> Set[AbstractModel]:
+        """Objects in repository."""
+        return self._objects
 
     @property
     def closed(self) -> bool:
@@ -57,11 +65,23 @@ class FakeRepository(AbstractRepository):
     def __contains__(self, obj: AbstractModel) -> bool:
         return obj in self._objects
 
-    def add(self, obj: AbstractModel) -> None:
-        """Add object."""
+    def add(self, obj: object) -> None:
+        """Add object.
+
+        Args:
+            obj: Object to add.
+
+        Raises:
+            TypeError, when `obj` is not type `AbstractModel`.
+
+        """
+        if not isinstance(obj, AbstractModel):
+            msg = f"expected type 'AbstractModel', got {type(obj)} instead"
+            raise TypeError(msg)
+
         self._objects.add(obj)
 
-    def get(self, ref: Union[int, str]) -> Optional[AbstractModel]:
+    def get(self, ref: Hashable) -> Optional[AbstractModel]:
         """Get object.
 
         Args:
@@ -79,8 +99,20 @@ class FakeRepository(AbstractRepository):
         """List objects."""
         return list(self._objects)
 
-    def remove(self, obj: AbstractModel) -> None:
-        """Remove object."""
+    def remove(self, obj: object) -> None:
+        """Remove object.
+
+        Args:
+            obj: Object to remove.
+
+        Raises:
+            TypeError, when `obj` is not type `AbstractModel`.
+
+        """
+        if not isinstance(obj, AbstractModel):
+            msg = f"expected type 'AbstractModel', got {type(obj)} instead"
+            raise TypeError(msg)
+
         self._objects.discard(obj)
 
     def commit(self) -> None:

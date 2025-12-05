@@ -2,7 +2,7 @@
 """Progressive Dispatcherr."""
 
 # Local Imports
-from .base_dispatcher import BaseDispatcher
+from .abstract_dispatcher import AbstractDispatcher
 from ..messagebus import AbstractMessageBus
 from ..progress import AbstractProgressBar
 from ..units_of_work import ProgressiveUnitOfWork
@@ -10,7 +10,7 @@ from ..units_of_work import ProgressiveUnitOfWork
 __all__ = ["ProgressiveDispatcher"]
 
 
-class ProgressiveDispatcher(BaseDispatcher):
+class ProgressiveDispatcher(AbstractDispatcher):
     """Implements a progressive dispatcher.
 
     Args:

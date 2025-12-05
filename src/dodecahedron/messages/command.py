@@ -17,8 +17,8 @@ database, such as retrieving the necessary database IDs for foreign keys.
 # Local Imports
 from .message import AbstractMessage
 
-__all__ = ["BaseCommand"]
+__all__ = ["AbstractCommand"]
 
 
-class BaseCommand(AbstractMessage):
-    """Class implements a command."""
+class AbstractCommand(AbstractMessage):
+    """Class represents an abstract command."""

@@ -10,16 +10,16 @@ from unittest import mock
 import pytest
 
 # Local Imports
-from dodecahedron.messages import BaseCommand
-from dodecahedron.messages import BaseEvent
+from dodecahedron.messages import AbstractCommand
+from dodecahedron.messages import AbstractEvent
 from dodecahedron.messagebus import MessageBus
 from dodecahedron.units_of_work import EventfulUnitOfWork
 
 
-class TestCommand(BaseCommand): ...
+class TestCommand(AbstractCommand): ...
 
 
-class TestEvent(BaseEvent): ...
+class TestEvent(AbstractEvent): ...
 
 
 def test_instantiates_messagebus() -> None:
