@@ -17,22 +17,24 @@ class AbstractFileSystemRepository(AbstractRepository):
     """Represents an abstract file-system repository.
 
     Args:
-        __file: File.
+        wrapper: File-system wrapper.
+        *args (optional): Positional arguments.
+        **kwargs (optional): Keyword arguments.
 
     """
 
-    def __init__(self, __file: Any, /, *args: Any, **kwargs: Any) -> None:
-        if not isinstance(__file, AbstractFileSystemWrapper):
+    def __init__(self, wrapper: Any, /, *args: Any, **kwargs: Any) -> None:
+        if not isinstance(wrapper, AbstractFileSystemWrapper):
             expected = "expected type 'AbstractFileSystemWrapper'"
-            actual = f"got {type(__file)} instead"
+            actual = f"got {type(wrapper)} instead"
             message = ", ".join([expected, actual])
             raise TypeError(message)
 
         super().__init__(*args, **kwargs)
-        self._file = __file
+        self._wrapper = wrapper
 
     @property
     def path(self) -> Optional[pathlib.Path]:
         """Path."""
-        result = getattr(self._file, "path", None)
+        result = getattr(self._wrapper, "path", None)
         return result

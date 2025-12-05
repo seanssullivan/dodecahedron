@@ -20,6 +20,8 @@ class AbstractSqlAlchemyRepository(SessionedRepository):
 
     Attributes:
         session: SQLAlchemy session.
+        *args (optional): Positional arguments.
+        **kwargs (optional): Keyword arguments.
 
     .. _SQLAlchemy Documentation:
         https://docs.sqlalchemy.org/

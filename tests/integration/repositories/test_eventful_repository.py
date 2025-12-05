@@ -5,6 +5,7 @@
 
 # Standard Library Imports
 from typing import Any
+from typing import Hashable
 from typing import List
 from typing import Optional
 from typing import Union
@@ -72,7 +73,7 @@ class ExampleRepository(EventfulRepository):
         """Add object."""
         self._objects.add(obj)
 
-    def get(self, ref: Union[int, str]) -> object:
+    def get(self, ref: Hashable) -> object:
         """Get object."""
         raise NotImplementedError
 

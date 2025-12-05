@@ -20,7 +20,7 @@ from typing import Union
 # Local Imports
 from .abstract_repository import AbstractRepository
 from ..messages import AbstractMessage
-from ..messages import BaseEvent
+from ..messages import AbstractEvent
 from ..queues import MessageQueue
 
 __all__ = ["EventfulRepository"]
@@ -28,6 +28,10 @@ __all__ = ["EventfulRepository"]
 
 class EventfulRepository(AbstractRepository):
     """Represents an eventful repository.
+
+    Args:
+        *args (optional): Positional arguments.
+        **kwargs (optional): Keyword arguments.
 
     Attributes:
         events: Events.
@@ -114,7 +118,7 @@ def collect_events_from_object(obj: object) -> List[AbstractMessage]:
     return results
 
 
-def get_events(obj: object) -> Union[Deque[BaseEvent], MessageQueue]:
+def get_events(obj: object) -> Union[Deque[AbstractEvent], MessageQueue]:
     """Get events from object.
 
     Args:
