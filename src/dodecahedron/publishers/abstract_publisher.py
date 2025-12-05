@@ -9,6 +9,7 @@ import json
 from typing import Any
 
 # Local Imports
+from ..json import JSONEncoder
 from ..messages import event
 
 __all__ = ["AbstractPublisher"]
@@ -37,6 +38,5 @@ class AbstractPublisher(abc.ABC):
         """
         log.info("publishing: channel=%s, event=%s", channel, event)
         data = asdict(event) if is_dataclass(event) else event
-        payload = json.dumps(data)
-
+        payload = json.dumps(data, cls=JSONEncoder)
         getattr(self.connection, "publish")(channel, payload)
