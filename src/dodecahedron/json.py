@@ -48,6 +48,9 @@ class JSONEncoder(json.JSONEncoder):
         return super().default(o)
 
 
+# ----------------------------------------------------------------------------
+# Helpers
+# ----------------------------------------------------------------------------
 def replace_nan(__value: Any, repl: Optional[str] = None) -> Any:
     """Replace 'np.nan'.
 
