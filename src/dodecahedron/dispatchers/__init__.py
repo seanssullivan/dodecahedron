@@ -7,8 +7,8 @@ import importlib
 from .abstract_dispatcher import *
 
 try:
-    importlib.import_module("tqdm")
-except (ImportError, ModuleNotFoundError):
+    importlib.import_module("tqdm")  # pragma: no cover
+except (ImportError, ModuleNotFoundError):  # pragma: no cover
     pass
-else:
+else:  # pragma: no cover
     from .progressive_dispatcher import *

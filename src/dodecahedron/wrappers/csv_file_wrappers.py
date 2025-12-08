@@ -314,7 +314,7 @@ class CsvIOWrapper(AbstractIOWrapper):
     @property
     def read_only(self) -> bool:
         """Whether read only."""
-        return getattr(self._context, "read_only")  # type: bool
+        return getattr(self._context, "read_only")
 
     def __enter__(self) -> CsvIOWrapper:
         return self
@@ -327,24 +327,24 @@ class CsvIOWrapper(AbstractIOWrapper):
         """Close `.csv` file."""
         self._file.close()
 
-    def read(self, size: int = -1, /) -> str:
+    def read(self, n: int = -1, /) -> str:
         """Read content of `.csv` file.
 
         Returns:
             Content.
 
         """
-        result = self._file.read(size)
+        result = self._file.read(n)
         return result
 
-    def readline(self, size: int = -1, /) -> str:
+    def readline(self, limit: int = -1, /) -> str:
         """Read line from `.csv` file.
 
         Returns:
             Line.
 
         """
-        result = self._file.readline(size)
+        result = self._file.readline(limit)
         return result
 
     def readlines(self, hint: int = -1, /) -> List[Any]:
@@ -366,10 +366,6 @@ class CsvIOWrapper(AbstractIOWrapper):
         """
         reader = self._get_record_reader()
         result: Dict[str, Any] = reader.read_record()
-
-        print(self.fieldnames)
-        print(reader.fieldnames)
-        print(result)
 
         if not self.fieldnames:
             self.fieldnames = reader.fieldnames

@@ -4,7 +4,9 @@
 
 # Standard Library Imports
 from typing import Any
+from typing import List
 from typing import Optional
+from typing import Set
 
 # Third-Party Imports
 # import pytest
@@ -15,11 +17,11 @@ from dodecahedron.metaclasses.tracker import SEEN_ATTR
 
 
 class SampleTracker(metaclass=TrackerMeta):
-    def __init__(self, objs: Optional[list] = None) -> None:
+    def __init__(self, objs: Optional[List[Any]] = None) -> None:
         self._objects = set(objs or [])
 
     @property
-    def seen(self) -> set:
+    def seen(self) -> Set[Any]:
         return getattr(self, SEEN_ATTR, set())
 
     def add(self, obj: Any) -> None:
@@ -33,7 +35,7 @@ class SampleTracker(metaclass=TrackerMeta):
         else:
             return result
 
-    def list(self) -> list:
+    def list(self) -> List[Any]:
         return list(self._objects)
 
     def remove(self, obj: Any) -> None:

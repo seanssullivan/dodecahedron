@@ -273,7 +273,7 @@ class XlsxIOWrapper(OpenPyXLMixin, AbstractIOWrapper):
     @property
     def read_only(self) -> bool:
         """Whether read only."""
-        return getattr(self._context, "read_only")  # type: bool
+        return getattr(self._context, "read_only")
 
     def __enter__(self) -> XlsxIOWrapper:
         return self
@@ -287,14 +287,14 @@ class XlsxIOWrapper(OpenPyXLMixin, AbstractIOWrapper):
         """Close `.xlsx` file."""
         self._file.close()
 
-    def read(self, size: int = -1, /) -> bytes:
+    def read(self, n: int = -1, /) -> bytes:
         """Read content of `.xlsx` file.
 
         Returns:
             Content.
 
         """
-        result = self._file.read(size)
+        result = self._file.read(n)
         return result
 
     def read_record(self) -> Dict[str, Any]:

@@ -5,6 +5,7 @@
 from os import PathLike
 from pathlib import PurePath
 from typing import Any
+from typing import overload
 from typing import TypeVar
 from typing import Union
 
@@ -132,7 +133,24 @@ def filepath_has_extension(__filepath: PurePath, /, extension: str) -> bool:
     return result
 
 
-def set_extension(__file: T, extension: str) -> T:
+@overload
+def set_extension(
+    __file: PurePath,
+    extension: str,
+) -> PurePath: ...
+
+
+@overload
+def set_extension(
+    __file: str,
+    extension: str,
+) -> str: ...
+
+
+def set_extension(
+    __file: Union[PurePath, str],
+    extension: str,
+) -> Union[PurePath, str]:
     """Set extension on file.
 
     Args:
@@ -147,7 +165,7 @@ def set_extension(__file: T, extension: str) -> T:
         TypeError: when `extension` is not type `str`.
 
     """
-    if not isinstance(__file, (PurePath, str)):
+    if not isinstance(__file, (PurePath, str)):  # type: ignore
         message = f"expected type 'Path' or 'str', got {type(__file)} instead"
         raise TypeError(message)
 

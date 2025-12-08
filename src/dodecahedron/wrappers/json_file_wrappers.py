@@ -187,7 +187,7 @@ class JsonIOWrapper(AbstractIOWrapper):
     @property
     def read_only(self) -> bool:
         """Whether read only."""
-        return getattr(self._context, "read_only")  # type: bool
+        return getattr(self._context, "read_only")
 
     def __enter__(self) -> JsonIOWrapper:
         return self

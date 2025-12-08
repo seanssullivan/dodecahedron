@@ -34,7 +34,7 @@ class AbstractTxtWrapper(AbstractTextWrapper):
 
     def _init_txt_io_wrapper(
         self,
-        __buffer: memoryview,
+        __buffer: Any,
         /,
         encoding: str = settings.DEFAULT_FILE_ENCODING,
         newline: str = settings.DEFAULT_TXT_NEWLINE,
@@ -157,7 +157,7 @@ class TxtIOWrapper(io.TextIOWrapper):
 
     def __init__(
         self,
-        buffer: memoryview,
+        buffer: Any,
         encoding: Optional[str] = None,
         errors: Optional[str] = None,
         newline: Optional[str] = None,
@@ -184,7 +184,7 @@ class TxtIOWrapper(io.TextIOWrapper):
         result = super().read(size)
         return result
 
-    def readline(self, size: int = -1) -> str:
+    def readline(self, size: int = -1) -> str:  # type: ignore[override]
         """Read line from `.txt` file.
 
         Returns:
@@ -194,7 +194,7 @@ class TxtIOWrapper(io.TextIOWrapper):
         result = super().readline(size)
         return result
 
-    def readlines(self, hint: int = -1) -> List[str]:
+    def readlines(self, hint: int = -1) -> List[str]:  # type: ignore[override]
         """Read lines from `.txt` file.
 
         Returns:
@@ -214,7 +214,7 @@ class TxtIOWrapper(io.TextIOWrapper):
         result = super().write(content)
         return result
 
-    def writelines(self, lines: Iterable[str], /) -> None:
+    def writelines(self, lines: Iterable[str], /) -> None:  # type: ignore[override]
         """Write lines to `.txt` file.
 
         Args:

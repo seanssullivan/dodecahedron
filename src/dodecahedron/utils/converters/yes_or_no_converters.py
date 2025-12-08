@@ -17,7 +17,7 @@ __all__ = ["to_y_or_n", "to_yes_or_no"]
 
 def to_y_or_n(
     __value: object, /, default: Optional[str] = None
-) -> Optional[Literal["Y", "N"]]:
+) -> Literal["Y", "N"]:
     """Convert value to `Y` or `N`.
 
     Args:
@@ -44,13 +44,13 @@ def to_y_or_n(
         message = f"'{__value}' cannot be converted to 'Y' or 'N'"
         raise ValueError(message)
 
-    result = "Y" if value is True else "N"
+    result: Literal["Y", "N"] = "Y" if value is True else "N"
     return result
 
 
 def to_yes_or_no(
     __value: object, /, default: Optional[str] = None
-) -> Optional[Literal["Yes", "No"]]:
+) -> Literal["Yes", "No"]:
     """Convert value to `Yes` or `No`.
 
     Args:
@@ -77,5 +77,5 @@ def to_yes_or_no(
         message = f"'{__value}' cannot be converted to 'Yes' or 'No'"
         raise ValueError(message) from error
 
-    result = "Yes" if value is True else "No"
+    result: Literal["Yes", "No"] = "Yes" if value is True else "No"
     return result

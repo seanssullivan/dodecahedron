@@ -8,6 +8,8 @@ import os
 import pathlib
 from typing import Any
 from typing import IO
+from typing import Iterable
+from typing import Iterator
 from typing import Optional
 from typing import TypeVar
 
@@ -435,3 +437,51 @@ class AbstractIOWrapper(IO[Any]):  # type: ignore
     def close(self) -> None:
         """Close `.xlsx` file."""
         raise NotImplementedError
+
+    def __iter__(self) -> Iterator[Any]:
+        return self.file.__iter__()
+
+    def __next__(self) -> Any:
+        return self.file.__next__()
+
+    def fileno(self) -> int:
+        return self.file.fileno()
+
+    def flush(self) -> None:
+        return self.file.flush()
+
+    def isatty(self) -> bool:
+        return self.file.isatty()
+
+    def read(self, n: int = -1) -> Any:
+        return self.file.read(n)
+
+    def readable(self) -> bool:
+        return self.file.readable()
+
+    def readline(self, limit: int = -1) -> Any:
+        return self.file.readline(limit)
+
+    def readlines(self, hint: int = -1) -> list[Any]:
+        return self.file.readlines(hint)
+
+    def seek(self, offset: int, whence: int = 0) -> int:
+        return self.file.seek(offset, whence)
+
+    def seekable(self) -> bool:
+        return self.file.seekable()
+
+    def tell(self) -> int:
+        return self.file.tell()
+
+    def truncate(self, size: Optional[int] = None) -> int:
+        return self.file.truncate(size)
+
+    def write(self, s: Any) -> int:
+        return self.file.write(s)
+
+    def writable(self) -> bool:
+        return self.file.writable()
+
+    def writelines(self, lines: Iterable[Any], /) -> None:
+        return self.file.writelines(lines)

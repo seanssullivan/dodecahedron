@@ -72,10 +72,10 @@ class CommandLineInterface(abc.ABC):
     @property
     def processes(self) -> Dict[str, Callable[..., None]]:
         """Processes."""
-        return self._processes
+        return self._processes  # pragma: no cover
 
     def __call__(self, args: Namespace) -> None:
-        self.execute(args)
+        self.execute(args)  # pragma: no cover
 
     def execute(
         self,

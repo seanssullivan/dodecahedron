@@ -12,6 +12,7 @@ from typing import Optional
 from .abstract_file_wrappers import AbstractDirectoryWrapper
 from .abstract_file_wrappers import AbstractFileSystemWrapper
 from .abstract_file_wrappers import AbstractFileWrapper
+from .abstract_file_wrappers import AbstractIOWrapper
 from ..utils import converters
 from .. import settings
 from .. import utils
@@ -110,7 +111,7 @@ class PdfFileWrapper(AbstractPdfWrapper, AbstractFileWrapper):
         return result
 
 
-class PdfIOWrapper:
+class PdfIOWrapper(AbstractIOWrapper):
     """Implements a I/O wrapper for `.pdf` files."""
 
     def __init__(self, __file: IO[Any]) -> None:
