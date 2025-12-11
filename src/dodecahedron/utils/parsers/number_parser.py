@@ -6,7 +6,7 @@ import re
 __all__ = ["parse_number"]
 
 
-def parse_number(__value: str, /) -> str:
+def parse_number(__value: str, /) -> float:
     """Parse number from string.
 
     Args:
@@ -26,5 +26,5 @@ def parse_number(__value: str, /) -> str:
     value = __value.replace("  ", " ").strip()
     representation = re.sub(r"[^0-9a-zA-Z.]+", r"", value)
     number = re.sub(r"(\d+)\s?[a-z]*", r"\1", representation, flags=re.I)
-    result = number[:-1] if number.endswith(".") else number
+    result = float(number)
     return result

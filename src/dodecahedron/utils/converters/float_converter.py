@@ -228,8 +228,7 @@ def float_from_str(__value: str, default: float = 0.0, /) -> float:
         return default
 
     try:
-        number = parsers.parse_number(value)
-        result = float(number)
+        result = parsers.parse_number(value)
 
     except ValueError:
         message = f"{type(__value)} cannot be converted to float"

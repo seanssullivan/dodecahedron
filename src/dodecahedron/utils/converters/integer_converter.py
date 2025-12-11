@@ -227,7 +227,7 @@ def int_from_str(__value: str, default: int = 0, /) -> int:
 
     try:
         number = parsers.parse_number(value)
-        result = int(float(number))
+        result = int(number)
 
     except ValueError:
         message = f"{__value} cannot be converted to int"

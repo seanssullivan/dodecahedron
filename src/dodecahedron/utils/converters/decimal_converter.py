@@ -242,7 +242,7 @@ def decimal_from_str(
 
     try:
         number = parsers.parse_number(value)
-        result = decimal.Decimal(number)
+        result = decimal.Decimal(str(number))
 
     except (decimal.InvalidOperation, ValueError):
         message = f"'{__value}' cannot be converted to decimal"
