@@ -11,3 +11,8 @@ pandas
 redis
 SQLAlchemy
 tqdm
+
+# Typing requirements
+types-cachetools
+types-python-dateutil
+types-pytz

@@ -34,7 +34,8 @@ def to_y_or_n(
 
     try:
         converter = BooleanConverter()
-        value = converter(__value) if __value else default
+        converter.default = converter(default)
+        value = converter(__value)
 
     except TypeError:
         message = f"{type(__value)} cannot be converted to 'Y' or 'N'"
@@ -67,7 +68,8 @@ def to_yes_or_no(
 
     try:
         converter = BooleanConverter()
-        value = converter(__value) if __value else default
+        converter.default = converter(default)
+        value = converter(__value)
 
     except TypeError as error:
         message = f"{type(__value)} cannot be converted to 'Yes' or 'No'"

@@ -5,6 +5,7 @@ from .boolean_converter import *
 from .currency_converter import *
 from .date_converter import *
 from .datetime_converter import *
+from .decimal_converter import *
 from .file_mode_converters import *
 from .float_converter import *
 from .integer_converter import *

@@ -33,3 +33,8 @@ def test_raises_error_for_invalid_default_value() -> None:
 def test_returns_default_when_none() -> None:
     result = converters.to_yes_or_no(None, "No")
     assert result == "No"
+
+
+def test_raises_error_when_default_is_not_yes_or_no() -> None:
+    with pytest.raises(ValueError):
+        converters.to_yes_or_no(None, "failure")  # type: ignore

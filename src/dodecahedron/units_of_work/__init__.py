@@ -9,8 +9,8 @@ from .eventful_unit_of_work import *
 from .sessioned_unit_of_work import *
 
 try:
-    importlib.import_module("tqdm")
-except (ImportError, ModuleNotFoundError):
+    importlib.import_module("tqdm")  # pragma: no cover
+except (ImportError, ModuleNotFoundError):  # pragma: no cover
     pass
 else:
-    from .progressive_unit_of_work import *
+    from .progressive_unit_of_work import *  # pragma: no cover

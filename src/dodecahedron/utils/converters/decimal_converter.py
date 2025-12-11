@@ -8,7 +8,6 @@ Module provides function for converting values to decimals.
 # Standard Library Imports
 import datetime
 import decimal
-import re
 import time
 from typing import Any
 from typing import Callable
@@ -18,6 +17,7 @@ from typing import Optional
 
 # Local Imports
 from .base_converter import BaseConverter
+from .. import parsers
 
 __all__ = ["to_decimal"]
 
@@ -63,6 +63,19 @@ class DecimalConverter(BaseConverter):
         self._conversions.update(DEFAULT_CONVERSIONS)
         self._conversions = self._conversions.new_child()
 
+    @property
+    def default(self) -> Any:  # pragma: no cover
+        """Default value."""
+        return self._default
+
+    @default.setter
+    def default(self, value: Any) -> None:  # pragma: no cover
+        if not isinstance(value, decimal.Decimal):  # type: ignore
+            message = f"expected type 'Decimal', got {type(value)} instead"
+            raise TypeError(message)
+
+        self._default = value
+
 
 def decimal_from_bool(__value: bool, _: decimal.Decimal, /) -> decimal.Decimal:
     """Convert boolean value to decimal.
@@ -77,7 +90,7 @@ def decimal_from_bool(__value: bool, _: decimal.Decimal, /) -> decimal.Decimal:
         TypeError: when value is not type 'bool'.
 
     """
-    if not isinstance(__value, bool):  # type: ignore
+    if not isinstance(__value, bool):  # type: ignore  # pragma: no cover
         message = f"expected type 'bool', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -100,7 +113,7 @@ def decimal_from_date(
         TypeError: when value is not type 'date'.
 
     """
-    if not isinstance(__value, datetime.date):  # type: ignore
+    if not isinstance(__value, datetime.date):  # type: ignore  # pragma: no cover
         message = f"expected type 'date', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -124,7 +137,7 @@ def decimal_from_datetime(
         TypeError: when value is not type 'datetime'.
 
     """
-    if not isinstance(__value, datetime.datetime):  # type: ignore
+    if not isinstance(__value, datetime.datetime):  # type: ignore  # pragma: no cover
         message = f"expected type 'datetime', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -148,7 +161,7 @@ def decimal_from_decimal(
         TypeError: when value is not type 'Decimal'.
 
     """
-    if not isinstance(__value, decimal.Decimal):  # type: ignore
+    if not isinstance(__value, decimal.Decimal):  # type: ignore  # pragma: no cover
         message = f"expected type 'Decimal', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -171,7 +184,7 @@ def decimal_from_float(
         TypeError: when value is not type 'float'.
 
     """
-    if not isinstance(__value, float):
+    if not isinstance(__value, float):  # type: ignore  # pragma: no cover
         message = f"expected type 'float', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -192,7 +205,7 @@ def decimal_from_int(__value: int, _: decimal.Decimal, /) -> decimal.Decimal:
         TypeError: when value is not type 'int'.
 
     """
-    if not isinstance(__value, int):  # type: ignore
+    if not isinstance(__value, int):  # type: ignore  # pragma: no cover
         message = f"expected type 'int', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -219,7 +232,7 @@ def decimal_from_str(
         ValueError: when value cannot be converted to decimal.
 
     """
-    if not isinstance(__value, str):  # type: ignore
+    if not isinstance(__value, str):  # type: ignore  # pragma: no cover
         message = f"expected type 'str', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -228,8 +241,10 @@ def decimal_from_str(
         return default
 
     try:
-        result = decimal.Decimal(re.sub(r"[^0-9a-zA-Z.]+", r"", value))
-    except decimal.InvalidOperation:
+        number = parsers.parse_number(value)
+        result = decimal.Decimal(number)
+
+    except (decimal.InvalidOperation, ValueError):
         message = f"'{__value}' cannot be converted to decimal"
         raise ValueError(message)
 

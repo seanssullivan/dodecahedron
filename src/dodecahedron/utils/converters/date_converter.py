@@ -68,6 +68,19 @@ class DateConverter(BaseConverter):
         self._conversions.update(DEFAULT_CONVERSIONS)
         self._conversions = self._conversions.new_child()
 
+    @property
+    def default(self) -> Any:  # pragma: no cover
+        """Default value."""
+        return self._default
+
+    @default.setter
+    def default(self, value: Any) -> None:  # pragma: no cover
+        if not isinstance(value, datetime.date):  # type: ignore
+            message = f"expected type 'date', got {type(value)} instead"
+            raise TypeError(message)
+
+        self._default = value
+
 
 def date_from_date(
     __value: datetime.date, _: Optional[datetime.date], /
@@ -84,7 +97,7 @@ def date_from_date(
         TypeError: when value is not type 'date'.
 
     """
-    if not isinstance(__value, datetime.date):  # type: ignore
+    if not isinstance(__value, datetime.date):  # type: ignore  # pragma: no cover
         message = f"expected type 'date', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -107,7 +120,7 @@ def date_from_datetime(
         TypeError: when value is not type 'datetime'.
 
     """
-    if not isinstance(__value, datetime.datetime):  # type: ignore
+    if not isinstance(__value, datetime.datetime):  # type: ignore  # pragma: no cover
         message = f"expected type 'datetime', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -130,7 +143,7 @@ def date_from_decimal(
         TypeError: when value is not type 'Decimal'.
 
     """
-    if not isinstance(__value, decimal.Decimal):  # type: ignore
+    if not isinstance(__value, decimal.Decimal):  # type: ignore  # pragma: no cover
         message = f"expected type 'Decimal', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -153,7 +166,7 @@ def date_from_float(
         TypeError: when value is not type 'float'.
 
     """
-    if not isinstance(__value, float):
+    if not isinstance(__value, float):  # type: ignore  # pragma: no cover
         message = f"expected type 'float', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -186,7 +199,7 @@ def date_from_serial_date(
         https://stackoverflow.com/a/6706556/16732779
 
     """
-    if not isinstance(__value, float):
+    if not isinstance(__value, float):  # type: ignore  # pragma: no cover
         message = f"expected type 'float', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -210,7 +223,7 @@ def date_from_int(
         TypeError: when value is not type 'int'.
 
     """
-    if not isinstance(__value, int):  # type: ignore
+    if not isinstance(__value, int):  # type: ignore  # pragma: no cover
         message = f"expected type 'int', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -236,7 +249,7 @@ def date_from_str(
         ValueError: when value cannot be converted to ``date``.
 
     """
-    if not isinstance(__value, str):  # type: ignore
+    if not isinstance(__value, str):  # type: ignore  # pragma: no cover
         message = f"expected type 'str', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -266,7 +279,7 @@ def date_from_timestamp(
         TypeError: when value is not type 'float' or 'int'.
 
     """
-    if not isinstance(__value, (float, int)):  # type: ignore
+    if not isinstance(__value, (float, int)):  # type: ignore  # pragma: no cover
         expected = "expected type 'float' or 'int'"
         actual = f"got {type(__value)} instead"
         message = ", ".join([expected, actual])

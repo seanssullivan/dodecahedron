@@ -49,6 +49,15 @@ class BaseConverter(AbstractConverter):
 
         self._on_error = on_error
 
+    @property
+    def default(self) -> Any:
+        """Default value."""
+        return self._default
+
+    @default.setter
+    def default(self, value: Any) -> None:
+        self._default = value
+
     def __call__(self, __value: Any, /) -> Any:
         try:
             result = (

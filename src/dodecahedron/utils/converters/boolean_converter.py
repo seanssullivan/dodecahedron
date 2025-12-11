@@ -63,6 +63,19 @@ class BooleanConverter(BaseConverter):
         self._conversions.update(DEFAULT_CONVERSIONS)
         self._conversions = self._conversions.new_child()
 
+    @property
+    def default(self) -> Any:  # pragma: no cover
+        """Default value."""
+        return self._default
+
+    @default.setter
+    def default(self, value: Any) -> None:  # pragma: no cover
+        if not isinstance(value, bool):  # type: ignore
+            message = f"expected type 'bool', got {type(value)} instead"
+            raise TypeError(message)
+
+        self._default = value
+
 
 def bool_from_bool(__value: bool, _: bool, /) -> bool:
     """Convert boolean value to ``bool``.
@@ -77,7 +90,7 @@ def bool_from_bool(__value: bool, _: bool, /) -> bool:
         TypeError: when value is not type 'bool'.
 
     """
-    if not isinstance(__value, bool):  # type: ignore
+    if not isinstance(__value, bool):  # type: ignore  # pragma: no cover
         message = f"expected type 'bool', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -98,7 +111,7 @@ def bool_from_date(__value: datetime.date, _: bool, /) -> bool:
         TypeError: when value is not type 'date'.
 
     """
-    if not isinstance(__value, datetime.date):  # type: ignore
+    if not isinstance(__value, datetime.date):  # type: ignore  # pragma: no cover
         message = f"expected type 'date', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -119,7 +132,7 @@ def bool_from_datetime(__value: datetime.datetime, _: bool, /) -> bool:
         TypeError: when value is not type 'datetime'.
 
     """
-    if not isinstance(__value, datetime.datetime):  # type: ignore
+    if not isinstance(__value, datetime.datetime):  # type: ignore  # pragma: no cover
         message = f"expected type 'datetime', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -140,7 +153,7 @@ def bool_from_decimal(__value: decimal.Decimal, _: bool, /) -> bool:
         TypeError: when value is not type 'Decimal'.
 
     """
-    if not isinstance(__value, decimal.Decimal):  # type: ignore
+    if not isinstance(__value, decimal.Decimal):  # type: ignore  # pragma: no cover
         message = f"expected type 'Decimal', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -161,7 +174,7 @@ def bool_from_float(__value: float, _: bool, /) -> bool:
         TypeError: when value is not type 'float'.
 
     """
-    if not isinstance(__value, float):
+    if not isinstance(__value, float):  # type: ignore  # pragma: no cover
         message = f"expected type 'float', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -182,7 +195,7 @@ def bool_from_int(__value: int, _: bool, /) -> bool:
         TypeError: when value is not type 'int'.
 
     """
-    if not isinstance(__value, int):  # type: ignore
+    if not isinstance(__value, int):  # type: ignore  # pragma: no cover
         message = f"expected type 'int', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -205,7 +218,7 @@ def bool_from_str(__value: str, default: bool = False, /) -> bool:
         ValueError: when value cannot be converted to ``bool``.
 
     """
-    if not isinstance(__value, str):  # type: ignore
+    if not isinstance(__value, str):  # type: ignore  # pragma: no cover
         message = f"expected type 'str', got {type(__value)} instead"
         raise TypeError(message)
 

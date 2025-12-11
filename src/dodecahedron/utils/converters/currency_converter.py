@@ -58,6 +58,19 @@ class CurrencyConverter(BaseConverter):
         self._conversions.update(DEFAULT_CONVERSIONS)
         self._conversions = self._conversions.new_child()
 
+    @property
+    def default(self) -> Any:  # pragma: no cover
+        """Default value."""
+        return self._default
+
+    @default.setter
+    def default(self, value: Any) -> None:  # pragma: no cover
+        if not isinstance(value, float):  # type: ignore
+            message = f"expected type 'float', got {type(value)} instead"
+            raise TypeError(message)
+
+        self._default = value
+
 
 def currency_from_decimal(__value: decimal.Decimal, _: float, /) -> float:
     """Convert decimal value to currency.
@@ -72,7 +85,7 @@ def currency_from_decimal(__value: decimal.Decimal, _: float, /) -> float:
         TypeError: when value is not type 'Decimal'.
 
     """
-    if not isinstance(__value, decimal.Decimal):  # type: ignore
+    if not isinstance(__value, decimal.Decimal):  # type: ignore  # pragma: no cover
         message = f"expected type 'Decimal', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -93,7 +106,7 @@ def currency_from_float(__value: float, _: float, /) -> float:
         TypeError: when value is not type 'float'.
 
     """
-    if not isinstance(__value, float):
+    if not isinstance(__value, float):  # type: ignore  # pragma: no cover
         message = f"expected type 'float', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -114,7 +127,7 @@ def currency_from_int(__value: int, _: float, /) -> float:
         TypeError: when value is not type 'int'.
 
     """
-    if not isinstance(__value, int):  # type: ignore
+    if not isinstance(__value, int):  # type: ignore  # pragma: no cover
         message = f"expected type 'int', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -137,7 +150,7 @@ def currency_from_str(__value: str, default: float = 0.00, /) -> float:
         ValueError: when value cannot be converted to currency.
 
     """
-    if not isinstance(__value, str):  # type: ignore
+    if not isinstance(__value, str):  # type: ignore  # pragma: no cover
         message = f"expected type 'str', got {type(__value)} instead"
         raise TypeError(message)
 

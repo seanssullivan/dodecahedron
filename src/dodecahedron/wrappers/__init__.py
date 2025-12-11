@@ -10,8 +10,8 @@ from .json_file_wrappers import *
 from .txt_file_wrappers import *
 
 try:
-    importlib.import_module("openpyxl")
-except (ImportError, ModuleNotFoundError):
+    importlib.import_module("openpyxl")  # pragma: no cover
+except (ImportError, ModuleNotFoundError):  # pragma: no cover
     pass
-else:
+else:  # pragma: no cover
     from .xlsx_file_wrappers import *

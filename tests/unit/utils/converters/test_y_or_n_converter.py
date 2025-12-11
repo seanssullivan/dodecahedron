@@ -33,3 +33,8 @@ def test_raises_error_for_invalid_default_value() -> None:
 def test_returns_default_when_none() -> None:
     result = converters.to_y_or_n(None, "N")
     assert result == "N"
+
+
+def test_raises_error_when_default_is_not_y_or_n() -> None:
+    with pytest.raises(ValueError):
+        converters.to_y_or_n(None, "failure")  # type: ignore

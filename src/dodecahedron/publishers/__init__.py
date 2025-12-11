@@ -7,8 +7,8 @@ import importlib
 from .abstract_publisher import *
 
 try:
-    importlib.import_module("redis")
-except (ImportError, ModuleNotFoundError):
+    importlib.import_module("redis")  # pragma: no cover
+except (ImportError, ModuleNotFoundError):  # pragma: no cover
     pass
-else:
+else:  # pragma: no cover
     from .redis_publisher import *

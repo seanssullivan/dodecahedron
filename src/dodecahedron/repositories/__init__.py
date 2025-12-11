@@ -16,15 +16,15 @@ from .eventful_repository import *
 from .txt_repository import *
 
 try:
-    importlib.import_module("sqlalchemy")
-except (ImportError, ModuleNotFoundError):
+    importlib.import_module("sqlalchemy")  # pragma: no cover
+except (ImportError, ModuleNotFoundError):  # pragma: no cover
     pass
-else:
+else:  # pragma: no cover
     from .sqlalchemy_repository import *
 
 try:
-    importlib.import_module("openpyxl")
-except (ImportError, ModuleNotFoundError):
+    importlib.import_module("openpyxl")  # pragma: no cover
+except (ImportError, ModuleNotFoundError):  # pragma: no cover
     pass
-else:
+else:  # pragma: no cover
     from .xlsx_repository import *

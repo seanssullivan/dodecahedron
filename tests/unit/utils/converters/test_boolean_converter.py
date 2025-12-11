@@ -5,12 +5,19 @@
 
 # Standard Library Imports
 import datetime
+import decimal
 
 # Third-Party Imports
 import pytest
 
 # Local Imports
 from dodecahedron.utils import converters
+
+
+@pytest.mark.parametrize("value", [True, False])
+def test_returns_boolean_from_boolean(value: bool) -> None:
+    result = converters.to_boolean(value)
+    assert result is value
 
 
 @pytest.mark.parametrize("value", [datetime.date.today()])
@@ -21,6 +28,12 @@ def test_returns_true_from_date(value: datetime.date) -> None:
 
 @pytest.mark.parametrize("value", [datetime.datetime.now()])
 def test_returns_true_from_datetime(value: datetime.datetime) -> None:
+    result = converters.to_boolean(value)
+    assert result is True
+
+
+@pytest.mark.parametrize("value", [decimal.Decimal("1")])
+def test_returns_true_from_decimal(value: decimal.Decimal) -> None:
     result = converters.to_boolean(value)
     assert result is True
 
@@ -49,6 +62,16 @@ def test_returns_false_from_string_for_falsey_values(value: str) -> None:
     assert result is False
 
 
+def test_returns_default_when_empty_string() -> None:
+    result = converters.to_boolean("", False)
+    assert result is False
+
+
 def test_returns_default_when_none() -> None:
     result = converters.to_boolean(None, True)
     assert result is True
+
+
+def test_raises_error_when_default_is_not_type_bool() -> None:
+    with pytest.raises(TypeError):
+        converters.to_boolean(None, "failure")  # type: ignore
