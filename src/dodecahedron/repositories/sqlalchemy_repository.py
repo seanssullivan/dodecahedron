@@ -2,12 +2,14 @@
 
 # Standard Library Imports
 from typing import Any
+import warnings
 
 # Third-Party Imports
 from sqlalchemy.orm import Session
 
 # Local Imports
 from .sessioned_repository import SessionedRepository
+from sqlalchemy import exc as sa_exc
 
 __all__ = ["SqlAlchemyRepository"]
 
@@ -40,6 +42,20 @@ class SqlAlchemyRepository(SessionedRepository):
     def session(self) -> Session:
         """Session."""
         return self._session
+
+    def commit(self, *args: Any, **kwargs: Any) -> Any:
+        """Commit changes to repository.
+
+        Args:
+            *args (optional): Positional arguments.
+            **kwargs (optional): Keyword arguments.
+
+        """
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=sa_exc.SAWarning)
+            result = super().commit(*args, **kwargs)
+
+        return result
 
     def execute(self, *args: Any, **kwargs: Any) -> Any:
         """Call the execute method directly on the SQLAlchemy session.
