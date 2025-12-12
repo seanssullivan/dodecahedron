@@ -9,11 +9,11 @@ from sqlalchemy.orm import Session
 # Local Imports
 from .sessioned_repository import SessionedRepository
 
-__all__ = ["AbstractSqlAlchemyRepository"]
+__all__ = ["SqlAlchemyRepository"]
 
 
-class AbstractSqlAlchemyRepository(SessionedRepository):
-    """Represents an abstract SQLAlchemy repository.
+class SqlAlchemyRepository(SessionedRepository):
+    """Class implements an SQLAlchemy repository.
 
     The repository uses SQLAlchemy to read data from a database and to handle
     relevant CRUD operations.
