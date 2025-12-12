@@ -57,7 +57,7 @@ def test_instantiates_class_from_dictionary(
 
 @pytest.mark.parametrize(
     "schema,properties",
-    [({"value": {"map_to": "_value", "converter": str}}, {})],
+    [({"value": {"map_to": "_value", "converters": {"inward": str}}}, {})],
 )
 def test_converts_value_when_instantiating_from_dictionary(
     schema: Dict[Hashable, Any],
@@ -84,3 +84,78 @@ def test_instantiates_class_from_list(
     result = mapper.from_list(["success"])
     assert isinstance(result, ExampleClass)
     assert result.value == "success"
+
+
+@pytest.mark.parametrize(
+    "schema,properties",
+    [({0: {"map_to": "_value", "converters": {"inward": str}}}, {})],
+)
+def test_converts_value_when_instantiating_from_list(
+    schema: Dict[Hashable, Any],
+    properties: Dict[Hashable, Any],
+) -> None:
+    mapper = ClassMapper(ExampleClass, schema, properties)
+    result = mapper.from_list([1])
+    assert isinstance(result.value, str)
+
+
+@pytest.mark.parametrize(
+    "schema,properties",
+    [
+        ({}, {"_value": "value"}),
+        ({"value": "_value"}, {}),
+        ({"value": {"map_to": "_value"}}, {}),
+    ],
+)
+def test_converts_class_to_dictionary(
+    schema: Dict[Hashable, Any],
+    properties: Dict[Hashable, Any],
+) -> None:
+    mapper = ClassMapper(ExampleClass, schema, properties)
+    result = mapper.to_dict(ExampleClass("success"))
+    assert isinstance(result, dict)
+    assert result["value"] == "success"
+
+
+@pytest.mark.parametrize(
+    "schema,properties",
+    [({"value": {"map_to": "_value", "converter": int}}, {})],
+)
+def test_converts_value_when_converting_to_dictionary(
+    schema: Dict[Hashable, Any],
+    properties: Dict[Hashable, Any],
+) -> None:
+    mapper = ClassMapper(ExampleClass, schema, properties)
+    result = mapper.to_dict(ExampleClass("1"))
+    assert isinstance(result["value"], int)
+
+
+@pytest.mark.parametrize(
+    "schema,properties",
+    [
+        ({}, {"_value": 0}),
+        ({0: "_value"}, {}),
+        ({0: {"map_to": "_value"}}, {}),
+    ],
+)
+def test_converts_class_to_list(
+    schema: Dict[Hashable, Any],
+    properties: Dict[Hashable, Any],
+) -> None:
+    mapper = ClassMapper(ExampleClass, schema, properties)
+    result = mapper.to_list(ExampleClass("success"))
+    assert isinstance(result, list)
+    assert result[0] == "success"
+
+
+@pytest.mark.parametrize(
+    "schema,properties",
+    [({0: {"map_to": "_value", "converter": int}}, {})],
+)
+def test_converts_value_when_converting_to_list(
+    schema: Dict[Hashable, Any],
+    properties: Dict[Hashable, Any],
+) -> None:
+    mapper = ClassMapper(ExampleClass, schema, properties)
+    result = mapper.to_list(ExampleClass("1"))
+    assert isinstance(result[0], int)

@@ -1,19 +1,14 @@
 # -*- coding: utf-8 -*-
-"""Class Mapper."""
+"""Dictionary Mapper."""
 
 # Standard Library Imports
 from __future__ import annotations
-from contextlib import contextmanager
 from typing import Any
 from typing import Callable
 from typing import Dict
-from typing import Generator
-from typing import Generic
 from typing import Hashable
 from typing import List
 from typing import Optional
-from typing import Type
-from typing import TypeVar
 
 # Local Imports
 from .abstract_mapper import AbstractMapper
@@ -21,34 +16,20 @@ from .schema import MapperSchema
 from .schema import INWARD
 from .schema import OUTWARD
 
-__all__ = ["ClassMapper"]
+__all__ = ["DictMapper"]
 
 
-# Custom types
-T = TypeVar("T")
-
-
-class ClassMapper(AbstractMapper, Generic[T]):
-    """Implements a class mapper."""
+class DictMapper(AbstractMapper):
+    """Implements a dictionary mapper."""
 
     def __init__(
         self,
-        __class: Type[T],
-        /,
         schema: Dict[Hashable, Any],
         properties: Optional[Dict[Hashable, Any]] = None,
     ) -> None:
         super().__init__()
-        self._class = __class
         self._schema = MapperSchema(schema)
         self._properties = properties
-
-        setattr(self._class, "__mapper__", self)
-
-    @property
-    def cls(self) -> Type[T]:
-        """Mapped class."""
-        return self._class
 
     @property
     def schema(self) -> MapperSchema:
@@ -61,76 +42,78 @@ class ClassMapper(AbstractMapper, Generic[T]):
         results = self._properties or self._get_attribute_names()
         return results
 
-    def from_dict(self, __dict: Dict[Hashable, Any], /) -> T:
-        """Instantiate class from dictionary.
+    def from_dict(self, __dict: Dict[Hashable, Any], /) -> Dict[Hashable, Any]:
+        """Instantiate dictionary from dictionary.
 
         Args:
             __dict: Dictionary.
 
         Returns:
-            Instance of mapped class.
+            Dictionary.
 
         """
-        with replace_init(self.cls) as cls:
-            result = cls()
-            for attr, key in self.properties.items():
-                converter = self._get_converter(key, direction=INWARD)
-                value = converter(__dict[key]) if converter else __dict[key]
-                setattr(result, str(attr), value)
+        if not isinstance(__dict, dict):  # type: ignore
+            message = f"expected type 'dict', got {type(__dict)} instead"
+            raise TypeError(message)
+
+        result: Dict[Hashable, Any] = {}
+        for outward_key, inward_key in self.properties.items():
+            converter = self._get_converter(inward_key, direction=INWARD)
+            value: Any = __dict[outward_key]
+            result[str(inward_key)] = converter(value) if converter else value
 
         return result
 
-    def from_list(self, __list: List[Any], /) -> T:
-        """Instantiate class from list.
+    def from_list(self, __list: List[Any], /) -> Dict[Hashable, Any]:
+        """Instantiate dictionary from list.
 
         Args:
             __list: List.
-
-        Returns:
-            Instance of mapped class.
-
-        """
-        with replace_init(self.cls) as cls:
-            result = cls()
-            for attr, idx in self.properties.items():
-                converter = self._get_converter(idx, direction=INWARD)
-                value = converter(__list[idx]) if converter else __list[idx]
-                setattr(result, str(attr), value)
-
-        return result
-
-    def to_dict(self, __instance: T, /) -> Dict[Hashable, Any]:
-        """Convert instance of class to dictionary.
-
-        Args:
-            __instance: Instance of mapped class.
 
         Returns:
             Dictionary.
 
         """
         result: Dict[Hashable, Any] = {}
-        for attr, key in self.properties.items():
-            converter = self._get_converter(key, direction=OUTWARD)
-            value = getattr(__instance, str(attr))
+        for key, idx in self.properties.items():
+            converter = self._get_converter(idx, direction=INWARD)
+            value: Any = __list[idx]
             result[key] = converter(value) if converter else value
 
         return result
 
-    def to_list(self, __instance: T, /) -> List[Any]:
+    def to_dict(self, __dict: Dict[Hashable, Any], /) -> Dict[Hashable, Any]:
+        """Convert instance of class to dictionary.
+
+        Args:
+            __dict: Dictionary.
+
+        Returns:
+            Dictionary.
+
+        """
+        result: Dict[Hashable, Any] = {}
+        for outward_key, inward_key in self.properties.items():
+            converter = self._get_converter(inward_key, direction=OUTWARD)
+            value: Any = __dict[inward_key]
+            result[str(outward_key)] = converter(value) if converter else value
+
+        return result
+
+    def to_list(self, __dict: Dict[Hashable, Any], /) -> List[Any]:
         """Convert instance of class to list.
 
         Args:
-            __instance: Instance of mapped class.
+            __dict: Dictionary.
 
         Returns:
             List.
 
         """
         result: List[Any] = []
-        for attr, key in sorted(self.properties.items(), key=lambda i: i[1]):
-            converter = self._get_converter(key, direction=OUTWARD)
-            value = getattr(__instance, str(attr))
+        for key, idx in sorted(self.properties.items(), key=lambda i: i[1]):
+            converter = self._get_converter(idx, direction=OUTWARD)
+            value: Any = __dict[key]
             item = converter(value) if converter else value
             result.append(item)
 
@@ -181,25 +164,3 @@ class ClassMapper(AbstractMapper, Generic[T]):
         """
         results = self.schema.get_attribute_names()
         return results
-
-
-# ----------------------------------------------------------------------------
-# Helpers
-# ----------------------------------------------------------------------------
-@contextmanager
-def replace_init(__class: type) -> Generator[type, None, None]:
-    """Temporarily replace the ``__init__`` method on a class.
-
-    Args:
-        __class: Class.
-
-    Yields:
-        Class.
-
-    """
-    init = getattr(__class, "__init__")
-    repl = getattr(object, "__init__")
-
-    setattr(__class, "__init__", repl)
-    yield __class
-    setattr(__class, "__init__", init)
