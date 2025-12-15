@@ -2,6 +2,7 @@
 
 # Standard Library Imports
 import datetime
+import decimal
 import json
 import pathlib
 from typing import Any
@@ -33,6 +34,9 @@ class JSONEncoder(json.JSONEncoder):
 
         if isinstance(o, datetime.date):
             return o.strftime("%Y-%m-%d")
+
+        if isinstance(o, decimal.Decimal):
+            return float(o)
 
         if isinstance(o, pathlib.Path):
             return str(o.resolve())
