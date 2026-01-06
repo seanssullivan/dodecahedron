@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
-"""Message Broker."""
+"""Base Message Broker."""
 
 # Standard Library Imports
 from __future__ import annotations
-import abc
 from collections import defaultdict
 from datetime import datetime
 import logging
 from typing import Any
-from typing import Callable
 from typing import Dict
 from typing import List
 from typing import Literal
 from typing import Optional
 
 # Local Imports
-from .metaclasses import SingletonMeta
-from . import config
+from .abstract_messagebroker import AbstractMessageBroker
+from .abstract_messagebroker import Subscriber
+from ..metaclasses import SingletonMeta
+from .. import config
 
 __all__ = ["MessageBroker"]
 
@@ -24,50 +24,9 @@ __all__ = ["MessageBroker"]
 # Initialize logger.
 log = logging.getLogger("dodecahedron")
 
-# Custom types
-Subscriber = Callable[[Dict[str, Any]], None]
-
 # Constants
 IGNORE = "ignore"
 RAISE = "raise"
-
-
-class AbstractMessageBroker(abc.ABC):
-    """Represents an abstract message broker."""
-
-    @property
-    @abc.abstractmethod
-    def channels(self) -> List[str]:
-        """Channels."""
-        raise NotImplementedError
-
-    @property
-    @abc.abstractmethod
-    def subscribers(self) -> Dict[str, List[Subscriber]]:
-        """Subscribers."""
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def publish(self, channel: str, event: str) -> None:
-        """Publish an event to a channel.
-
-        Args:
-            channel: Name of channel.
-            event: JSON representation of an event.
-
-        """
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def subscribe(self, channel: str, subscriber: Subscriber) -> None:
-        """Add subscriber to channel.
-
-        Args:
-            channel: Name of channel to which to subscribe.
-            subscriber: Function to call for events on channel.
-
-        """
-        raise NotImplementedError
 
 
 class MessageBroker(AbstractMessageBroker, metaclass=SingletonMeta):
@@ -88,33 +47,42 @@ class MessageBroker(AbstractMessageBroker, metaclass=SingletonMeta):
         """Subscribers."""
         return self._subscribers
 
-    def publish(self, channel: str, event: str) -> None:
-        """Publish an event to a channel.
+    def publish(self, channel: Any, message: str) -> None:
+        """Publish a message to a channel.
 
         Args:
             channel: Name of channel.
-            event: JSON representation of an event.
+            message: JSON representation of a message.
+
+        Raises:
+            TypeError: when `channel` argument is not type ``str``.
 
         """
-        message = self.make_message(event)
-        self.send_message(channel, message)
+        if not isinstance(channel, str):
+            arg = f"expected type 'str', got {type(channel)} instead"
+            raise TypeError(arg)
+
+        self.send_message(channel, self.make_message(message))
 
     @staticmethod
-    def make_message(event: str, /) -> Dict[str, Any]:
+    def make_message(__data: str, /) -> Dict[str, Any]:
         """Make message to send to subscribers.
 
         Args:
-            event: Published event.
+            __data: Data to include in message.
 
         Returns:
             Message.
 
         """
-        message: Dict[str, Any] = {"data": event, "created_at": datetime.now()}
-        return message
+        result: Dict[str, Any] = {
+            "data": __data,
+            "created_at": datetime.now(),
+        }
+        return result
 
     def send_message(
-        self, channel: str, message: Dict[str, Any]
+        self, channel: Any, message: Dict[str, Any]
     ) -> None:  # pylint: disable=broad-except
         """Send message to channel subscribers.
 
@@ -122,7 +90,14 @@ class MessageBroker(AbstractMessageBroker, metaclass=SingletonMeta):
             channel: Name of channel.
             message: Message to send to subscribers.
 
+        Raises:
+            TypeError: when `channel` argument is not type ``str``.
+
         """
+        if not isinstance(channel, str):
+            arg = f"expected type 'str', got {type(channel)} instead"
+            raise TypeError(arg)
+
         for subscriber in self.subscribers[channel]:
             try:
                 log.debug(
@@ -134,14 +109,21 @@ class MessageBroker(AbstractMessageBroker, metaclass=SingletonMeta):
                 handle_error(channel, error, on_error=IGNORE)
                 continue
 
-    def subscribe(self, channel: str, subscriber: Subscriber) -> None:
+    def subscribe(self, channel: Any, subscriber: Subscriber) -> None:
         """Add subscriber to channel.
 
         Args:
             channel: Name of channel to which to subscribe.
-            subscriber: Function to call for events on channel.
+            subscriber: Function to call for messages on channel.
+
+        Raises:
+            TypeError: when `channel` argument is not type ``str``.
 
         """
+        if not isinstance(channel, str):
+            arg = f"expected type 'str', got {type(channel)} instead"
+            raise TypeError(arg)
+
         self.subscribers[channel].append(subscriber)
 
 

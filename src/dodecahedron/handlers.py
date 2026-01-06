@@ -2,8 +2,6 @@
 
 # Standard Library Imports
 import collections
-import functools
-import inspect
 from typing import Any
 from typing import Callable
 from typing import Dict
@@ -15,18 +13,17 @@ from typing import Union
 # Local Imports
 from .messages import AbstractCommand
 from .messages import AbstractEvent
+from .helpers import inject_dependencies
 
 __all__ = [
     "inject_handler_dependencies",
-    "inject_dependencies",
     "merge_event_handlers",
 ]
 
 
 # Custom types
-Handler = Callable[..., None]
-CommandHandlers = Dict[Type[AbstractCommand], Handler]
-EventHandlers = Dict[Type[AbstractEvent], List[Handler]]
+CommandHandlers = Dict[Type[AbstractCommand], Callable[..., None]]
+EventHandlers = Dict[Type[AbstractEvent], List[Callable[..., None]]]
 
 
 @overload
@@ -137,33 +134,6 @@ def inject_event_handler_dependencies(
         for event_type, event_handlers in __handlers.items()
     }
     return results
-
-
-def inject_dependencies(
-    __handler: Handler,
-    /,
-    dependencies: Dict[str, Any],
-) -> Handler:
-    """Inject dependencies into handler function.
-
-    Based on 'Architecture Patterns in Python' dependency injection pattern.
-
-    Args:
-        __handler: Handler function.
-        dependencies: Dependencies.
-
-    .. _Architecture Patterns in Python:
-        https://github.com/cosmicpython/code
-
-    """
-    params = inspect.signature(__handler).parameters
-    kwargs = {
-        name: dependency
-        for name, dependency in dependencies.items()
-        if name in params
-    }
-    result = functools.partial(__handler, **kwargs)
-    return result
 
 
 def merge_event_handlers(*args: EventHandlers) -> EventHandlers:

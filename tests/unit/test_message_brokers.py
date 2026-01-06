@@ -6,7 +6,7 @@
 from unittest import mock
 
 # Local Imports
-from dodecahedron.messagebroker import MessageBroker
+from dodecahedron.messagebrokers import MessageBroker
 
 
 def test_instantiates_message_broker() -> None:

@@ -1,14 +1,20 @@
 # -*- coding: utf-8 -*-
 
 # Standard Library Imports
+import functools
 import importlib
+import inspect
 from types import ModuleType
+from typing import Any
+from typing import Callable
+from typing import Dict
 from typing import Literal
 from typing import Optional
 from typing import overload
 
 __all__ = [
     "import_module",
+    "inject_dependencies",
     "raise_for_instance",
 ]
 
@@ -57,6 +63,33 @@ def import_module(
 
         return None
 
+    return result
+
+
+def inject_dependencies(
+    __func: Callable[..., None],
+    /,
+    dependencies: Dict[str, Any],
+) -> Callable[..., None]:
+    """Inject dependencies into function.
+
+    Based on 'Architecture Patterns in Python' dependency injection pattern.
+
+    Args:
+        __func: Function.
+        dependencies: Dependencies.
+
+    .. _Architecture Patterns in Python:
+        https://github.com/cosmicpython/code
+
+    """
+    params = inspect.signature(__func).parameters
+    kwargs = {
+        name: dependency
+        for name, dependency in dependencies.items()
+        if name in params
+    }
+    result = functools.partial(__func, **kwargs)
     return result
 
 
