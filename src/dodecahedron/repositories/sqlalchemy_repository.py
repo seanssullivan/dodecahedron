@@ -28,6 +28,7 @@ class SqlAlchemyRepository(SessionedRepository):
     .. _SQLAlchemy Documentation:
         https://docs.sqlalchemy.org/
 
+
     """
 
     def __init__(self, session: Session, /, *args: Any, **kwargs: Any) -> None:

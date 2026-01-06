@@ -3,7 +3,6 @@
 
 # Standard Library Imports
 from __future__ import annotations
-import abc
 import csv
 import os
 from typing import Any
@@ -23,6 +22,7 @@ from .abstract_file_wrappers import AbstractFileWrapper
 from .abstract_file_wrappers import AbstractTextWrapper
 from .abstract_file_wrappers import AbstractIOWrapper
 from ..utils import converters
+from .. import helpers
 from .. import settings
 from .. import utils
 
@@ -38,28 +38,49 @@ class AbstractCsvWrapper(AbstractTextWrapper):
     """Represents an abstract wrapper class for `.csv` files."""
 
     @property
-    @abc.abstractmethod
     def delimiter(self) -> str:
         """Delimiter."""
-        raise NotImplementedError
+        return self._delimiter
+
+    @delimiter.setter
+    def delimiter(self, value: Any) -> None:
+        helpers.raise_for_instance(value, str)
+        self._delimiter: str = value
 
     @property
-    @abc.abstractmethod
     def dialect(self) -> Union[csv.Dialect, str]:
         """Dialect."""
-        raise NotImplementedError
+        return self._dialect
+
+    @dialect.setter
+    def dialect(self, value: Any) -> None:
+        if not isinstance(value, (csv.Dialect, str)):
+            expected = "expected type 'Dialect' or 'str'"
+            actual = f"got {type(value)} instead"
+            message = ", ".join([expected, actual])
+            raise TypeError(message)
+
+        self._dialect: Union[csv.Dialect, str] = value
 
     @property
-    @abc.abstractmethod
     def fieldnames(self) -> Sequence[str]:
         """Fieldnames."""
-        raise NotImplementedError
+        return self._fieldnames
+
+    @fieldnames.setter
+    def fieldnames(self, value: Any) -> None:
+        helpers.raise_for_instance(value, Sequence)
+        self._fieldnames: Sequence[str] = value
 
     @property
-    @abc.abstractmethod
     def quotechar(self) -> str:
         """Quote character."""
-        raise NotImplementedError
+        return self._quotechar
+
+    @quotechar.setter
+    def quotechar(self, value: Any) -> None:
+        helpers.raise_for_instance(value, str)
+        self._quotechar: str = value
 
     def _init_csv_io_wrapper(self, __file: IO[Any], /) -> CsvIOWrapper:
         """Initialize I/O wrapper for `.csv` file.
@@ -110,30 +131,10 @@ class CsvDirectoryWrapper(AbstractCsvWrapper, AbstractDirectoryWrapper):
             newline=newline,
             read_only=read_only,
         )
-        self._delimiter = delimiter
-        self._dialect = dialect
-        self._fieldnames = fieldnames or []
-        self._quotechar = quotechar
-
-    @property
-    def delimiter(self) -> str:
-        """Delimiter."""
-        return self._delimiter
-
-    @property
-    def dialect(self) -> Union[csv.Dialect, str]:
-        """Dialect."""
-        return self._dialect
-
-    @property
-    def fieldnames(self) -> Sequence[str]:
-        """Fieldnames."""
-        return self._fieldnames
-
-    @property
-    def quotechar(self) -> str:
-        """Quote character."""
-        return self._quotechar
+        self.delimiter = delimiter
+        self.dialect = dialect
+        self.fieldnames = fieldnames or []
+        self.quotechar = quotechar
 
     def open(self, filename: str, /, mode: str = "r") -> CsvIOWrapper:
         """Open a `.csv` file and return a file object.
@@ -192,30 +193,10 @@ class CsvFileWrapper(AbstractCsvWrapper, AbstractFileWrapper):
         )
         utils.raise_for_extension(filepath, settings.CSV_EXTENSION)
 
-        self._delimiter = delimiter
-        self._dialect = dialect
-        self._fieldnames = fieldnames or []
-        self._quotechar = quotechar
-
-    @property
-    def delimiter(self) -> str:
-        """Delimiter."""
-        return self._delimiter
-
-    @property
-    def dialect(self) -> Union[csv.Dialect, str]:
-        """Dialect."""
-        return self._dialect
-
-    @property
-    def fieldnames(self) -> Sequence[str]:
-        """Fieldnames."""
-        return self._fieldnames
-
-    @property
-    def quotechar(self) -> str:
-        """Quote character."""
-        return self._quotechar
+        self.delimiter = delimiter
+        self.dialect = dialect
+        self.fieldnames = fieldnames or []
+        self.quotechar = quotechar
 
     def open(self, mode: str = "r") -> CsvIOWrapper:
         """Open the `.csv` file and return a file object.
@@ -250,25 +231,25 @@ class CsvIOWrapper(AbstractIOWrapper):
         return self._file.closed
 
     @property
+    def context(self) -> Union[AbstractCsvWrapper, CsvIOWrapper]:
+        """Context."""
+        return self._context or self
+
+    @property
     def delimiter(self) -> Optional[str]:
         """Delimiter."""
-        default = getattr(self._context, "delimiter", None)
-        result = getattr(self, "_delimiter", default)
+        result = getattr(self.context, "_delimiter", None)
         return result
 
     @delimiter.setter
     def delimiter(self, value: Any) -> None:
-        if not isinstance(value, str):
-            message = f"expected type 'str', got {type(value)} instead"
-            raise TypeError(message)
-
-        setattr(self, "_delimiter", value)
+        helpers.raise_for_instance(value, str)
+        setattr(self.context, "_delimiter", value)
 
     @property
     def dialect(self) -> Optional[Union[csv.Dialect, str]]:
         """Dialect."""
-        default = getattr(self._context, "dialect", None)
-        result = getattr(self, "_dialect", default)
+        result = getattr(self.context, "_dialect", None)
         return result
 
     @dialect.setter
@@ -279,37 +260,29 @@ class CsvIOWrapper(AbstractIOWrapper):
             message = ", ".join([expected, actual])
             raise TypeError(message)
 
-        setattr(self, "_dialect", value)
+        setattr(self.context, "_dialect", value)
 
     @property
     def fieldnames(self) -> Sequence[str]:
         """Fieldnames."""
-        default = getattr(self._context, "fieldnames", [])
-        result = getattr(self, "_fieldnames", default)
+        result = getattr(self.context, "_fieldnames", [])
         return result
 
     @fieldnames.setter
     def fieldnames(self, value: Any) -> None:
-        if not isinstance(value, Sequence):
-            message = f"expected type 'Sequence', got {type(value)} instead"
-            raise TypeError(message)
-
-        setattr(self, "_fieldnames", value)
+        helpers.raise_for_instance(value, Sequence)
+        setattr(self.context, "_fieldnames", value)
 
     @property
     def quotechar(self) -> Optional[str]:
         """Delimiter."""
-        default = getattr(self._context, "quotechar", None)
-        result = getattr(self, "_quotechar", default)
+        result = getattr(self.context, "_quotechar", None)
         return result
 
     @quotechar.setter
     def quotechar(self, value: Any) -> None:
-        if not isinstance(value, str):
-            message = f"expected type 'str', got {type(value)} instead"
-            raise TypeError(message)
-
-        setattr(self, "_quotechar", value)
+        helpers.raise_for_instance(value, str)
+        setattr(self.context, "_quotechar", value)
 
     @property
     def read_only(self) -> bool:
