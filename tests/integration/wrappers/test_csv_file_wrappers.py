@@ -163,8 +163,8 @@ def test_reading_record_sets_fieldnames(
     with wrapper.open() as file:
         file.read_record()
 
-        expected = ["id", "value"]
-        assert file.fieldnames == expected
+    expected = ["id", "value"]
+    assert wrapper.fieldnames == expected
 
 
 def test_can_read_records_from_csv_file(
@@ -190,26 +190,7 @@ def test_can_read_records_from_csv_file(
     assert results == expected
 
 
-def test_reading_records_sets_fieldnames_on_file(
-    make_csv_file: Callable[..., pathlib.Path],
-) -> None:
-    rows = [
-        ["id", "value"],
-        ["1", "One"],
-        ["2", "Two"],
-        ["3", "Three"],
-    ]
-    path = make_csv_file("test.csv", rows)
-
-    wrapper = CsvFileWrapper(path.resolve())
-    with wrapper.open() as file:
-        file.read_records()
-
-        expected = ["id", "value"]
-        assert file.fieldnames == expected
-
-
-def test_reading_records_sets_fieldnames_on_wrapper(
+def test_reading_records_sets_fieldnames(
     make_csv_file: Callable[..., pathlib.Path],
 ) -> None:
     rows = [

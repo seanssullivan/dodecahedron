@@ -14,6 +14,7 @@ from typing import Optional
 from typing import Sequence
 from typing import Tuple
 from typing import TypeVar
+from typing import Union
 
 # Third-Party Imports
 from openpyxl import load_workbook
@@ -26,6 +27,7 @@ from .abstract_file_wrappers import AbstractFileSystemWrapper
 from .abstract_file_wrappers import AbstractFileWrapper
 from .abstract_file_wrappers import AbstractIOWrapper
 from ..utils import converters
+from .. import helpers
 from .. import settings
 from .. import utils
 
@@ -42,6 +44,16 @@ T = TypeVar("T")
 
 class AbstractXlsxWrapper(AbstractFileSystemWrapper):
     """Represents an abstract wrapper class for `.xlsx` files."""
+
+    @property
+    def fieldnames(self) -> Sequence[Any]:
+        """Fieldnames."""
+        return self._fieldnames
+
+    @fieldnames.setter
+    def fieldnames(self, value: Any) -> None:
+        helpers.raise_for_instance(value, Sequence)
+        self._fieldnames: Sequence[str] = value
 
     def _init_xlsx_io_wrapper(
         self, __file: IO[Any], /, mode: str
@@ -83,12 +95,7 @@ class XlsxDirectoryWrapper(AbstractXlsxWrapper, AbstractDirectoryWrapper):
             extension=settings.XLSX_EXTENSION,
             read_only=read_only,
         )
-        self._fieldnames = fieldnames
-
-    @property
-    def fieldnames(self) -> Sequence[str]:
-        """Fieldnames."""
-        return self._fieldnames or []
+        self.fieldnames = fieldnames or []
 
     def open(self, filename: str, /, mode: str = "rb") -> XlsxIOWrapper:
         """Open a `.xlsx` file and return a file object.
@@ -133,12 +140,7 @@ class XlsxFileWrapper(AbstractXlsxWrapper, AbstractFileWrapper):
         super().__init__(filepath, read_only=read_only)
         utils.raise_for_extension(filepath, settings.XLSX_EXTENSION)
 
-        self._fieldnames = fieldnames or []
-
-    @property
-    def fieldnames(self) -> Sequence[Any]:
-        """Fieldnames."""
-        return self._fieldnames
+        self.fieldnames = fieldnames or []
 
     def open(self, mode: str = "rb") -> XlsxIOWrapper:
         """Open the `.xlsx` file and return a file object.
@@ -242,19 +244,20 @@ class XlsxIOWrapper(OpenPyXLMixin, AbstractIOWrapper):
         return self._file.closed
 
     @property
+    def context(self) -> Union[AbstractXlsxWrapper, XlsxIOWrapper]:
+        """Context."""
+        return self._context or self
+
+    @property
     def fieldnames(self) -> Sequence[str]:
         """Fieldnames."""
-        default = getattr(self._context, "fieldnames", [])
-        result = getattr(self, "_fieldnames", default)
+        result = getattr(self.context, "_fieldnames", [])
         return result
 
     @fieldnames.setter
     def fieldnames(self, value: Any) -> None:
-        if not isinstance(value, Sequence):
-            message = f"expected type 'Sequence', got {type(value)} instead"
-            raise TypeError(message)
-
-        setattr(self, "_fieldnames", value)
+        helpers.raise_for_instance(value, Sequence)
+        setattr(self.context, "_fieldnames", value)
 
     @property
     def sheetname(self) -> Optional[str]:

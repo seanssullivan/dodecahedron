@@ -118,8 +118,8 @@ def test_reading_record_sets_fieldnames(
     with wrapper.open() as file:
         file.read_record()
 
-        expected = ["id", "value"]
-        assert file.fieldnames == expected
+    expected = ["id", "value"]
+    assert wrapper.fieldnames == expected
 
 
 def test_can_read_records_from_xlsx_file(
@@ -160,8 +160,8 @@ def test_reading_records_sets_fieldnames(
     with wrapper.open() as file:
         file.read_records()
 
-        expected = ["id", "value"]
-        assert file.fieldnames == expected
+    expected = ["id", "value"]
+    assert wrapper.fieldnames == expected
 
 
 def test_can_read_row_from_xlsx_file(
