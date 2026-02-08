@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Progressive Dispatcherr."""
+"""Progressive Dispatcher."""
 
 # Local Imports
 from .abstract_dispatcher import AbstractDispatcher
@@ -11,7 +11,7 @@ __all__ = ["ProgressiveDispatcher"]
 
 
 class ProgressiveDispatcher(AbstractDispatcher):
-    """Implements a progressive dispatcher.
+    """Class implements a progressive dispatcher.
 
     Args:
         __bus: Message bus.

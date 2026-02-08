@@ -70,6 +70,19 @@ def test_converts_value_when_instantiating_from_dictionary(
 
 @pytest.mark.parametrize(
     "schema,properties",
+    [({"value": {"map_to": "_value", "default": "success"}}, {})],
+)
+def test_sets_default_value_when_instantiating_from_dictionary(
+    schema: Dict[Hashable, Any],
+    properties: Dict[Hashable, Any],
+) -> None:
+    mapper = ClassMapper(ExampleClass, schema, properties)
+    result = mapper.from_dict({})
+    assert result.value == "success"
+
+
+@pytest.mark.parametrize(
+    "schema,properties",
     [
         ({}, {"_value": 0}),
         ({0: "_value"}, {}),

@@ -57,10 +57,15 @@ class DictMapper(AbstractMapper):
             raise TypeError(message)
 
         result: Dict[Hashable, Any] = {}
-        for outward_key, inward_key in self.properties.items():
-            converter = self._get_converter(inward_key, direction=INWARD)
-            value: Any = __dict[outward_key]
-            result[str(inward_key)] = converter(value) if converter else value
+        for outward, inward in self.properties.items():
+            converter = self._get_converter(inward, direction=INWARD)
+            default = self._get_default_value(inward)
+            value: Any = (
+                converter(__dict[outward])
+                if converter and outward in __dict
+                else __dict.get(outward, default)
+            )
+            result[str(inward)] = value
 
         return result
 
@@ -77,8 +82,8 @@ class DictMapper(AbstractMapper):
         result: Dict[Hashable, Any] = {}
         for key, idx in self.properties.items():
             converter = self._get_converter(idx, direction=INWARD)
-            value: Any = __list[idx]
-            result[key] = converter(value) if converter else value
+            value: Any = converter(__list[idx]) if converter else __list[idx]
+            result[key] = value
 
         return result
 
@@ -93,10 +98,15 @@ class DictMapper(AbstractMapper):
 
         """
         result: Dict[Hashable, Any] = {}
-        for outward_key, inward_key in self.properties.items():
-            converter = self._get_converter(inward_key, direction=OUTWARD)
-            value: Any = __dict[inward_key]
-            result[str(outward_key)] = converter(value) if converter else value
+        for outward, inward in self.properties.items():
+            converter = self._get_converter(inward, direction=OUTWARD)
+            default = self._get_default_value(inward)
+            value: Any = (
+                converter(__dict[inward])
+                if converter and inward in __dict
+                else __dict.get(inward, default)
+            )
+            result[str(outward)] = value
 
         return result
 
@@ -113,25 +123,14 @@ class DictMapper(AbstractMapper):
         result: List[Any] = []
         for key, idx in sorted(self.properties.items(), key=lambda i: i[1]):
             converter = self._get_converter(idx, direction=OUTWARD)
-            value: Any = __dict[key]
-            item = converter(value) if converter else value
-            result.append(item)
+            default = self._get_default_value(key)
+            value = (
+                converter(__dict[key])
+                if converter and key in __dict
+                else __dict.get(key, default)
+            )
+            result.append(value)
 
-        return result
-
-    def _get_attribute_mapper(
-        self, ref: Hashable
-    ) -> Optional[Dict[Hashable, Any]]:
-        """Get attribute mapper.
-
-        Args:
-            ref: Reference for attribute.
-
-        Returns:
-            Attribute mapper.
-
-        """
-        result = self.schema.get_attribute_mapper(ref)
         return result
 
     def _get_converter(
@@ -155,6 +154,21 @@ class DictMapper(AbstractMapper):
         result = self.schema.get_converter(ref, direction, default=default)
         return result
 
+    def _get_attribute_mapper(
+        self, ref: Hashable
+    ) -> Optional[Dict[Hashable, Any]]:
+        """Get attribute mapper.
+
+        Args:
+            ref: Reference for attribute.
+
+        Returns:
+            Attribute mapper.
+
+        """
+        result = self.schema.get_attribute_mapper(ref)
+        return result
+
     def _get_attribute_names(self) -> Dict[Hashable, Hashable]:
         """Get attribute names.
 
@@ -164,3 +178,16 @@ class DictMapper(AbstractMapper):
         """
         results = self.schema.get_attribute_names()
         return results
+
+    def _get_default_value(self, ref: Hashable) -> Any:
+        """Get default value.
+
+        Args:
+            ref: Reference for attribute.
+
+        Returns:
+            Default value.
+
+        """
+        result = self.schema.get_default_value(ref)
+        return result

@@ -19,5 +19,5 @@ class MessageMeta(abc.ABCMeta):
 
     def __call__(cls: Type[T], *args: Any, **kwargs: Any) -> T:
         instance = super().__call__(*args, **kwargs)
-        setattr(instance, "__created_at__", datetime.datetime.now())
+        setattr(instance, "_created_at", datetime.datetime.now())
         return instance

@@ -1,8 +1,5 @@
-bdist_wheel:
-	python setup.py bdist_wheel
-
-sdist:
-	python setup.py sdist
+build:
+	hatch build
 
 test:
 	coverage run -m pytest --tb=short

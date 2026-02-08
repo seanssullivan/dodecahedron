@@ -1,6 +1,7 @@
 # Development requirements
 -r testing.txt
 build
+hatch
 mypy
 pylint
 wheel

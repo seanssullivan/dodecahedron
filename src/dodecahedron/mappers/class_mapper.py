@@ -43,7 +43,7 @@ class ClassMapper(AbstractMapper, Generic[T]):
         self._schema = MapperSchema(schema)
         self._properties = properties
 
-        setattr(self._class, "__mapper__", self)
+        setattr(self._class, "_mapper", self)
 
     @property
     def cls(self) -> Type[T]:
@@ -75,7 +75,12 @@ class ClassMapper(AbstractMapper, Generic[T]):
             result = cls()
             for attr, key in self.properties.items():
                 converter = self._get_converter(key, direction=INWARD)
-                value = converter(__dict[key]) if converter else __dict[key]
+                default = self._get_default_value(key)
+                value = (
+                    converter(__dict[key])
+                    if converter and key in __dict
+                    else __dict.get(key, default)
+                )
                 setattr(result, str(attr), value)
 
         return result
@@ -112,8 +117,13 @@ class ClassMapper(AbstractMapper, Generic[T]):
         result: Dict[Hashable, Any] = {}
         for attr, key in self.properties.items():
             converter = self._get_converter(key, direction=OUTWARD)
-            value = getattr(__instance, str(attr))
-            result[key] = converter(value) if converter else value
+            default = self._get_default_value(key)
+            value = (
+                converter(getattr(__instance, str(attr)))
+                if converter and hasattr(__instance, str(attr))
+                else getattr(__instance, str(attr), default)
+            )
+            result[key] = value
 
         return result
 
@@ -130,9 +140,13 @@ class ClassMapper(AbstractMapper, Generic[T]):
         result: List[Any] = []
         for attr, key in sorted(self.properties.items(), key=lambda i: i[1]):
             converter = self._get_converter(key, direction=OUTWARD)
-            value = getattr(__instance, str(attr))
-            item = converter(value) if converter else value
-            result.append(item)
+            default = self._get_default_value(key)
+            value = (
+                converter(getattr(__instance, str(attr)))
+                if converter and hasattr(__instance, str(attr))
+                else getattr(__instance, str(attr), default)
+            )
+            result.append(value)
 
         return result
 
@@ -181,6 +195,19 @@ class ClassMapper(AbstractMapper, Generic[T]):
         """
         results = self.schema.get_attribute_names()
         return results
+
+    def _get_default_value(self, ref: Hashable) -> Any:
+        """Get default value.
+
+        Args:
+            ref: Reference for attribute.
+
+        Returns:
+            Default value.
+
+        """
+        result = self.schema.get_default_value(ref)
+        return result
 
 
 # ----------------------------------------------------------------------------
