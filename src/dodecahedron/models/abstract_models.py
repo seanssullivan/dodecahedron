@@ -14,6 +14,7 @@ Implementation based on 'Architecture Patterns in Python' domain model pattern.
 
 # Standard Library Imports
 import abc
+from typing import Any
 from typing import Deque
 from typing import Union
 from typing import TYPE_CHECKING
@@ -37,7 +38,7 @@ class AbstractModel(abc.ABC):
     """
 
     @abc.abstractmethod
-    def __eq__(self, other: object) -> bool:
+    def __eq__(self, other: object, /) -> bool:
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -69,16 +70,16 @@ class AbstractAggregate(AbstractModel):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def add(self, obj: object) -> None:
+    def add(self, obj: object, /, *args: Any, **kwargs: Any) -> None:
         """Add object to aggregate."""
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get(self, ref: str) -> object:
+    def get(self, ref: str, /, *args: Any, **kwargs: Any) -> object:
         """Get object in aggregate."""
         raise NotImplementedError
 
     @abc.abstractmethod
-    def remove(self, obj: object) -> None:
+    def remove(self, obj: object, /, *args: Any, **kwargs: Any) -> None:
         """Remove object from aggregate."""
         raise NotImplementedError
