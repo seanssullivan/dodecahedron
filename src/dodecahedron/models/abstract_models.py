@@ -16,6 +16,7 @@ Implementation based on 'Architecture Patterns in Python' domain model pattern.
 import abc
 from typing import Any
 from typing import Deque
+from typing import Hashable
 from typing import Union
 from typing import TYPE_CHECKING
 
@@ -75,7 +76,7 @@ class AbstractAggregate(AbstractModel):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get(self, ref: str, /, *args: Any, **kwargs: Any) -> object:
+    def get(self, ref: Hashable, /, *args: Any, **kwargs: Any) -> object:
         """Get object in aggregate."""
         raise NotImplementedError
 
