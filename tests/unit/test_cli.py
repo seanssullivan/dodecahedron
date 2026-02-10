@@ -25,7 +25,7 @@ def test_cli_calls_process_function() -> None:
 def test_cli_passes_positional_arguments_to_process_function() -> None:
     result: Optional[str] = None
 
-    def process(value: str) -> None:
+    def process(value: str, /) -> None:
         nonlocal result
         result = value
 

@@ -12,6 +12,7 @@ arguments that the user provides and calls the appropriate service function.
 import abc
 from argparse import ArgumentParser
 from argparse import Namespace
+import enum
 import inspect
 import logging
 from typing import Any
@@ -193,7 +194,7 @@ def get_positional_only_arguments(
     params: List[str] = [
         name
         for name, param in __signature.parameters.items()
-        if param.kind.name == "POSITIONAL_ONLY"
+        if param.kind.name == ParameterType.POSITIONAL_ONLY
     ]
     results = tuple(getattr(__namespace, param) for param in params)
     return results
@@ -217,7 +218,7 @@ def get_positional_or_keyword_arguments(
     params: List[str] = [
         name
         for name, param in __signature.parameters.items()
-        if param.kind.name == "POSITIONAL_OR_KEYWORD"
+        if param.kind.name == ParameterType.POSITIONAL_OR_KEYWORD
     ]
     results = {param: getattr(__namespace, param) for param in params}
     return results
@@ -241,7 +242,16 @@ def get_keyword_only_arguments(
     params: List[str] = [
         name
         for name, param in __signature.parameters.items()
-        if param.kind.name == "KEYWORD_ONLY"
+        if param.kind.name == ParameterType.KEYWORD_ONLY
     ]
     results = {param: getattr(__namespace, param, None) for param in params}
     return results
+
+
+@enum.unique
+class ParameterType(str, enum.Enum):
+    """Implements parameter types."""
+
+    KEYWORD_ONLY = "KEYWORD_ONLY"
+    POSITIONAL_ONLY = "POSITIONAL_ONLY"
+    POSITIONAL_OR_KEYWORD = "POSITIONAL_OR_KEYWORD"

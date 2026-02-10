@@ -16,7 +16,7 @@ Implementation based on 'Architecture Patterns in Python' domain model pattern.
 import abc
 from typing import Any
 from typing import Deque
-from typing import Hashable
+from typing import Optional
 from typing import Union
 from typing import TYPE_CHECKING
 
@@ -72,15 +72,39 @@ class AbstractAggregate(AbstractModel):
 
     @abc.abstractmethod
     def add(self, obj: object, /, *args: Any, **kwargs: Any) -> None:
-        """Add object to aggregate."""
+        """Add object to aggregate.
+
+        Args:
+            obj: Object to add.
+            *args (optional): Positional arguments.
+            **kwargs (optional): keyword arguments.
+
+        """
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get(self, ref: Hashable, /, *args: Any, **kwargs: Any) -> object:
-        """Get object in aggregate."""
+    def get(self, ref: Any, /, *args: Any, **kwargs: Any) -> Optional[object]:
+        """Get object in aggregate.
+
+        Args:
+            ref: Reference for object.
+            *args (optional): Positional arguments.
+            **kwargs (optional): keyword arguments.
+
+        Returns:
+            Object.
+
+        """
         raise NotImplementedError
 
     @abc.abstractmethod
     def remove(self, obj: object, /, *args: Any, **kwargs: Any) -> None:
-        """Remove object from aggregate."""
+        """Remove object from aggregate.
+
+        Args:
+            obj: Object to remove.
+            *args (optional): Positional arguments.
+            **kwargs (optional): keyword arguments.
+
+        """
         raise NotImplementedError

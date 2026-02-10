@@ -84,7 +84,12 @@ class BaseConverter(AbstractConverter):
         result = conversion(__value, self._default)
         return result
 
-    def _handle_exception(self, __value: Any, error: Exception, /) -> Any:
+    def _handle_exception(
+        self,
+        __value: Any,
+        /,
+        error: Exception,
+    ) -> Any:
         """Handle conversion between data types.
 
         Args:
@@ -101,7 +106,10 @@ class BaseConverter(AbstractConverter):
         return self._default
 
     def set_conversion(
-        self, __type: type, func: Callable[..., Any], /
+        self,
+        __type: type,
+        /,
+        func: Callable[..., Any],
     ) -> None:
         """Set conversion for type.
 
