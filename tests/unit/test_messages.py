@@ -22,7 +22,7 @@ from dodecahedron.messages import AbstractMessage
 )
 def test_sets_created_at_attribute(message: Type[AbstractMessage]) -> None:
     instance = message()
-    result = getattr(instance, "__created_at__", None)
+    result = getattr(instance, "_created_at", None)
     assert result is not None
     assert isinstance(result, datetime.datetime)
 

@@ -17,11 +17,11 @@ __all__ = ["AbstractMessage"]
 class AbstractMessage(abc.ABC, metaclass=MessageMeta):
     """Class represents an abstract message."""
 
-    __created_at__: datetime.datetime
+    _created_at: datetime.datetime
 
     def __gt__(self, other: object) -> bool:
         result = (
-            self.__created_at__ > other.__created_at__
+            self._created_at > other._created_at
             if isinstance(other, AbstractMessage)
             else False
         )
@@ -29,7 +29,7 @@ class AbstractMessage(abc.ABC, metaclass=MessageMeta):
 
     def __lt__(self, other: object) -> bool:
         result = (
-            self.__created_at__ < other.__created_at__
+            self._created_at < other._created_at
             if isinstance(other, AbstractMessage)
             else False
         )

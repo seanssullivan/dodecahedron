@@ -73,6 +73,25 @@ class MapperSchema(collections.UserDict):  # type: ignore
 
         return result
 
+    def get_default_value(self, ref: Hashable) -> Any:
+        """Get default value.
+
+        Args:
+            ref: Reference for attribute.
+
+        Returns:
+            Default value.
+
+        """
+        try:
+            mapper = self.get_attribute_mapper(ref)
+            result = mapper.get("default") if mapper else None
+
+        except KeyError:
+            return None
+
+        return result
+
     def get_attribute_mapper(
         self, ref: Hashable
     ) -> Optional[Dict[Hashable, Any]]:
@@ -87,6 +106,7 @@ class MapperSchema(collections.UserDict):  # type: ignore
         """
         try:
             result = self.data[ref]
+
         except KeyError:
             return None
 
