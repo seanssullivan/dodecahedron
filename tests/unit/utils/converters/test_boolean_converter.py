@@ -6,6 +6,10 @@
 # Standard Library Imports
 import datetime
 import decimal
+from typing import Any
+from typing import Dict
+from typing import Hashable
+from typing import List
 
 # Third-Party Imports
 import pytest
@@ -38,6 +42,18 @@ def test_returns_true_from_decimal(value: decimal.Decimal) -> None:
     assert result is True
 
 
+@pytest.mark.parametrize("value", [{"key": True}, {"key": 1}, {"key": "yes"}])
+def test_returns_true_from_dictionary(value: Dict[Hashable, Any]) -> None:
+    result = converters.to_boolean(value)
+    assert result is True
+
+
+@pytest.mark.parametrize("value", [{"key": False}, {"key": 0}, {"key": "no"}])
+def test_returns_false_from_dictionary(value: Dict[Hashable, Any]) -> None:
+    result = converters.to_boolean(value)
+    assert result is False
+
+
 @pytest.mark.parametrize("value,expected", [(0.0, False), (1.0, True)])
 def test_returns_boolean_from_float(value: float, expected: bool) -> None:
     result = converters.to_boolean(value)
@@ -48,6 +64,24 @@ def test_returns_boolean_from_float(value: float, expected: bool) -> None:
 def test_returns_boolean_from_integer(value: int, expected: bool) -> None:
     result = converters.to_boolean(value)
     assert result == expected
+
+
+@pytest.mark.parametrize("value", [[True], [1], ["yes"]])
+def test_returns_true_from_list_with_truthy_values(value: List[Any]) -> None:
+    result = converters.to_boolean(value)
+    assert result is True
+
+
+@pytest.mark.parametrize("value", [[False], [0], ["no"]])
+def test_returns_false_from_list_with_falsy_values(value: List[Any]) -> None:
+    result = converters.to_boolean(value)
+    assert result is False
+
+
+@pytest.mark.parametrize("value", [[False, True, 0, "yes"]])
+def test_returns_false_from_list_with_mixed_values(value: List[Any]) -> None:
+    result = converters.to_boolean(value)
+    assert result is False
 
 
 @pytest.mark.parametrize("value", ["true", "yes", "y", "1"])
