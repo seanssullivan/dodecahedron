@@ -57,7 +57,7 @@ def test_json_encoder_dumps_nat(value: Any) -> None:
     assert result is not None
 
 
-@pytest.mark.parametrize("value", [pd.NaT, np.datetime64('NaT')])
+@pytest.mark.parametrize("value", [pd.NaT, np.datetime64("NaT")])
 def test_json_encoder_converts_nat_to_none(value: Any) -> None:
     data = json.dumps({"value": value}, cls=JSONEncoder)
     result = json.loads(data)

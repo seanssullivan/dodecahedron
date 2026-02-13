@@ -11,7 +11,7 @@ from unittest.mock import Mock
 # import pytest
 
 # Local Imports
-from dodecahedron.cli import CommandLineInterface
+from dodecahedron.adapters.cli import CommandLineInterface
 
 
 def test_cli_calls_process_function() -> None:

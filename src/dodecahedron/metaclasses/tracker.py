@@ -23,7 +23,7 @@ ADD_METHOD = "add"
 GET_METHOD = "get"
 LIST_METHOD = "list"
 REMOVE_METHOD = "remove"
-SEEN_ATTR = "__seen__"
+SEEN_ATTR = "_seen"
 
 # Custom types
 T = TypeVar("T")

@@ -24,29 +24,29 @@ def make_commands(
         Commands.
 
     """
-    results = [make_event(delay=delay) for _ in range(n)]
+    results = [make_command(delay=delay) for _ in range(n)]
     return results
 
 
-def make_commands(*, delay: Union[float, int] = 0) -> messages.AbstractCommand:
-    """Make commands.
+def make_command(*, delay: Union[float, int] = 0) -> messages.AbstractCommand:
+    """Make command.
 
     Args:
         delay (optional): Delay before instantiating commands. Default ``0``.
 
     Returns:
-        Commands.
+        Command.
 
     Raises:
         TypeError: when `delay` is not type ``float`` or ``int``.
 
     """
-    if not isinstance(delay, (float, int)):
+    if not isinstance(delay, (float, int)):  # type: ignore
         message = f"expected type 'float' or 'int', got {type(delay)} instead"
         raise TypeError(message)
 
     time.sleep(delay)
-    result = messages.AbstractEvent()
+    result = messages.AbstractCommand()
     return result
 
 
@@ -80,7 +80,7 @@ def make_event(*, delay: Union[float, int] = 0) -> messages.AbstractEvent:
         TypeError: when `delay` is not type ``float`` or ``int``.
 
     """
-    if not isinstance(delay, (float, int)):
+    if not isinstance(delay, (float, int)):  # type: ignore
         message = f"expected type 'float' or 'int', got {type(delay)} instead"
         raise TypeError(message)
 
@@ -119,7 +119,7 @@ def make_message(*, delay: Union[float, int] = 0) -> messages.AbstractMessage:
         TypeError: when `delay` is not type ``float`` or ``int``.
 
     """
-    if not isinstance(delay, (float, int)):
+    if not isinstance(delay, (float, int)):  # type: ignore
         message = f"expected type 'float' or 'int', got {type(delay)} instead"
         raise TypeError(message)
 

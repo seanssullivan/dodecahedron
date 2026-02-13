@@ -20,7 +20,7 @@ import xlsxwriter  # type: ignore
 
 
 @pytest.fixture
-def tempdir() -> Generator[str, None, None]:
+def tempdir() -> Generator[pathlib.Path, None, None]:
     """Fixture to make a temporary directory.
 
     Yields:
@@ -28,13 +28,13 @@ def tempdir() -> Generator[str, None, None]:
 
     """
     tempdir = tempfile.mkdtemp()
-    yield tempdir
+    yield pathlib.Path(tempdir)
     shutil.rmtree(tempdir)
 
 
 @pytest.fixture
 def make_csv_file(
-    tempdir: str,
+    tempdir: pathlib.Path,
 ) -> Generator[Callable[..., pathlib.Path], None, None]:
     """Fixture to make a temporary `.csv` file.
 
@@ -50,7 +50,7 @@ def make_csv_file(
             message = f"expected type 'str', got {type(filename)} instead"
             raise TypeError(message)
 
-        path = pathlib.Path(tempdir) / filename
+        path = tempdir / filename
         with path.open("w") as file:
             writer = csv.writer(file)
             for line in lines or []:
@@ -63,7 +63,7 @@ def make_csv_file(
 
 @pytest.fixture
 def make_json_file(
-    tempdir: str,
+    tempdir: pathlib.Path,
 ) -> Generator[Callable[..., pathlib.Path], None, None]:
     """Fixture to make a temporary `.json` file.
 
@@ -77,7 +77,7 @@ def make_json_file(
             message = f"expected type 'str', got {type(filename)} instead"
             raise TypeError(message)
 
-        path = pathlib.Path(tempdir) / filename
+        path = tempdir / filename
         with path.open("w") as file:
             json.dump(content or [], file)
 
@@ -88,7 +88,7 @@ def make_json_file(
 
 @pytest.fixture
 def make_pdf_file(
-    tempdir: str,
+    tempdir: pathlib.Path,
 ) -> Generator[Callable[..., pathlib.Path], None, None]:
     """Fixture to make a temporary `.pdf` file.
 
@@ -102,7 +102,7 @@ def make_pdf_file(
             message = f"expected type 'str', got {type(filename)} instead"
             raise TypeError(message)
 
-        path = pathlib.Path(tempdir) / filename
+        path = tempdir / filename
         pdf = fpdf.FPDF()
         pdf.add_page()
         pdf.set_font("Arial", "", 16)
@@ -115,7 +115,7 @@ def make_pdf_file(
 
 @pytest.fixture
 def make_txt_file(
-    tempdir: str,
+    tempdir: pathlib.Path,
 ) -> Generator[Callable[..., pathlib.Path], None, None]:
     """Fixture to make a temporary `.txt` file.
 
@@ -131,7 +131,7 @@ def make_txt_file(
             message = f"expected type 'str', got {type(filename)} instead"
             raise TypeError(message)
 
-        path = pathlib.Path(tempdir) / filename
+        path = tempdir / filename
         with path.open("w") as file:
             file.write(content or "")
 
@@ -141,8 +141,35 @@ def make_txt_file(
 
 
 @pytest.fixture
+def make_whl_file(
+    tempdir: pathlib.Path,
+) -> Generator[Callable[..., pathlib.Path], None, None]:
+    """Fixture to make a temporary `.whl` file.
+
+    Args:
+        tempdir: Temporary directory.
+
+    """
+
+    def _make_file(
+        filename: str, content: Optional[bytes] = None
+    ) -> pathlib.Path:
+        if not isinstance(filename, bytes):  # type: ignore
+            message = f"expected type 'bytes', got {type(filename)} instead"
+            raise TypeError(message)
+
+        path = tempdir / filename
+        with path.open("wb") as file:
+            file.write(content or b"")
+
+        return path
+
+    yield _make_file
+
+
+@pytest.fixture
 def make_xlsx_file(
-    tempdir: str,
+    tempdir: pathlib.Path,
 ) -> Generator[Callable[..., pathlib.Path], None, None]:
     """Fixture to make a temporary `.xlsx` file.
 
@@ -161,7 +188,7 @@ def make_xlsx_file(
             message = f"expected type 'str', got {type(filename)} instead"
             raise TypeError(message)
 
-        path = pathlib.Path(tempdir) / filename
+        path = tempdir / filename
         workbook = xlsxwriter.Workbook(path)
         worksheet = workbook.add_worksheet(sheet)  # type: ignore
 
@@ -177,7 +204,7 @@ def make_xlsx_file(
 
 @pytest.fixture
 def make_zip_file(
-    tempdir: str,
+    tempdir: pathlib.Path,
 ) -> Generator[Callable[..., pathlib.Path], None, None]:
     """Fixture to make a temporary `.zip` file.
 
@@ -195,7 +222,7 @@ def make_zip_file(
             message = f"expected type 'Path', got {type(filepath)} instead"
             raise TypeError(message)
 
-        zippath = pathlib.Path(tempdir) / zipname
+        zippath = tempdir / zipname
         with zipfile.ZipFile(zippath, "w") as file:
             file.write(filepath, arcname=filepath.name)
 
