@@ -2,15 +2,39 @@
 
 # Standard Library Imports
 import importlib
+from importlib import metadata
+from packaging.version import Version
 from types import ModuleType
+from typing import List
 from typing import Literal
 from typing import Optional
 from typing import overload
 
 __all__ = [
+    "get_package_version",
     "import_module",
-    "raise_for_instance",
+    "list_installed_packages",
 ]
+
+
+def get_package_version(name: str) -> Optional[Version]:
+    """Get version of installed package.
+
+    Args:
+        name: Name of package.
+
+    Returns:
+        Version.
+
+    """
+    try:
+        value = metadata.version(name)
+        result = Version(value)
+
+    except metadata.PackageNotFoundError:
+        return None
+
+    return result
 
 
 @overload
@@ -60,19 +84,12 @@ def import_module(
     return result
 
 
-def raise_for_instance(__obj: object, __class: type) -> None:
-    """Raise error when object is not instance of provided class.
+def list_installed_packages() -> List[str]:
+    """List installed package.
 
-    Args:
-        __obj: Object for which to check class.
-        __class: Class for which to check.
-
-    Raises:
-        TypeError: when object is not an instance of class.
+    Returns:
+        Packages.
 
     """
-    if not isinstance(__obj, __class):
-        expected = f"expected type '{__class.__name__!s}'"
-        actual = f"got {type(__obj)} instead"
-        message = ", ".join([expected, actual])
-        raise TypeError(message)
+    results = [dist.name for dist in metadata.distributions()]
+    return results

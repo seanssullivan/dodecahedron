@@ -16,7 +16,7 @@ from typing import Optional
 
 # Local Imports
 from .metaclasses import SingletonMeta
-from . import config
+from . import environment
 
 __all__ = ["MessageBroker"]
 
@@ -162,7 +162,7 @@ def handle_error(
         on_error: Strategy for handling errors.
 
     """
-    exc_info = not config.is_production_environment()
+    exc_info = not environment.is_production_environment()
     log.error("Error handling %s", event, exc_info=exc_info)
     if on_error == RAISE:
         raise error

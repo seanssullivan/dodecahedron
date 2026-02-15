@@ -43,7 +43,7 @@ from .messages import AbstractEvent
 from .messages import AbstractMessage
 from .queues import MessageQueue
 from .units_of_work import AbstractUnitOfWork
-from . import config
+from . import environment
 
 __all__ = [
     "AbstractMessageBus",
@@ -310,7 +310,7 @@ def handle_error(
         on_error: Strategy for handling errors.
 
     """
-    exc_info = not config.is_production_environment()
+    exc_info = not environment.is_production_environment()
     log.error("Error handling %s", message, exc_info=exc_info)
     if on_error == RAISE:
         raise error

@@ -27,7 +27,7 @@ from .abstract_file_wrappers import AbstractFileSystemWrapper
 from .abstract_file_wrappers import AbstractFileWrapper
 from .abstract_file_wrappers import AbstractIOWrapper
 from ..utils import converters
-from .. import helpers
+from .. import errors
 from .. import settings
 from .. import utils
 
@@ -52,7 +52,7 @@ class AbstractXlsxWrapper(AbstractFileSystemWrapper):
 
     @fieldnames.setter
     def fieldnames(self, value: Any) -> None:
-        helpers.raise_for_instance(value, Sequence)
+        errors.raise_for_instance(value, Sequence)
         self._fieldnames: Sequence[str] = value
 
     def _init_xlsx_io_wrapper(
@@ -256,7 +256,7 @@ class XlsxIOWrapper(OpenPyXLMixin, AbstractIOWrapper):
 
     @fieldnames.setter
     def fieldnames(self, value: Any) -> None:
-        helpers.raise_for_instance(value, Sequence)
+        errors.raise_for_instance(value, Sequence)
         setattr(self.context, "_fieldnames", value)
 
     @property
