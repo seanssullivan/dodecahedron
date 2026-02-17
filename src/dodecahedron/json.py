@@ -11,7 +11,7 @@ from typing import Hashable
 from typing import Optional
 
 # Local Imports
-from .helpers import import_module
+from .packages import import_module
 
 # Optional Third-Party Imports
 np = import_module("numpy", required=False)

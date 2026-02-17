@@ -5,37 +5,20 @@ import importlib
 from importlib import metadata
 from packaging.version import Version
 from types import ModuleType
+from typing import Any
 from typing import List
 from typing import Literal
 from typing import Optional
 from typing import overload
 
 __all__ = [
-    "get_package_version",
+    "get_installed_package_version",
     "import_module",
+    "is_final_release",
+    "is_prerelease",
     "list_installed_packages",
     "search_installed_packages",
 ]
-
-
-def get_package_version(name: str) -> Optional[Version]:
-    """Get version of installed package.
-
-    Args:
-        name: Name of package.
-
-    Returns:
-        Version.
-
-    """
-    try:
-        value = metadata.version(name)
-        result = Version(value)
-
-    except metadata.PackageNotFoundError:
-        return None
-
-    return result
 
 
 @overload
@@ -85,6 +68,29 @@ def import_module(
     return result
 
 
+# ----------------------------------------------------------------------------
+# Selectors
+# ----------------------------------------------------------------------------
+def get_installed_package_version(name: str) -> Optional[Version]:
+    """Get version of installed package.
+
+    Args:
+        name: Name of package.
+
+    Returns:
+        Version.
+
+    """
+    try:
+        value = metadata.version(name)
+        result = Version(value)
+
+    except metadata.PackageNotFoundError:
+        return None
+
+    return result
+
+
 def list_installed_packages() -> List[str]:
     """List installed packages.
 
@@ -112,3 +118,48 @@ def search_installed_packages(*args: str) -> List[str]:
         if all(arg in name for arg in args)
     ]
     return results
+
+
+# ----------------------------------------------------------------------------
+# Validators
+# ----------------------------------------------------------------------------
+def is_final_release(__version: Any, /) -> bool:
+    """Check whether version is final release.
+
+    Args:
+        __version: Version.
+
+    Returns:
+        Whether version is final release.
+
+    Raises:
+        TypeError: when argument is not type `Version`.
+
+    """
+    if not isinstance(__version, Version):
+        message = f"expected type 'Version', got {type(__version)} instead"
+        raise TypeError(message)
+
+    result = not __version.dev and not __version.pre
+    return result
+
+
+def is_prerelease(__version: Any, /) -> bool:
+    """Check whether version is pre-release.
+
+    Args:
+        __version: Version.
+
+    Returns:
+        Whether version is pre-release.
+
+    Raises:
+        TypeError: when argument is not type `Version`.
+
+    """
+    if not isinstance(__version, Version):
+        message = f"expected type 'Version', got {type(__version)} instead"
+        raise TypeError(message)
+
+    result = bool(__version.pre)
+    return result
