@@ -14,6 +14,7 @@ __all__ = [
     "get_package_version",
     "import_module",
     "list_installed_packages",
+    "search_installed_packages",
 ]
 
 
@@ -85,11 +86,29 @@ def import_module(
 
 
 def list_installed_packages() -> List[str]:
-    """List installed package.
+    """List installed packages.
 
     Returns:
         Packages.
 
     """
-    results = [dist.name for dist in metadata.distributions()]
+    results = sorted(dist.name for dist in metadata.distributions())
+    return results
+
+
+def search_installed_packages(*args: str) -> List[str]:
+    """Search installed packages.
+
+    Args:
+        args: Reference(s) for packages.
+
+    Returns:
+        Packages.
+
+    """
+    results = [
+        name
+        for name in list_installed_packages()
+        if all(arg in name for arg in args)
+    ]
     return results
