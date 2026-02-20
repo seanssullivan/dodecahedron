@@ -22,7 +22,11 @@ from .. import parsers
 __all__ = ["to_float"]
 
 
-def to_float(__value: Any, /, default: float = 0.0) -> float:
+def to_float(
+    __value: Any,
+    /,
+    default: Optional[float] = 0.0,
+) -> Optional[float]:
     """Convert value to float.
 
     Args:
@@ -50,10 +54,10 @@ class FloatConverter(BaseConverter):
     def __init__(
         self,
         *,
-        default: float = 0.0,
+        default: Optional[float] = 0.0,
         on_error: Literal["default", "raise"] = "raise",
     ) -> None:
-        if not isinstance(default, float):
+        if default is not None and not isinstance(default, float):
             message = f"expected type 'float', got {type(default)} instead"
             raise TypeError(message)
 
@@ -75,7 +79,7 @@ class FloatConverter(BaseConverter):
         self._default = value
 
 
-def float_from_bool(__value: bool, _: float, /) -> float:
+def float_from_bool(__value: bool, /, *_: Any) -> float:
     """Convert boolean value to float.
 
     Args:
@@ -96,9 +100,7 @@ def float_from_bool(__value: bool, _: float, /) -> float:
     return result
 
 
-def float_from_date(
-    __value: datetime.date, _: Optional[float] = None, /
-) -> float:
+def float_from_date(__value: datetime.date, /, *_: Any) -> float:
     """Convert date value to float.
 
     Args:
@@ -119,9 +121,7 @@ def float_from_date(
     return result
 
 
-def float_from_datetime(
-    __value: datetime.datetime, _: Optional[float] = None, /
-) -> float:
+def float_from_datetime(__value: datetime.datetime, /, *_: Any) -> float:
     """Convert datetime value to float.
 
     Args:
@@ -142,7 +142,7 @@ def float_from_datetime(
     return result
 
 
-def float_from_decimal(__value: decimal.Decimal, _: float, /) -> float:
+def float_from_decimal(__value: decimal.Decimal, /, *_: Any) -> float:
     """Convert decimal value to float.
 
     Args:
@@ -163,7 +163,7 @@ def float_from_decimal(__value: decimal.Decimal, _: float, /) -> float:
     return result
 
 
-def float_from_float(__value: float, _: float, /) -> float:
+def float_from_float(__value: float, /, *_: Any) -> float:
     """Convert float value to float.
 
     Args:
@@ -184,7 +184,7 @@ def float_from_float(__value: float, _: float, /) -> float:
     return result
 
 
-def float_from_int(__value: int, _: float, /) -> float:
+def float_from_int(__value: int, /, *_: Any) -> float:
     """Convert integer value to float.
 
     Args:
@@ -205,7 +205,11 @@ def float_from_int(__value: int, _: float, /) -> float:
     return result
 
 
-def float_from_str(__value: str, default: float = 0.0, /) -> float:
+def float_from_str(
+    __value: str,
+    /,
+    default: Optional[float] = 0.0,
+) -> Optional[float]:
     """Convert string value to float.
 
     Args:
@@ -223,22 +227,18 @@ def float_from_str(__value: str, default: float = 0.0, /) -> float:
         message = f"expected type 'str', got {type(__value)} instead"
         raise TypeError(message)
 
-    value = __value.replace("  ", " ").strip()
-    if not value:
-        return default
-
     try:
-        result = parsers.parse_number(value)
+        value = __value.replace("  ", " ").strip()
+        result = parsers.parse_number(value) if value else default
 
     except ValueError:
         message = f"{type(__value)} cannot be converted to float"
         raise ValueError(message)
 
-    else:
-        return result
+    return result
 
 
-DEFAULT_CONVERSIONS: Dict[type, Callable[..., float]] = {
+DEFAULT_CONVERSIONS: Dict[type, Callable[..., Optional[float]]] = {
     bool: float_from_bool,
     datetime.date: float_from_date,
     datetime.datetime: float_from_datetime,

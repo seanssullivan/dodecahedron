@@ -13,6 +13,8 @@ from typing import Callable
 from typing import Dict
 from typing import List
 from typing import Literal
+from typing import Optional
+from typing import overload
 
 # Local Imports
 from .base_converter import BaseConverter
@@ -25,7 +27,27 @@ FALSY_VALUES = ("false", "no", "n", "0")
 TRUTHY_VALUES = ("true", "yes", "y", "1")
 
 
-def to_boolean(__value: Any, /, default: bool = False) -> bool:
+@overload
+def to_boolean(
+    __value: Any,
+    /,
+    default: bool,
+) -> bool: ...
+
+
+@overload
+def to_boolean(
+    __value: Any,
+    /,
+    default: Optional[bool] = None,
+) -> Optional[bool]: ...
+
+
+def to_boolean(
+    __value: Any,
+    /,
+    default: Optional[bool] = False,
+) -> Optional[bool]:
     """Convert value to boolean.
 
     Args:
@@ -53,10 +75,10 @@ class BooleanConverter(BaseConverter):
     def __init__(
         self,
         *,
-        default: bool = False,
+        default: Optional[bool] = False,
         on_error: Literal["default", "raise"] = "raise",
     ) -> None:
-        if not isinstance(default, bool):  # type: ignore
+        if default is not None and not isinstance(default, bool):  # type: ignore
             message = f"expected type 'bool', got {type(default)} instead"
             raise TypeError(message)
 
@@ -78,7 +100,7 @@ class BooleanConverter(BaseConverter):
         self._default = value
 
 
-def bool_from_bool(__value: bool, _: bool, /) -> bool:
+def bool_from_bool(__value: bool, /, *_: Any) -> bool:
     """Convert boolean value to ``bool``.
 
     Args:
@@ -99,7 +121,7 @@ def bool_from_bool(__value: bool, _: bool, /) -> bool:
     return result
 
 
-def bool_from_date(__value: datetime.date, _: bool, /) -> bool:
+def bool_from_date(__value: datetime.date, /, *_: Any) -> bool:
     """Convert date value to ``bool``.
 
     Args:
@@ -120,7 +142,7 @@ def bool_from_date(__value: datetime.date, _: bool, /) -> bool:
     return result
 
 
-def bool_from_datetime(__value: datetime.datetime, _: bool, /) -> bool:
+def bool_from_datetime(__value: datetime.datetime, /, *_: Any) -> bool:
     """Convert datetime value to ``bool``.
 
     Args:
@@ -141,7 +163,7 @@ def bool_from_datetime(__value: datetime.datetime, _: bool, /) -> bool:
     return result
 
 
-def bool_from_decimal(__value: decimal.Decimal, _: bool, /) -> bool:
+def bool_from_decimal(__value: decimal.Decimal, /, *_: Any) -> bool:
     """Convert decimal value to ``bool``.
 
     Args:
@@ -162,7 +184,7 @@ def bool_from_decimal(__value: decimal.Decimal, _: bool, /) -> bool:
     return result
 
 
-def bool_from_dict(__values: Dict[str, Any], default: bool, /) -> bool:
+def bool_from_dict(__values: Dict[str, Any], /, default: bool) -> bool:
     """Convert dictionary value to ``bool``.
 
     Args:
@@ -184,7 +206,7 @@ def bool_from_dict(__values: Dict[str, Any], default: bool, /) -> bool:
     return result
 
 
-def bool_from_float(__value: float, _: bool, /) -> bool:
+def bool_from_float(__value: float, /, *_: Any) -> bool:
     """Convert float value to ``bool``.
 
     Args:
@@ -208,7 +230,7 @@ def bool_from_float(__value: float, _: bool, /) -> bool:
     return result
 
 
-def bool_from_int(__value: int, _: bool, /) -> bool:
+def bool_from_int(__value: int, /, *_: Any) -> bool:
     """Convert integer value to ``bool``.
 
     Args:
@@ -229,7 +251,7 @@ def bool_from_int(__value: int, _: bool, /) -> bool:
     return result
 
 
-def bool_from_list(__values: List[Any], default: bool, /) -> bool:
+def bool_from_list(__values: List[Any], /, default: bool) -> bool:
     """Convert list value to ``bool``.
 
     Args:
@@ -254,7 +276,7 @@ def bool_from_list(__values: List[Any], default: bool, /) -> bool:
     return result
 
 
-def bool_from_str(__value: str, default: bool = False, /) -> bool:
+def bool_from_str(__value: str, /, default: bool = False) -> bool:
     """Convert string value to `bool`.
 
     Args:
@@ -286,7 +308,7 @@ def bool_from_str(__value: str, default: bool = False, /) -> bool:
     raise ValueError(f"'{__value}' cannot be converted to bool")
 
 
-DEFAULT_CONVERSIONS: Dict[type, Callable[..., bool]] = {
+DEFAULT_CONVERSIONS: Dict[type, Callable[..., Optional[bool]]] = {
     bool: bool_from_bool,
     datetime.date: bool_from_date,
     datetime.datetime: bool_from_datetime,

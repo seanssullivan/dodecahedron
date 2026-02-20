@@ -21,7 +21,9 @@ __all__ = ["to_string"]
 
 
 def to_string(
-    __value: object, /, default: Optional[str] = None
+    __value: object,
+    /,
+    default: Optional[str] = None,
 ) -> Optional[str]:
     """Convert value to string.
 
@@ -52,7 +54,7 @@ class StringConverter(BaseConverter):
         default: Optional[str] = None,
         on_error: Literal["default", "raise"] = "raise",
     ) -> None:
-        if default and not isinstance(default, str):  # type: ignore
+        if default is not None and not isinstance(default, str):  # type: ignore
             message = f"expected type 'str', got {type(default)} instead"
             raise TypeError(message)
 
@@ -74,7 +76,7 @@ class StringConverter(BaseConverter):
         self._default = value
 
 
-def str_from_bool(__value: bool, _: Optional[str] = None, /) -> str:
+def str_from_bool(__value: bool, /, *_: Any) -> str:
     """Convert boolean value to ``str``.
 
     Args:
@@ -95,7 +97,7 @@ def str_from_bool(__value: bool, _: Optional[str] = None, /) -> str:
     return result
 
 
-def str_from_date(__value: datetime.date, _: Optional[str] = None, /) -> str:
+def str_from_date(__value: datetime.date, /, *_: Any) -> str:
     """Convert date value to ``str``.
 
     Args:
@@ -116,9 +118,7 @@ def str_from_date(__value: datetime.date, _: Optional[str] = None, /) -> str:
     return result
 
 
-def str_from_datetime(
-    __value: datetime.datetime, _: Optional[str] = None, /
-) -> str:
+def str_from_datetime(__value: datetime.datetime, /, *_: Any) -> str:
     """Convert datetime value to ``str``.
 
     Args:
@@ -139,9 +139,7 @@ def str_from_datetime(
     return result
 
 
-def str_from_decimal(
-    __value: decimal.Decimal, _: Optional[str] = None, /
-) -> str:
+def str_from_decimal(__value: decimal.Decimal, /, *_: Any) -> str:
     """Convert decimal value to ``str``.
 
     Args:
@@ -162,7 +160,7 @@ def str_from_decimal(
     return result
 
 
-def str_from_float(__value: float, _: Optional[str] = None, /) -> str:
+def str_from_float(__value: float, /, *_: Any) -> str:
     """Convert float value to ``str``.
 
     Args:
@@ -183,7 +181,7 @@ def str_from_float(__value: float, _: Optional[str] = None, /) -> str:
     return result
 
 
-def str_from_int(__value: int, _: Optional[str] = None, /) -> str:
+def str_from_int(__value: int, /, *_: Any) -> str:
     """Convert integer value to ``str``.
 
     Args:
@@ -205,7 +203,9 @@ def str_from_int(__value: int, _: Optional[str] = None, /) -> str:
 
 
 def str_from_str(
-    __value: str, default: Optional[str] = None, /
+    __value: str,
+    /,
+    default: Optional[str] = None,
 ) -> Optional[str]:
     """Convert string value to ``str``.
 
@@ -226,10 +226,7 @@ def str_from_str(
         raise TypeError(message)
 
     value = __value.replace("  ", " ").strip()
-    if not value:
-        return default
-
-    result = str(__value)
+    result = str(value) if value else default
     return result
 
 

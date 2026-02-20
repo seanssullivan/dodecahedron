@@ -14,6 +14,7 @@ from typing import Callable
 from typing import Dict
 from typing import Literal
 from typing import Optional
+from typing import overload
 
 # Third-Party Imports
 from dateutil.parser import parse
@@ -25,7 +26,27 @@ from .base_converter import BaseConverter
 __all__ = ["to_timestamp"]
 
 
-def to_timestamp(__value: Any, /, default: float = 0.0) -> float:
+@overload
+def to_timestamp(
+    __value: Any,
+    /,
+    default: float,
+) -> float: ...
+
+
+@overload
+def to_timestamp(
+    __value: Any,
+    /,
+    default: Optional[float] = None,
+) -> Optional[float]: ...
+
+
+def to_timestamp(
+    __value: Any,
+    /,
+    default: Optional[float] = 0.0,
+) -> Optional[float]:
     """Convert date to timestamp.
 
     Args:
@@ -52,10 +73,10 @@ class TimestampConverter(BaseConverter):
     def __init__(
         self,
         *,
-        default: float = 0.0,
+        default: Optional[float] = 0.0,
         on_error: Literal["default", "raise"] = "raise",
     ) -> None:
-        if not isinstance(default, float):
+        if default is not None and not isinstance(default, float):
             message = f"expected type 'float', got {type(default)} instead"
             raise TypeError(message)
 
@@ -77,9 +98,7 @@ class TimestampConverter(BaseConverter):
         self._default = value
 
 
-def timestamp_from_date(
-    __value: datetime.date, _: Optional[float] = None, /
-) -> float:
+def timestamp_from_date(__value: datetime.date, /, *_: Any) -> float:
     """Convert date value to timestamp.
 
     Args:
@@ -100,9 +119,7 @@ def timestamp_from_date(
     return result
 
 
-def timestamp_from_datetime(
-    __value: datetime.datetime, _: Optional[float] = None, /
-) -> float:
+def timestamp_from_datetime(__value: datetime.datetime, /, *_: Any) -> float:
     """Convert datetime value to timestamp.
 
     Args:
@@ -123,9 +140,7 @@ def timestamp_from_datetime(
     return result
 
 
-def timestamp_from_decimal(
-    __value: decimal.Decimal, _: Optional[float] = None, /
-) -> float:
+def timestamp_from_decimal(__value: decimal.Decimal, /, *_: Any) -> float:
     """Convert decimal value to timestamp.
 
     Args:
@@ -146,9 +161,7 @@ def timestamp_from_decimal(
     return result
 
 
-def timestamp_from_float(
-    __value: float, _: Optional[float] = None, /
-) -> float:
+def timestamp_from_float(__value: float, /, *_: Any) -> float:
     """Convert float value to timestamp.
 
     Args:
@@ -169,7 +182,7 @@ def timestamp_from_float(
     return result
 
 
-def timestamp_from_int(__value: int, _: Optional[float] = None, /) -> float:
+def timestamp_from_int(__value: int, /, *_: Any) -> float:
     """Convert integer value to timestamp.
 
     Args:
@@ -191,7 +204,9 @@ def timestamp_from_int(__value: int, _: Optional[float] = None, /) -> float:
 
 
 def timestamp_from_str(
-    __value: str, default: Optional[float] = None, /
+    __value: str,
+    /,
+    default: Optional[float] = None,
 ) -> Optional[float]:
     """Convert string value to timestamp.
 
