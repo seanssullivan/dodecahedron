@@ -84,11 +84,11 @@ class AbstractRepository(abc.ABC, metaclass=RepositoryMeta):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def commit(self) -> None:
+    def commit(self, *args: Any, **kwargs: Any) -> None:
         """Commit changes to repository."""
         raise NotImplementedError
 
     @abc.abstractmethod
-    def rollback(self) -> None:
+    def rollback(self, *args: Any, **kwargs: Any) -> None:
         """Rollback changes to repository."""
         raise NotImplementedError

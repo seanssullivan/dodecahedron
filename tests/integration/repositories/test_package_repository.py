@@ -29,3 +29,10 @@ def test_loads_packages_from_environment() -> None:
     repo.load()
     results = repo.list()
     assert len(results) != 0
+
+
+def test_removes_package_from_repository() -> None:
+    pkg = Package("test")
+    repo = PackageRepository(packages=[pkg])
+    repo.remove(pkg)
+    assert pkg.is_removed
