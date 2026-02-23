@@ -2,10 +2,12 @@
 
 # Standard Library Imports
 from __future__ import annotations
+from typing import Any
 
 # Third-Party Imports
 from ..units_of_work import AbstractUnitOfWork
 from ..units_of_work import EventfulUnitOfWork
+from .. import helpers
 
 __all__ = ["FakeUnitOfWork", "FakeEventfulUnitOfWork"]
 
@@ -24,11 +26,21 @@ class FakeUnitOfWork(AbstractUnitOfWork):
         result = getattr(self, COMMITTED_ATTR, False)
         return result
 
+    @committed.setter
+    def committed(self, value: Any) -> None:
+        helpers.raise_for_instance(value, bool)
+        setattr(self, COMMITTED_ATTR, value)
+
     @property
     def rolled_back(self) -> bool:
         """Whether `rollback()` method was called."""
         result = getattr(self, ROLLED_BACK_ATTR, False)
         return result
+
+    @rolled_back.setter
+    def rolled_back(self, value: Any) -> None:
+        helpers.raise_for_instance(value, bool)
+        setattr(self, ROLLED_BACK_ATTR, value)
 
     def __enter__(self) -> FakeUnitOfWork:
         return self
