@@ -97,6 +97,24 @@ class Package(AbstractModel):
         self._version = value
 
     @property
+    def is_dev_release(self) -> bool:
+        """Whether version is development release."""
+        result = bool(self.version.dev) if self.version else False
+        return result
+
+    @property
+    def is_final_release(self) -> bool:
+        """Whether version is final release."""
+        result = not self.is_dev_release and not self.is_pre_release
+        return result
+
+    @property
+    def is_pre_release(self) -> bool:
+        """Whether version is pre-release."""
+        result = bool(self.version.pre) if self.version else False
+        return result
+
+    @property
     def is_removed(self) -> bool:
         """Whether package was removed."""
         return self._removed_at is not None
