@@ -22,7 +22,7 @@ from .abstract_file_wrappers import AbstractFileWrapper
 from .abstract_file_wrappers import AbstractTextWrapper
 from .abstract_file_wrappers import AbstractIOWrapper
 from ..utils import converters
-from .. import helpers
+from .. import errors
 from .. import settings
 from .. import utils
 
@@ -44,7 +44,7 @@ class AbstractCsvWrapper(AbstractTextWrapper):
 
     @delimiter.setter
     def delimiter(self, value: Any) -> None:
-        helpers.raise_for_instance(value, str)
+        errors.raise_for_instance(value, str)
         self._delimiter: str = value
 
     @property
@@ -69,7 +69,7 @@ class AbstractCsvWrapper(AbstractTextWrapper):
 
     @fieldnames.setter
     def fieldnames(self, value: Any) -> None:
-        helpers.raise_for_instance(value, Sequence)
+        errors.raise_for_instance(value, Sequence)
         self._fieldnames: Sequence[str] = value
 
     @property
@@ -79,7 +79,7 @@ class AbstractCsvWrapper(AbstractTextWrapper):
 
     @quotechar.setter
     def quotechar(self, value: Any) -> None:
-        helpers.raise_for_instance(value, str)
+        errors.raise_for_instance(value, str)
         self._quotechar: str = value
 
     def _init_csv_io_wrapper(self, __file: IO[Any], /) -> CsvIOWrapper:
@@ -243,7 +243,7 @@ class CsvIOWrapper(AbstractIOWrapper):
 
     @delimiter.setter
     def delimiter(self, value: Any) -> None:
-        helpers.raise_for_instance(value, str)
+        errors.raise_for_instance(value, str)
         setattr(self.context, "_delimiter", value)
 
     @property
@@ -270,7 +270,7 @@ class CsvIOWrapper(AbstractIOWrapper):
 
     @fieldnames.setter
     def fieldnames(self, value: Any) -> None:
-        helpers.raise_for_instance(value, Sequence)
+        errors.raise_for_instance(value, Sequence)
         setattr(self.context, "_fieldnames", value)
 
     @property
@@ -281,7 +281,7 @@ class CsvIOWrapper(AbstractIOWrapper):
 
     @quotechar.setter
     def quotechar(self, value: Any) -> None:
-        helpers.raise_for_instance(value, str)
+        errors.raise_for_instance(value, str)
         setattr(self.context, "_quotechar", value)
 
     @property

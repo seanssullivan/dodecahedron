@@ -13,6 +13,7 @@ from typing import Any
 from typing import Callable
 from typing import Dict
 from typing import Literal
+from typing import Optional
 
 # Local Imports
 from .base_converter import BaseConverter
@@ -21,7 +22,11 @@ from .. import parsers
 __all__ = ["to_integer"]
 
 
-def to_integer(__value: Any, /, default: int = 0) -> int:
+def to_integer(
+    __value: Any,
+    /,
+    default: Optional[int] = 0,
+) -> Optional[int]:
     """Convert value to integer.
 
     Args:
@@ -49,10 +54,10 @@ class IntegerConverter(BaseConverter):
     def __init__(
         self,
         *,
-        default: int = 0,
+        default: Optional[int] = 0,
         on_error: Literal["default", "raise"] = "raise",
     ) -> None:
-        if not isinstance(default, int):  # type: ignore
+        if default is not None and not isinstance(default, int):  # type: ignore
             message = f"expected type 'int', got {type(default)} instead"
             raise TypeError(message)
 
@@ -74,7 +79,7 @@ class IntegerConverter(BaseConverter):
         self._default = value
 
 
-def int_from_bool(__value: bool, _: int, /) -> int:
+def int_from_bool(__value: bool, /, *_: Any) -> int:
     """Convert boolean value to ``int``.
 
     Args:
@@ -95,7 +100,7 @@ def int_from_bool(__value: bool, _: int, /) -> int:
     return result
 
 
-def int_from_date(__value: datetime.date, _: int, /) -> int:
+def int_from_date(__value: datetime.date, /, *_: Any) -> int:
     """Convert date value to ``int``.
 
     Args:
@@ -117,7 +122,7 @@ def int_from_date(__value: datetime.date, _: int, /) -> int:
     return result
 
 
-def int_from_datetime(__value: datetime.datetime, _: int, /) -> int:
+def int_from_datetime(__value: datetime.datetime, /, *_: Any) -> int:
     """Convert datetime value to ``int``.
 
     Args:
@@ -139,7 +144,7 @@ def int_from_datetime(__value: datetime.datetime, _: int, /) -> int:
     return result
 
 
-def int_from_decimal(__value: decimal.Decimal, _: int, /) -> int:
+def int_from_decimal(__value: decimal.Decimal, /, *_: Any) -> int:
     """Convert decimal value to ``int``.
 
     Args:
@@ -160,7 +165,7 @@ def int_from_decimal(__value: decimal.Decimal, _: int, /) -> int:
     return result
 
 
-def int_from_float(__value: float, _: int, /) -> int:
+def int_from_float(__value: float, /, *_: Any) -> int:
     """Convert float value to ``int``.
 
     Args:
@@ -181,7 +186,7 @@ def int_from_float(__value: float, _: int, /) -> int:
     return result
 
 
-def int_from_int(__value: int, _: int, /) -> int:
+def int_from_int(__value: int, /, *_: Any) -> int:
     """Convert integer value to ``int``.
 
     Args:
@@ -202,7 +207,11 @@ def int_from_int(__value: int, _: int, /) -> int:
     return result
 
 
-def int_from_str(__value: str, default: int = 0, /) -> int:
+def int_from_str(
+    __value: str,
+    /,
+    default: Optional[int] = 0,
+) -> Optional[int]:
     """Convert string value to ``int``.
 
     Args:
@@ -221,13 +230,10 @@ def int_from_str(__value: str, default: int = 0, /) -> int:
         message = f"expected type 'str', got {type(__value)} instead"
         raise TypeError(message)
 
-    value = __value.replace("  ", " ").strip()
-    if not value:
-        return default
-
     try:
-        number = parsers.parse_number(value)
-        result = int(number)
+        value = __value.replace("  ", " ").strip()
+        number = parsers.parse_number(value) if value else default
+        result = int(number) if number is not None else None
 
     except ValueError:
         message = f"{__value} cannot be converted to int"
@@ -236,7 +242,7 @@ def int_from_str(__value: str, default: int = 0, /) -> int:
     return result
 
 
-DEFAULT_CONVERSIONS: Dict[type, Callable[..., int]] = {
+DEFAULT_CONVERSIONS: Dict[type, Callable[..., Optional[int]]] = {
     bool: int_from_bool,
     datetime.date: int_from_date,
     datetime.datetime: int_from_datetime,

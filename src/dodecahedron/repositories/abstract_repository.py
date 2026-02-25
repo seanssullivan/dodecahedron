@@ -31,21 +31,25 @@ class AbstractRepository(abc.ABC, metaclass=RepositoryMeta):
         return getattr(self, SEEN_ATTR, set())
 
     @abc.abstractmethod
-    def add(self, obj: Any) -> None:
+    def add(self, obj: Any, /, *args: Any, **kwargs: Any) -> None:
         """Add object to repository.
 
         Args:
             obj: Object to add to repository.
+            *args (optional): Positional arguments.
+            **kwargs (optional): Keyword arguments.
 
         """
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get(self, ref: Hashable) -> Any:
+    def get(self, ref: Hashable, /, *args: Any, **kwargs: Any) -> Any:
         """Get object from repository.
 
         Args:
             ref: Reference to object.
+            *args (optional): Positional arguments.
+            **kwargs (optional): Keyword arguments.
 
         Returns:
             Object.
@@ -54,31 +58,37 @@ class AbstractRepository(abc.ABC, metaclass=RepositoryMeta):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def list(self) -> List[Any]:
+    def list(self, /, *args: Any, **kwargs: Any) -> List[Any]:
         """List objects in repository.
 
+        Args:
+            *args (optional): Positional arguments.
+            **kwargs (optional): Keyword arguments.
+
         Returns:
-            Objects in repository.
+            Objects.
 
         """
         raise NotImplementedError
 
     @abc.abstractmethod
-    def remove(self, obj: Any) -> None:
+    def remove(self, obj: Any, /, *args: Any, **kwargs: Any) -> None:
         """Remove object from repository.
 
         Args:
             obj: Object to remove from repository.
+            *args (optional): Positional arguments.
+            **kwargs (optional): Keyword arguments.
 
         """
         raise NotImplementedError
 
     @abc.abstractmethod
-    def commit(self) -> None:
+    def commit(self, *args: Any, **kwargs: Any) -> None:
         """Commit changes to repository."""
         raise NotImplementedError
 
     @abc.abstractmethod
-    def rollback(self) -> None:
+    def rollback(self, *args: Any, **kwargs: Any) -> None:
         """Rollback changes to repository."""
         raise NotImplementedError

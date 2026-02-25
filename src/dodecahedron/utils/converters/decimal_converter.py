@@ -14,6 +14,7 @@ from typing import Callable
 from typing import Dict
 from typing import Literal
 from typing import Optional
+from typing import overload
 
 # Local Imports
 from .base_converter import BaseConverter
@@ -22,9 +23,27 @@ from .. import parsers
 __all__ = ["to_decimal"]
 
 
+@overload
 def to_decimal(
-    __value: Any, /, default: decimal.Decimal = decimal.Decimal("0.0")
-) -> decimal.Decimal:
+    __value: Any,
+    /,
+    default: decimal.Decimal,
+) -> decimal.Decimal: ...
+
+
+@overload
+def to_decimal(
+    __value: Any,
+    /,
+    default: Optional[decimal.Decimal] = None,
+) -> Optional[decimal.Decimal]: ...
+
+
+def to_decimal(
+    __value: Any,
+    /,
+    default: Optional[decimal.Decimal] = decimal.Decimal("0.0"),
+) -> Optional[decimal.Decimal]:
     """Convert value to decimal.
 
     Args:
@@ -52,10 +71,10 @@ class DecimalConverter(BaseConverter):
     def __init__(
         self,
         *,
-        default: decimal.Decimal = decimal.Decimal("0.0"),
+        default: Optional[decimal.Decimal] = decimal.Decimal("0.0"),
         on_error: Literal["default", "raise"] = "raise",
     ) -> None:
-        if not isinstance(default, decimal.Decimal):  # type: ignore
+        if default is not None and not isinstance(default, decimal.Decimal):  # type: ignore
             message = f"expected type 'Decimal', got {type(default)} instead"
             raise TypeError(message)
 
@@ -77,7 +96,7 @@ class DecimalConverter(BaseConverter):
         self._default = value
 
 
-def decimal_from_bool(__value: bool, _: decimal.Decimal, /) -> decimal.Decimal:
+def decimal_from_bool(__value: bool, /, *_: Any) -> decimal.Decimal:
     """Convert boolean value to decimal.
 
     Args:
@@ -98,9 +117,7 @@ def decimal_from_bool(__value: bool, _: decimal.Decimal, /) -> decimal.Decimal:
     return result
 
 
-def decimal_from_date(
-    __value: datetime.date, _: decimal.Decimal, /
-) -> decimal.Decimal:
+def decimal_from_date(__value: datetime.date, /, *_: Any) -> decimal.Decimal:
     """Convert date value to decimal.
 
     Args:
@@ -123,7 +140,7 @@ def decimal_from_date(
 
 
 def decimal_from_datetime(
-    __value: datetime.datetime, _: decimal.Decimal, /
+    __value: datetime.datetime, /, *_: Any
 ) -> decimal.Decimal:
     """Convert datetime value to decimal.
 
@@ -147,7 +164,7 @@ def decimal_from_datetime(
 
 
 def decimal_from_decimal(
-    __value: decimal.Decimal, _: decimal.Decimal, /
+    __value: decimal.Decimal, /, *_: Any
 ) -> decimal.Decimal:
     """Convert decimal value to decimal.
 
@@ -169,9 +186,7 @@ def decimal_from_decimal(
     return result
 
 
-def decimal_from_float(
-    __value: float, _: decimal.Decimal, /
-) -> decimal.Decimal:
+def decimal_from_float(__value: float, /, *_: Any) -> decimal.Decimal:
     """Convert float value to decimal.
 
     Args:
@@ -192,7 +207,7 @@ def decimal_from_float(
     return result
 
 
-def decimal_from_int(__value: int, _: decimal.Decimal, /) -> decimal.Decimal:
+def decimal_from_int(__value: int, /, *_: Any) -> decimal.Decimal:
     """Convert integer value to decimal.
 
     Args:
@@ -215,8 +230,8 @@ def decimal_from_int(__value: int, _: decimal.Decimal, /) -> decimal.Decimal:
 
 def decimal_from_str(
     __value: str,
-    default: Optional[decimal.Decimal] = decimal.Decimal("0.0"),
     /,
+    default: Optional[decimal.Decimal] = decimal.Decimal("0.0"),
 ) -> Optional[decimal.Decimal]:
     """Convert string value to decimal.
 

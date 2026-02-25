@@ -12,6 +12,8 @@ from typing import Any
 from typing import Callable
 from typing import Dict
 from typing import Literal
+from typing import Optional
+from typing import overload
 
 # Local Imports
 from .base_converter import BaseConverter
@@ -19,7 +21,27 @@ from .base_converter import BaseConverter
 __all__ = ["to_currency"]
 
 
-def to_currency(__value: Any, /, default: float = 0.00) -> float:
+@overload
+def to_currency(
+    __value: Any,
+    /,
+    default: float,
+) -> float: ...
+
+
+@overload
+def to_currency(
+    __value: Any,
+    /,
+    default: Optional[float] = None,
+) -> Optional[float]: ...
+
+
+def to_currency(
+    __value: Any,
+    /,
+    default: Optional[float] = 0.00,
+) -> Optional[float]:
     """Convert value to currency.
 
     Args:
@@ -47,10 +69,10 @@ class CurrencyConverter(BaseConverter):
     def __init__(
         self,
         *,
-        default: float = 0.00,
+        default: Optional[float] = 0.00,
         on_error: Literal["default", "raise"] = "raise",
     ) -> None:
-        if not isinstance(default, float):
+        if default is not None and not isinstance(default, float):
             message = f"expected type 'float', got {type(default)} instead"
             raise TypeError(message)
 
@@ -72,7 +94,7 @@ class CurrencyConverter(BaseConverter):
         self._default = value
 
 
-def currency_from_decimal(__value: decimal.Decimal, _: float, /) -> float:
+def currency_from_decimal(__value: decimal.Decimal, /, *_: Any) -> float:
     """Convert decimal value to currency.
 
     Args:
@@ -93,7 +115,7 @@ def currency_from_decimal(__value: decimal.Decimal, _: float, /) -> float:
     return result
 
 
-def currency_from_float(__value: float, _: float, /) -> float:
+def currency_from_float(__value: float, /, *_: Any) -> float:
     """Convert float value to currency.
 
     Args:
@@ -114,7 +136,7 @@ def currency_from_float(__value: float, _: float, /) -> float:
     return result
 
 
-def currency_from_int(__value: int, _: float, /) -> float:
+def currency_from_int(__value: int, /, *_: Any) -> float:
     """Convert integer value to currency.
 
     Args:
@@ -135,7 +157,11 @@ def currency_from_int(__value: int, _: float, /) -> float:
     return result
 
 
-def currency_from_str(__value: str, default: float = 0.00, /) -> float:
+def currency_from_str(
+    __value: str,
+    /,
+    default: Optional[float] = 0.00,
+) -> Optional[float]:
     """Convert string value to currency.
 
     Args:
@@ -154,22 +180,19 @@ def currency_from_str(__value: str, default: float = 0.00, /) -> float:
         message = f"expected type 'str', got {type(__value)} instead"
         raise TypeError(message)
 
-    value = __value.replace("  ", " ").strip()
-    if not value:
-        return default
-
     try:
-        amount = float(re.sub(r"[^0-9a-zA-Z.]+", r"", value))
+        value = __value.replace("  ", " ").strip()
+        amount = re.sub(r"[^0-9a-zA-Z.]+", r"", value) if value else default
+        result = round(float(amount), 2) if amount is not None else None
 
     except ValueError:
         message = f"'{__value}' cannot be converted to currency"
         raise ValueError(message)
 
-    result = round(amount, 2)
     return result
 
 
-DEFAULT_CONVERSIONS: Dict[type, Callable[..., float]] = {
+DEFAULT_CONVERSIONS: Dict[type, Callable[..., Optional[float]]] = {
     decimal.Decimal: currency_from_decimal,
     float: currency_from_float,
     int: currency_from_int,

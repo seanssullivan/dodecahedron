@@ -14,6 +14,7 @@ from typing import Dict
 from typing import Literal
 from typing import Optional
 from typing import Union
+from typing import overload
 
 # Third-Party Imports
 import cachetools
@@ -27,8 +28,26 @@ from .base_converter import BaseConverter
 __all__ = ["to_date"]
 
 
+@overload
 def to_date(
-    __value: Any, /, default: Optional[datetime.date] = None
+    __value: Any,
+    /,
+    default: datetime.date,
+) -> datetime.date: ...
+
+
+@overload
+def to_date(
+    __value: Any,
+    /,
+    default: Optional[datetime.date] = None,
+) -> Optional[datetime.date]: ...
+
+
+def to_date(
+    __value: Any,
+    /,
+    default: Optional[datetime.date] = None,
 ) -> Optional[datetime.date]:
     """Converts value to date.
 
@@ -60,7 +79,7 @@ class DateConverter(BaseConverter):
         default: Optional[datetime.date] = None,
         on_error: Literal["default", "raise"] = "raise",
     ) -> None:
-        if default and not isinstance(default, datetime.date):  # type: ignore
+        if default is not None and not isinstance(default, datetime.date):  # type: ignore
             message = f"expected type 'date', got {type(default)} instead"
             raise TypeError(message)
 
@@ -82,9 +101,7 @@ class DateConverter(BaseConverter):
         self._default = value
 
 
-def date_from_date(
-    __value: datetime.date, _: Optional[datetime.date], /
-) -> datetime.date:
+def date_from_date(__value: datetime.date, /, *_: Any) -> datetime.date:
     """Convert date value to ``date``.
 
     Args:
@@ -106,7 +123,7 @@ def date_from_date(
 
 
 def date_from_datetime(
-    __value: datetime.datetime, _: Optional[datetime.date], /
+    __value: datetime.datetime, /, *_: Any
 ) -> datetime.date:
     """Convert datetime value to ``date``.
 
@@ -128,9 +145,7 @@ def date_from_datetime(
     return result
 
 
-def date_from_decimal(
-    __value: decimal.Decimal, _: Optional[datetime.date], /
-) -> datetime.date:
+def date_from_decimal(__value: decimal.Decimal, /, *_: Any) -> datetime.date:
     """Convert decimal value to ``date``.
 
     Args:
@@ -151,9 +166,7 @@ def date_from_decimal(
     return result
 
 
-def date_from_float(
-    __value: float, _: Optional[datetime.date], /
-) -> datetime.date:
+def date_from_float(__value: float, /, *_: Any) -> datetime.date:
     """Convert float value to ``date``.
 
     Args:
@@ -179,9 +192,7 @@ def date_from_float(
     return result
 
 
-def date_from_serial_date(
-    __value: float, _: Optional[datetime.date], /
-) -> datetime.date:
+def date_from_serial_date(__value: float, /, *_: Any) -> datetime.date:
     """Convert serial date value to ``date``.
 
     Implementation based on answer from Stack Overflow.
@@ -208,9 +219,7 @@ def date_from_serial_date(
     return result
 
 
-def date_from_int(
-    __value: int, _: Optional[datetime.date], /
-) -> datetime.date:
+def date_from_int(__value: int, /, *_: Any) -> datetime.date:
     """Convert integer value to ``date``.
 
     Args:
@@ -233,7 +242,9 @@ def date_from_int(
 
 @cachetools.cached(cachetools.LRUCache(maxsize=1000), hashkey)
 def date_from_str(
-    __value: str, default: Optional[datetime.date] = None, /
+    __value: str,
+    /,
+    default: Optional[datetime.date] = None,
 ) -> Optional[datetime.date]:
     """Convert string value to ``date``.
 
@@ -265,7 +276,7 @@ def date_from_str(
 
 
 def date_from_timestamp(
-    __value: Union[float, int], _: Optional[datetime.date], /
+    __value: Union[float, int], /, *_: Any
 ) -> datetime.date:
     """Convert timestamp value to ``date``.
 

@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 
 # Local Imports
 from .messages import AbstractMessage
-from .helpers import raise_for_instance
+from . import errors
 
 __all__ = [
     "AbstractQueue",
@@ -112,7 +112,7 @@ class MessageQueue(AbstractQueue):
     ) -> MessageQueue:
         if __iterable is not None:
             for item in __iterable:
-                raise_for_instance(item, AbstractMessage)
+                errors.raise_for_instance(item, AbstractMessage)
 
         instance = super().__new__(cls)
         return instance
@@ -130,7 +130,7 @@ class MessageQueue(AbstractQueue):
             __item: Message to append to queue.
 
         """
-        raise_for_instance(__item, AbstractMessage)
+        errors.raise_for_instance(__item, AbstractMessage)
         super().append(__item)
 
     def extend(self, __iterable: Iterable[object], /) -> None:
@@ -142,7 +142,7 @@ class MessageQueue(AbstractQueue):
         """
         messages: List[AbstractMessage] = []
         for item in __iterable:
-            raise_for_instance(item, AbstractMessage)
+            errors.raise_for_instance(item, AbstractMessage)
             messages.append(item)  # type: ignore
 
         super().extend(messages)
