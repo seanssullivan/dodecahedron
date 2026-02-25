@@ -20,7 +20,7 @@ class Package(AbstractModel):
     """Class implements a package.
 
     Args:
-        name: NAme of package.
+        name: Name of package.
         distribution (optional); Distribution.
         filepath (optional): Filepath.
         version (optional): Version.

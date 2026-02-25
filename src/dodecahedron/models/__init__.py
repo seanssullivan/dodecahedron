@@ -2,4 +2,4 @@
 
 # Local Imports
 from .abstract_models import *
-from .package import *
+from .package_model import *
