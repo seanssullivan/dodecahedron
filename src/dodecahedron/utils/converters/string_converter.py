@@ -13,6 +13,7 @@ from typing import Callable
 from typing import Dict
 from typing import Literal
 from typing import Optional
+import uuid
 
 # Local Imports
 from .base_converter import BaseConverter
@@ -230,6 +231,33 @@ def str_from_str(
     return result
 
 
+def str_from_uuid(
+    __value: uuid.UUID,
+    /,
+    default: Optional[str] = None,
+) -> Optional[str]:
+    """Convert ``UUID`` value to ``str``.
+
+    Args:
+        __value: Value to convert to ``str``.
+        default (optional): Default value. Default ``None``.
+
+    Returns:
+        String.
+
+    Raises:
+        TypeError: when value is not type 'UUID'.
+        ValueError: when value cannot be converted to ``str``.
+
+    """
+    if not isinstance(__value, UUID):  # type: ignore  # pragma: no cover
+        message = f"expected type 'UUID', got {type(__value)} instead"
+        raise TypeError(message)
+
+    result = str(__value)
+    return result
+
+
 DEFAULT_CONVERSIONS: Dict[type, Callable[..., Optional[str]]] = {
     bool: str_from_bool,
     datetime.date: str_from_date,
@@ -238,4 +266,6 @@ DEFAULT_CONVERSIONS: Dict[type, Callable[..., Optional[str]]] = {
     float: str_from_float,
     int: str_from_int,
     str: str_from_str,
+    uuid.UUID: str_from_uuid,
 }
+
