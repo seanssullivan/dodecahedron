@@ -21,7 +21,12 @@ __all__ = ["JSONEncoder"]
 
 
 class JSONEncoder(json.JSONEncoder):
-    """Class implements a custom JSON encoder."""
+    """Class implements a custom JSON encoder.
+
+    Todo:
+        * Allow converters to be passed in as an argument.
+    
+    """
 
     def encode(self, o: Any, *args: Any, **kwargs: Any) -> str:
         """Return a JSON string representation of a Python data structure."""
