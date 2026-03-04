@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Standard Library Imports
+import dataclasses
 import datetime
 import decimal
 import json
@@ -9,6 +10,7 @@ from typing import Any
 from typing import Dict
 from typing import Hashable
 from typing import Optional
+import uuid
 
 # Local Imports
 from .helpers import import_module
@@ -34,6 +36,9 @@ class JSONEncoder(json.JSONEncoder):
         return result
 
     def default(self, o: object) -> Any:
+        if dataclasses.is_dataclass(o):
+            return dataclasses.asdict(o)
+        
         if isinstance(o, datetime.datetime):
             return o.strftime("%Y-%m-%d %H:%M:%S")
 
@@ -45,6 +50,9 @@ class JSONEncoder(json.JSONEncoder):
 
         if isinstance(o, pathlib.Path):
             return str(o.resolve())
+
+        if isinstance(o, uuid.UUID):
+            return str(o)
 
         # Only check when numpy is installed.
         if np is not None and isinstance(o, getattr(np, "bool_")):
