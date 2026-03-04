@@ -24,7 +24,7 @@ class JSONEncoder(json.JSONEncoder):
     """Class implements a custom JSON encoder.
 
     Todo:
-        * Allow converters to be passed in as an argument.
+        * Allow converters to be set on a class attribute.
     
     """
 
