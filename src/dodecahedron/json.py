@@ -30,7 +30,7 @@ class JSONEncoder(json.JSONEncoder):
 
     def default(self, o: object) -> Any:
         if isinstance(o, datetime.datetime):
-            return str(o)
+            return o.strftime("%Y-%m-%d %H:%M:%S")
 
         if isinstance(o, datetime.date):
             return o.strftime("%Y-%m-%d")
