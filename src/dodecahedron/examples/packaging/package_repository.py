@@ -10,13 +10,13 @@ from typing import List
 from typing import Optional
 
 # Local Imports
-from .abstract_repository import AbstractRepository
-from ..models import Package
+from dodecahedron.repositories import EventfulRepository
+from .package_model import Package
 
 __all__ = ["PackageRepository"]
 
 
-class PackageRepository(AbstractRepository):
+class PackageRepository(EventfulRepository):
     """Class implements a package repository."""
 
     def __init__(
@@ -39,7 +39,7 @@ class PackageRepository(AbstractRepository):
             obj: Package.
 
         Raises:
-            TypeError: when argument is not ype ``Package``.
+            TypeError: when argument is not type ``Package``.
 
         """
         if not isinstance(obj, Package):
@@ -56,7 +56,7 @@ class PackageRepository(AbstractRepository):
             obj: Package.
 
         Raises:
-            TypeError: when argument is not ype ``Package``.
+            TypeError: when argument is not type ``Package``.
 
         """
         if not isinstance(obj, Package):
@@ -106,7 +106,7 @@ class PackageRepository(AbstractRepository):
             obj: Package.
 
         Raises:
-            TypeError: when argument is not ype ``Package``.
+            TypeError: when argument is not type ``Package``.
 
         """
         if not isinstance(obj, Package):
@@ -116,11 +116,29 @@ class PackageRepository(AbstractRepository):
         if obj in self._packages:
             obj.removed_at = datetime.now()
 
-    def commit(self) -> None:
-        """Commit packages in repository."""
-        self._install_packages()
-        self._upgrade_packages()
-        self._uninstall_packages()
+    def commit(
+        self,
+        *,
+        install: bool = True,
+        upgrade: bool = True,
+        uninstall: bool = True,
+    ) -> None:
+        """Commit packages in repository.
+
+        Args:
+            install (optional): Whether to install packages. Default ``True``.
+            upgrade (optional): Whether to upgrade packages. Default ``True``.
+            uninstall (optional): Whether to uninstall packages. Default ``True``.
+
+        """
+        if install is True:
+            self._install_packages()
+
+        if upgrade is True:
+            self._upgrade_packages()
+
+        if uninstall is True:
+            self._uninstall_packages()
 
     def _install_packages(self) -> None:
         """Install packages."""

@@ -7,7 +7,7 @@ from typing import Any
 # Third-Party Imports
 from ..units_of_work import AbstractUnitOfWork
 from ..units_of_work import EventfulUnitOfWork
-from .. import helpers
+from .. import errors
 
 __all__ = ["FakeUnitOfWork", "FakeEventfulUnitOfWork"]
 
@@ -28,7 +28,7 @@ class FakeUnitOfWork(AbstractUnitOfWork):
 
     @committed.setter
     def committed(self, value: Any) -> None:
-        helpers.raise_for_instance(value, bool)
+        errors.raise_for_instance(value, bool)
         setattr(self, COMMITTED_ATTR, value)
 
     @property
@@ -39,7 +39,7 @@ class FakeUnitOfWork(AbstractUnitOfWork):
 
     @rolled_back.setter
     def rolled_back(self, value: Any) -> None:
-        helpers.raise_for_instance(value, bool)
+        errors.raise_for_instance(value, bool)
         setattr(self, ROLLED_BACK_ATTR, value)
 
     def __enter__(self) -> FakeUnitOfWork:

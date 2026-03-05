@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Txt Repository."""
+"""Text File Repository."""
 
 # Standard Library Imports
 import logging

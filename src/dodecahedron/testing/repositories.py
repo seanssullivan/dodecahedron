@@ -12,7 +12,7 @@ from typing import Set
 from ..models import AbstractModel
 from ..repositories import AbstractRepository
 from ..repositories import EventfulRepository
-from .. import helpers
+from .. import errors
 
 __all__ = ["FakeRepository", "FakeEventfulRepository"]
 
@@ -53,7 +53,7 @@ class FakeRepository(AbstractRepository):
 
     @closed.setter
     def closed(self, value: Any) -> None:
-        helpers.raise_for_instance(value, bool)
+        errors.raise_for_instance(value, bool)
         setattr(self, CLOSED_ATTR, value)
 
     @property
@@ -64,7 +64,7 @@ class FakeRepository(AbstractRepository):
 
     @committed.setter
     def committed(self, value: Any) -> None:
-        helpers.raise_for_instance(value, bool)
+        errors.raise_for_instance(value, bool)
         setattr(self, COMMITTED_ATTR, value)
 
     @property
@@ -75,7 +75,7 @@ class FakeRepository(AbstractRepository):
 
     @rolled_back.setter
     def rolled_back(self, value: Any) -> None:
-        helpers.raise_for_instance(value, bool)
+        errors.raise_for_instance(value, bool)
         setattr(self, ROLLED_BACK_ATTR, value)
 
     def __contains__(self, obj: AbstractModel) -> bool:

@@ -104,11 +104,11 @@ class ClassMapper(AbstractMapper, Generic[T]):
 
         return result
 
-    def to_dict(self, __instance: T, /) -> Dict[Hashable, Any]:
+    def to_dict(self, __obj: T, /) -> Dict[Hashable, Any]:
         """Convert instance of class to dictionary.
 
         Args:
-            __instance: Instance of mapped class.
+            __obj: Instance of mapped class.
 
         Returns:
             Dictionary.
@@ -119,19 +119,19 @@ class ClassMapper(AbstractMapper, Generic[T]):
             converter = self._get_converter(key, direction=OUTWARD)
             default = self._get_default_value(key)
             value = (
-                converter(getattr(__instance, str(attr)))
-                if converter and hasattr(__instance, str(attr))
-                else getattr(__instance, str(attr), default)
+                converter(getattr(__obj, str(attr)))
+                if converter and hasattr(__obj, str(attr))
+                else getattr(__obj, str(attr), default)
             )
             result[key] = value
 
         return result
 
-    def to_list(self, __instance: T, /) -> List[Any]:
+    def to_list(self, __obj: T, /) -> List[Any]:
         """Convert instance of class to list.
 
         Args:
-            __instance: Instance of mapped class.
+            __obj: Instance of mapped class.
 
         Returns:
             List.
@@ -142,9 +142,9 @@ class ClassMapper(AbstractMapper, Generic[T]):
             converter = self._get_converter(key, direction=OUTWARD)
             default = self._get_default_value(key)
             value = (
-                converter(getattr(__instance, str(attr)))
-                if converter and hasattr(__instance, str(attr))
-                else getattr(__instance, str(attr), default)
+                converter(getattr(__obj, str(attr)))
+                if converter and hasattr(__obj, str(attr))
+                else getattr(__obj, str(attr), default)
             )
             result.append(value)
 

@@ -11,7 +11,7 @@ from typing import Dict
 from typing import Optional
 
 # Local Imports
-from .abstract_models import AbstractModel
+from dodecahedron.models import AbstractModel
 
 __all__ = ["Package"]
 

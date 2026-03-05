@@ -19,8 +19,10 @@ from typing import Sequence
 
 # Local Imports
 from .file_system_repository import AbstractFileSystemRepository
+from ..wrappers.csv_file_wrappers import AbstractCsvWrapper
+from ..wrappers.csv_file_wrappers import CsvDirectoryWrapper
 from ..wrappers.csv_file_wrappers import CsvFileWrapper
-from ..mappers import ClassMapper
+from ..mappers import AbstractMapper
 
 __all__ = ["AbstractCsvFileRepository"]
 
@@ -29,7 +31,121 @@ __all__ = ["AbstractCsvFileRepository"]
 log = logging.getLogger("dodecahedron")
 
 
-class AbstractCsvFileRepository(AbstractFileSystemRepository):
+class AbstractCsvRepository(AbstractFileSystemRepository):
+    """Represents an abstract `.csv` repository.
+
+    Args:
+        wrapper: CSV wrapper.
+        *args (optional): Positional arguments.
+        mapper (optional): Mapper. Default ``None``.
+        **kwargs (optional): Keyword arguments.
+
+    Attributes:
+        columns: Columns names.
+
+    """
+
+    def __init__(
+        self,
+        wrapper: Any,
+        /,
+        *args: Any,
+        mapper: Optional[AbstractMapper] = None,
+        **kwargs: Any,
+    ) -> None:
+        if not isinstance(wrapper, AbstractCsvWrapper):
+            expected = "expected type 'AbstractCsvWrapper'"
+            actual = f"got {type(wrapper)} instead"
+            message = ", ".join([expected, actual])
+            raise TypeError(message)
+
+        if mapper and not isinstance(mapper, AbstractMapper):  # type: ignore
+            expected = "expected type 'AbstractMapper'"
+            actual = f"got {type(mapper)} instead"
+            message = ", ".join([expected, actual])
+            raise TypeError(message)
+
+        super().__init__(wrapper, *args, **kwargs)
+        self._mapper = mapper
+
+    @property
+    def columns(self) -> Optional[Sequence[Any]]:
+        """Column names."""
+        results = getattr(self._wrapper, "fieldnames", None)
+        return results
+
+    @property
+    def mapper(self) -> Optional[AbstractMapper]:
+        """Mapper."""
+        return self._mapper
+
+
+class AbstractCsvDirectoryRepository(AbstractCsvRepository):
+    """Represents an abstract `.csv` directory repository.
+
+    Args:
+        wrapper: CSV directory wrapper.
+        *args (optional): Positional arguments.
+        mapper (optional): Mapper. Default ``None``.
+        **kwargs (optional): Keyword arguments.
+
+    Attributes:
+        columns: Columns names.
+
+    """
+
+    def __init__(
+        self,
+        wrapper: Any,
+        /,
+        *args: Any,
+        mapper: Optional[AbstractMapper] = None,
+        **kwargs: Any,
+    ) -> None:
+        if not isinstance(wrapper, CsvDirectoryWrapper):
+            expected = "expected type 'CsvDirectoryWrapper'"
+            actual = f"got {type(wrapper)} instead"
+            message = ", ".join([expected, actual])
+            raise TypeError(message)
+
+        super().__init__(wrapper, *args, mapper=mapper, **kwargs)
+
+    def _read_records(self, filename: str, /) -> List[Dict[Hashable, Any]]:
+        """Read records from file.
+
+        Args:
+            filename: Filename.
+
+        Returns:
+            Records.
+
+        """
+        with self._wrapper.open(filename) as file:
+            results = getattr(file, "read_records")()
+
+        return results
+
+    def _write_records(
+        self,
+        filename: str,
+        records: List[Dict[Hashable, Any]],
+        /,
+    ) -> None:
+        """Write records to file.
+
+        Args:
+            filename: Filename.
+            records: Records.
+
+        """
+        with self._wrapper.open(filename, mode="w") as file:
+            getattr(file, "write_header")()
+            results = getattr(file, "write_records")(records)
+
+        return results
+
+
+class AbstractCsvFileRepository(AbstractCsvRepository):
     """Represents an abstract `.csv` file repository.
 
     Args:
@@ -48,7 +164,7 @@ class AbstractCsvFileRepository(AbstractFileSystemRepository):
         wrapper: Any,
         /,
         *args: Any,
-        mapper: Optional["ClassMapper[Any]"] = None,
+        mapper: Optional[AbstractMapper] = None,
         **kwargs: Any,
     ) -> None:
         if not isinstance(wrapper, CsvFileWrapper):
@@ -57,25 +173,7 @@ class AbstractCsvFileRepository(AbstractFileSystemRepository):
             message = ", ".join([expected, actual])
             raise TypeError(message)
 
-        if mapper and not isinstance(mapper, ClassMapper):  # type: ignore
-            expected = "expected type 'ClassMapper'"
-            actual = f"got {type(mapper)} instead"
-            message = ", ".join([expected, actual])
-            raise TypeError(message)
-
-        super().__init__(wrapper, *args, **kwargs)
-        self._mapper = mapper
-
-    @property
-    def columns(self) -> Optional[Sequence[Any]]:
-        """Column names."""
-        results = getattr(self._wrapper, "fieldnames", None)
-        return results
-
-    @property
-    def mapper(self) -> Optional["ClassMapper[Any]"]:
-        """Mapper."""
-        return self._mapper
+        super().__init__(wrapper, *args, mapper=mapper, **kwargs)
 
     def _read_records(self) -> List[Dict[Hashable, Any]]:
         """Read records from file.

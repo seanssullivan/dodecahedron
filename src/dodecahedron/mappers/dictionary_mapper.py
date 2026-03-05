@@ -87,11 +87,11 @@ class DictMapper(AbstractMapper):
 
         return result
 
-    def to_dict(self, __dict: Dict[Hashable, Any], /) -> Dict[Hashable, Any]:
+    def to_dict(self, __obj: Dict[Hashable, Any], /) -> Dict[Hashable, Any]:
         """Convert instance of class to dictionary.
 
         Args:
-            __dict: Dictionary.
+            __obj: Dictionary.
 
         Returns:
             Dictionary.
@@ -102,19 +102,19 @@ class DictMapper(AbstractMapper):
             converter = self._get_converter(inward, direction=OUTWARD)
             default = self._get_default_value(inward)
             value: Any = (
-                converter(__dict[inward])
-                if converter and inward in __dict
-                else __dict.get(inward, default)
+                converter(__obj[inward])
+                if converter and inward in __obj
+                else __obj.get(inward, default)
             )
             result[str(outward)] = value
 
         return result
 
-    def to_list(self, __dict: Dict[Hashable, Any], /) -> List[Any]:
+    def to_list(self, __obj: Dict[Hashable, Any], /) -> List[Any]:
         """Convert instance of class to list.
 
         Args:
-            __dict: Dictionary.
+            __obj: Dictionary.
 
         Returns:
             List.
@@ -125,9 +125,9 @@ class DictMapper(AbstractMapper):
             converter = self._get_converter(idx, direction=OUTWARD)
             default = self._get_default_value(key)
             value = (
-                converter(__dict[key])
-                if converter and key in __dict
-                else __dict.get(key, default)
+                converter(__obj[key])
+                if converter and key in __obj
+                else __obj.get(key, default)
             )
             result.append(value)
 

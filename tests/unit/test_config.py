@@ -9,7 +9,7 @@ import os
 import pytest
 
 # Local Imports
-from dodecahedron import environment
+from dodecahedron.helpers import environment
 
 
 @pytest.mark.parametrize("env", ["dev", "development"])

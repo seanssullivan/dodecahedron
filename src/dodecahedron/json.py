@@ -27,7 +27,7 @@ class JSONEncoder(json.JSONEncoder):
 
     Todo:
         * Allow converters to be set on a class attribute.
-    
+
     """
 
     def encode(self, o: Any, *args: Any, **kwargs: Any) -> str:
@@ -37,8 +37,8 @@ class JSONEncoder(json.JSONEncoder):
 
     def default(self, o: object) -> Any:
         if dataclasses.is_dataclass(o):
-            return dataclasses.asdict(o)
-        
+            return dataclasses.asdict(o)  # type: ignore
+
         if isinstance(o, datetime.datetime):
             return o.strftime("%Y-%m-%d %H:%M:%S")
 

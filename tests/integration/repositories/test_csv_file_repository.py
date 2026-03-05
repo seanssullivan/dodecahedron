@@ -74,8 +74,8 @@ class ExampleFileRepository(AbstractCsvFileRepository, FakeRepository):
         objs = [self.mapper.from_dict(record) for record in records]  # type: ignore
         self._objects = set(objs)
 
-    def save(self) -> None:
-        """Save objects to file."""
+    def commit(self) -> None:
+        """Commit changes."""
         records = [self.mapper.to_dict(obj) for obj in self._objects]  # type: ignore
         self._write_records(records)
 
@@ -114,7 +114,6 @@ def test_saves_csv_file(tempdir: str) -> None:
     repo = ExampleFileRepository(wrapper, mapper=mapper)
 
     repo.add(ExampleModel("1", "TEST"))
-    repo.save()
     repo.commit()
 
     expected = temppath / "test.csv"

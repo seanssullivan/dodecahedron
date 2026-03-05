@@ -43,7 +43,7 @@ from .messages import AbstractEvent
 from .messages import AbstractMessage
 from .queues import MessageQueue
 from .units_of_work import AbstractUnitOfWork
-from . import environment
+from .helpers import environment
 
 __all__ = [
     "AbstractMessageBus",

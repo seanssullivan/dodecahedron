@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Base Error Classes."""
+"""Error Classes."""
 
 __all__ = [
     "BaseError",
@@ -8,10 +8,20 @@ __all__ = [
 
 
 class BaseError(Exception):
-    """Base class for errors."""
+    """Base class for errors.
+
+    Args:
+        msg (str): Human readable string describing the exception.
+        code (:obj:`int`, optional): Error code.
+
+    Attributes:
+        msg (str): Human readable string describing the exception.
+        code (int): Exception error code.
+
+    """
 
 
-def raise_for_instance(__obj: object, __class: type) -> None:
+def raise_for_instance(__obj: object, __class: type, /) -> None:
     """Raise error when object is not instance of provided class.
 
     Args:

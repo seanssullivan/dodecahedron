@@ -16,7 +16,7 @@ from typing import Optional
 
 # Local Imports
 from .metaclasses import SingletonMeta
-from . import environment
+from .helpers import environment
 
 __all__ = ["MessageBroker"]
 

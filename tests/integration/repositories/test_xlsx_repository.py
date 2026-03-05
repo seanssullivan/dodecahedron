@@ -75,8 +75,8 @@ class ExampleFileRepository(AbstractXlsxFileRepository, FakeRepository):
         objs = [self.mapper.from_dict(record) for record in records]  # type: ignore
         self._objects = set(objs)
 
-    def save(self) -> None:
-        """Save objects to file."""
+    def commit(self) -> None:
+        """Commit changes."""
         objects = sorted(
             list(self._objects),
             key=lambda v: getattr(v, "reference"),
@@ -119,7 +119,6 @@ def test_saves_xlsx_file(tempdir: str) -> None:
     repo = ExampleFileRepository(wrapper, mapper=mapper)
 
     repo.add(ExampleModel("1", "TEST"))
-    repo.save()
     repo.commit()
 
     expected = temppath / "test.xlsx"
@@ -139,7 +138,6 @@ def test_adds_row_to_xlsx_file(
     repo.load()
 
     repo.add(ExampleModel("2", "SUCCESS"))
-    repo.save()
     repo.commit()
 
     workbook = load_workbook(filepath, data_only=True, read_only=True)

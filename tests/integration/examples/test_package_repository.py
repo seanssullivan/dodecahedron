@@ -7,8 +7,8 @@
 # import pytest
 
 # Local Imports
-from dodecahedron.models import Package
-from dodecahedron.repositories import PackageRepository
+from dodecahedron.examples.packaging import Package
+from dodecahedron.examples.packaging import PackageRepository
 
 
 def test_adds_package_to_repository() -> None:
