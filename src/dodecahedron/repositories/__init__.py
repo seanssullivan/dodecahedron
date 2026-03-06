@@ -7,7 +7,7 @@ Todo:
 """
 
 # Standard Library Imports
-import importlib
+import importlib  # pragma: no cover
 
 # Local Imports
 from .abstract_repository import *
@@ -15,15 +15,15 @@ from .csv_repository import *
 from .eventful_repository import *
 from .txt_repository import *
 
-try:
-    importlib.import_module("sqlalchemy")  # pragma: no cover
+try:  # pragma: no cover
+    importlib.import_module("sqlalchemy")
 except (ImportError, ModuleNotFoundError):  # pragma: no cover
     pass
 else:  # pragma: no cover
     from .sqlalchemy_repository import *
 
-try:
-    importlib.import_module("openpyxl")  # pragma: no cover
+try:  # pragma: no cover
+    importlib.import_module("openpyxl")
 except (ImportError, ModuleNotFoundError):  # pragma: no cover
     pass
 else:  # pragma: no cover

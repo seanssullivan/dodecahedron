@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 
 # Standard Library Imports
-import importlib
+import importlib  # pragma: no cover
 
 # Local Imports
 from .abstract_unit_of_work import *
 from .eventful_unit_of_work import *
 from .sessioned_unit_of_work import *
 
-try:
-    importlib.import_module("tqdm")  # pragma: no cover
+try:  # pragma: no cover
+    importlib.import_module("tqdm")
 except (ImportError, ModuleNotFoundError):  # pragma: no cover
     pass
 else:

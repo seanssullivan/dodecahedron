@@ -231,16 +231,11 @@ def str_from_str(
     return result
 
 
-def str_from_uuid(
-    __value: uuid.UUID,
-    /,
-    default: Optional[str] = None,
-) -> Optional[str]:
+def str_from_uuid(__value: uuid.UUID, /, *_: Any) -> Optional[str]:
     """Convert ``UUID`` value to ``str``.
 
     Args:
         __value: Value to convert to ``str``.
-        default (optional): Default value. Default ``None``.
 
     Returns:
         String.
@@ -250,7 +245,7 @@ def str_from_uuid(
         ValueError: when value cannot be converted to ``str``.
 
     """
-    if not isinstance(__value, UUID):  # type: ignore  # pragma: no cover
+    if not isinstance(__value, uuid.UUID):  # type: ignore  # pragma: no cover
         message = f"expected type 'UUID', got {type(__value)} instead"
         raise TypeError(message)
 
@@ -268,4 +263,3 @@ DEFAULT_CONVERSIONS: Dict[type, Callable[..., Optional[str]]] = {
     str: str_from_str,
     uuid.UUID: str_from_uuid,
 }
-
