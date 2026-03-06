@@ -8,6 +8,7 @@ Module provides function for converting values to strings.
 # Standard Library Imports
 import datetime
 import decimal
+import pathlib
 from typing import Any
 from typing import Callable
 from typing import Dict
@@ -203,6 +204,29 @@ def str_from_int(__value: int, /, *_: Any) -> str:
     return result
 
 
+def str_from_path(__value: str, /, *_: Any) -> Optional[str]:
+    """Convert Path value to ``str``.
+
+    Args:
+        __value: Value to convert to ``str``.
+
+    Returns:
+        String.
+
+    Raises:
+        TypeError: when value is not type 'Path'.
+        ValueError: when value cannot be converted to ``str``.
+
+    """
+    if not isinstance(__value, pathlib.Path):  # type: ignore  # pragma: no cover
+        message = f"expected type 'Path', got {type(__value)} instead"
+        raise TypeError(message)
+
+    value = __value.resolve()
+    result = str(value)
+    return result
+
+
 def str_from_str(
     __value: str,
     /,
@@ -260,6 +284,7 @@ DEFAULT_CONVERSIONS: Dict[type, Callable[..., Optional[str]]] = {
     decimal.Decimal: str_from_decimal,
     float: str_from_float,
     int: str_from_int,
+    pathlib.Path: str_from_path,
     str: str_from_str,
     uuid.UUID: str_from_uuid,
 }
