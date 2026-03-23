@@ -23,7 +23,7 @@ __all__ = ["to_boolean"]
 
 
 # Constants
-FALSY_VALUES = ("false", "no", "n", "0")
+FALSY_VALUES = ("empty", "false", "na", "n/a", "no", "none", "null", "n", "0")
 TRUTHY_VALUES = ("true", "yes", "y", "1")
 
 
