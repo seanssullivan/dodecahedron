@@ -91,7 +91,9 @@ class CommandLineInterface(abc.ABC):
         """
         namespace = self._parse_arguments(args)
         process: str = getattr(namespace, PROCESS)
-        self._execute_process(process.lower(), namespace)
+
+        log.debug("Running '%s' process...", process)
+        self._run_process(process.lower(), namespace)
 
     def _parse_arguments(
         self,
@@ -111,20 +113,19 @@ class CommandLineInterface(abc.ABC):
         )
         return result
 
-    def _execute_process(
+    def _run_process(
         self,
         __process: str,
         __namespace: Namespace,
         /,
     ) -> None:
-        """Execute process.
+        """Run process.
 
         Args:
             __process: Name of process.
             __namespace: Namespace.
 
         """
-        log.debug("Executing '%s' process...", __process)
         process = self._processes[__process]
         signature = inspect.signature(process)
         args = select_positional_arguments(__namespace, signature)
