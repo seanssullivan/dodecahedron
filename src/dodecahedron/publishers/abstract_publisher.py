@@ -10,7 +10,7 @@ from typing import Any
 
 # Local Imports
 from ..json import JSONEncoder
-from ..messages import event
+from ..messages import AbstractMessage
 
 __all__ = ["AbstractPublisher"]
 
@@ -28,15 +28,15 @@ class AbstractPublisher(abc.ABC):
         """Connection."""
         raise NotImplementedError
 
-    def publish(self, channel: str, event: event.AbstractEvent, /) -> None:
-        """publishes an event to an external message broker.
+    def publish(self, channel: str, message: AbstractMessage, /) -> None:
+        """publishes an message to an external message broker.
 
         Args:
-            channel: Channel on which to publish event.
-            event: Event to publish on external broker.
+            channel: Channel on which to publish message.
+            message: Message to publish on external broker.
 
         """
-        log.info("publishing: channel=%s, event=%s", channel, event)
-        data = asdict(event) if is_dataclass(event) else event
+        log.info("publishing: channel=%s, message=%s", channel, message)
+        data = asdict(message) if is_dataclass(message) else message
         payload = json.dumps(data, cls=JSONEncoder)
         getattr(self.connection, "publish")(channel, payload)
