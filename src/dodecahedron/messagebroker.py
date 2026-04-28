@@ -6,6 +6,7 @@ from __future__ import annotations
 import abc
 from collections import defaultdict
 from datetime import datetime
+import json
 import logging
 from typing import Any
 from typing import Callable
@@ -15,6 +16,7 @@ from typing import Literal
 from typing import Optional
 
 # Local Imports
+from .json import JSONEncoder
 from .metaclasses import SingletonMeta
 from . import environment
 
@@ -88,19 +90,19 @@ class MessageBroker(AbstractMessageBroker, metaclass=SingletonMeta):
         """Subscribers."""
         return self._subscribers
 
-    def publish(self, channel: str, event: str) -> None:
+    def publish(self, channel: str, event: Any) -> None:
         """Publish an event to a channel.
 
         Args:
             channel: Name of channel.
-            event: JSON representation of an event.
+            event: Event to publish.
 
         """
         message = self.make_message(event)
         self.send_message(channel, message)
 
     @staticmethod
-    def make_message(event: str, /) -> Dict[str, Any]:
+    def make_message(event: Any, /) -> Dict[str, Any]:
         """Make message to send to subscribers.
 
         Args:
@@ -110,7 +112,15 @@ class MessageBroker(AbstractMessageBroker, metaclass=SingletonMeta):
             Message.
 
         """
-        message: Dict[str, Any] = {"data": event, "created_at": datetime.now()}
+        data = (
+            json.dumps(event, cls=JSONEncoder)
+            if not isinstance(event, str)
+            else event
+        )
+        message: Dict[str, Any] = {
+            "data": data,
+            "created_at": datetime.now(),
+        }
         return message
 
     def send_message(
