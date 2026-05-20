@@ -31,12 +31,21 @@ __all__ = [
 
 
 class AbstractModel(abc.ABC):
-    """Represents an abstract model.
+    """Class represents an abstract model.
 
     Models have one responsibility: to be unique. Therefore, subclasses must
     implement both the `__eq__` and `__hash__` methods.
 
+    Attributes:
+        parent: Parent model.
+
     """
+
+    @property
+    @abc.abstractmethod
+    def parent(self) -> Optional["AbstractModel"]:
+        """Parent model."""
+        return getattr(self, "_parent", None)
 
     @abc.abstractmethod
     def __eq__(self, other: object, /) -> bool:
@@ -48,7 +57,7 @@ class AbstractModel(abc.ABC):
 
 
 class AbstractAggregate(AbstractModel):
-    """Represents an abstract aggregate.
+    """Class represents an abstract aggregate.
 
     The primary purpose of an aggregate is not simply to hold a collection of
     objects; instead, the purpose of an aggregate is to record events raised
