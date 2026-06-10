@@ -14,6 +14,7 @@ Implementation based on 'Architecture Patterns in Python' domain model pattern.
 
 # Standard Library Imports
 import abc
+from datetime import datetime
 from typing import Any
 from typing import Deque
 from typing import Optional
@@ -31,12 +32,30 @@ __all__ = [
 
 
 class AbstractModel(abc.ABC):
-    """Represents an abstract model.
+    """Class represents an abstract model.
 
     Models have one responsibility: to be unique. Therefore, subclasses must
     implement both the `__eq__` and `__hash__` methods.
 
+    Args:
+        created_at (optional): Datetime when object created. Default ``datetime.now()``.
+
+    Attributes:
+        created_at: Datetime when object created.
+        is_removed: Whether object is removed.
+        removed_at: Datetime when object removed.
+        updated_at: Datetime when object updated.
+
     """
+
+    def __init__(
+        self,
+        *,
+        created_at: Optional[datetime] = None,
+    ) -> None:
+        self._created_at = created_at or datetime.now()
+        self._removed_at = None
+        self._updated_at = None
 
     @abc.abstractmethod
     def __eq__(self, other: object, /) -> bool:
@@ -46,9 +65,29 @@ class AbstractModel(abc.ABC):
     def __hash__(self) -> int:
         raise NotImplementedError
 
+    @property
+    def created_at(self) -> datetime:
+        """When object was created."""
+        return getattr(self, "_created_at")
+
+    @property
+    def is_removed(self) -> bool:
+        """Whether object is removed."""
+        return self.removed_at is not None
+
+    @property
+    def removed_at(self) -> Optional[datetime]:
+        """Datetime when object was removed."""
+        return getattr(self, "_removed_at", None)
+
+    @property
+    def updated_at(self) -> Optional[datetime]:
+        """Datetime when object was updated."""
+        return getattr(self, "_updated_at", None)
+
 
 class AbstractAggregate(AbstractModel):
-    """Represents an abstract aggregate.
+    """Class represents an abstract aggregate.
 
     The primary purpose of an aggregate is not simply to hold a collection of
     objects; instead, the purpose of an aggregate is to record events raised
