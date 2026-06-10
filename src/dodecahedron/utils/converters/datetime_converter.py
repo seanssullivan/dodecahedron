@@ -25,7 +25,7 @@ from dateutil.tz import tzlocal
 import pytz
 
 # Local Imports
-from .base_converter import BaseConverter
+from .abstract_converter import AbstractConverter
 
 __all__ = ["to_datetime"]
 
@@ -70,7 +70,7 @@ def to_datetime(
     return result
 
 
-class DatetimeConverter(BaseConverter):
+class DatetimeConverter(AbstractConverter):
     """Class implements a datetime converter.
 
     Args:

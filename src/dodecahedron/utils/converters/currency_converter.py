@@ -16,7 +16,7 @@ from typing import Optional
 from typing import overload
 
 # Local Imports
-from .base_converter import BaseConverter
+from .abstract_converter import AbstractConverter
 
 __all__ = ["to_currency"]
 
@@ -57,7 +57,7 @@ def to_currency(
     return result
 
 
-class CurrencyConverter(BaseConverter):
+class CurrencyConverter(AbstractConverter):
     """Class implements a currency converter.
 
     Args:
