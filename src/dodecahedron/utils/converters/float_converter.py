@@ -16,7 +16,7 @@ from typing import Literal
 from typing import Optional
 
 # Local Imports
-from .base_converter import BaseConverter
+from .abstract_converter import AbstractConverter
 from .. import parsers
 
 __all__ = ["to_float"]
@@ -42,7 +42,7 @@ def to_float(
     return result
 
 
-class FloatConverter(BaseConverter):
+class FloatConverter(AbstractConverter):
     """Class implements a float converter.
 
     Args:

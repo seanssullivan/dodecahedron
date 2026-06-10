@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Local Imports
+from .abstract_converter import *
 from .boolean_converter import *
 from .currency_converter import *
 from .date_converter import *

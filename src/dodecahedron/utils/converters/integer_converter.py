@@ -16,7 +16,7 @@ from typing import Literal
 from typing import Optional
 
 # Local Imports
-from .base_converter import BaseConverter
+from .abstract_converter import AbstractConverter
 from .. import parsers
 
 __all__ = ["to_integer"]
@@ -42,7 +42,7 @@ def to_integer(
     return result
 
 
-class IntegerConverter(BaseConverter):
+class IntegerConverter(AbstractConverter):
     """Class implements a integer converter.
 
     Args:

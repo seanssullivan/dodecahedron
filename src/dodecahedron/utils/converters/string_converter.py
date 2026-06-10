@@ -17,7 +17,7 @@ from typing import Optional
 import uuid
 
 # Local Imports
-from .base_converter import BaseConverter
+from .abstract_converter import AbstractConverter
 
 __all__ = ["to_string"]
 
@@ -41,7 +41,7 @@ def to_string(
     return result
 
 
-class StringConverter(BaseConverter):
+class StringConverter(AbstractConverter):
     """Class implements a string converter.
 
     Args:

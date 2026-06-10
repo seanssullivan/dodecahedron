@@ -18,7 +18,6 @@ from typing import TypeVar
 # Local Imports
 from .abstract_unit_of_work import AbstractUnitOfWork
 
-
 # Custom types
 T = TypeVar("T")
 
