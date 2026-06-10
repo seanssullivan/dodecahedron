@@ -21,6 +21,9 @@ from typing import Optional
 from typing import Union
 from typing import TYPE_CHECKING
 
+# Local Imports
+from .. import errors
+
 if TYPE_CHECKING:
     from ..messages import AbstractMessage
     from ..queues import MessageQueue
@@ -80,10 +83,20 @@ class AbstractModel(abc.ABC):
         """Datetime when object was removed."""
         return getattr(self, "_removed_at", None)
 
+    @removed_at.setter
+    def removed_at(self, value: object) -> None:
+        errors.raise_for_instance(value, datetime)
+        setattr(self, "_removed_at", value)
+
     @property
     def updated_at(self) -> Optional[datetime]:
         """Datetime when object was updated."""
         return getattr(self, "_updated_at", None)
+
+    @updated_at.setter
+    def updated_at(self, value: object) -> None:
+        errors.raise_for_instance(value, datetime)
+        setattr(self, "_updated_at", value)
 
 
 class AbstractAggregate(AbstractModel):
