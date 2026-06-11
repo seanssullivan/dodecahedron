@@ -56,6 +56,13 @@ class AbstractModel(abc.ABC):
         *,
         created_at: Optional[datetime] = None,
     ) -> None:
+        # Context attributes
+        self._context: Any = None
+
+        # POArent attributes
+        self._parent: Optional[AbstractAggregate] = None
+
+        # Tracking attributes
         self._created_at = created_at or datetime.now()
         self._removed_at = None
         self._updated_at = None
@@ -67,6 +74,29 @@ class AbstractModel(abc.ABC):
     @abc.abstractmethod
     def __hash__(self) -> int:
         raise NotImplementedError
+
+    @property
+    def context(self) -> Any:
+        """Context."""
+        return self._context
+
+    @context.deleter
+    def context(self) -> None:
+        self._context = None
+
+    @context.setter
+    def context(self, obj: Any) -> None:
+        self._context = obj
+
+    @property
+    def parent(self) -> Optional["AbstractAggregate"]:
+        """Parent."""
+        return self._parent
+
+    @parent.setter
+    def parent(self, obj: Any) -> None:
+        errors.raise_for_instance(obj, AbstractAggregate)
+        self._parent = obj
 
     @property
     def created_at(self) -> datetime:
@@ -83,6 +113,10 @@ class AbstractModel(abc.ABC):
         """Datetime when object was removed."""
         return getattr(self, "_removed_at", None)
 
+    @removed_at.deleter
+    def removed_at(self) -> None:
+        setattr(self, "_removed_at", None)
+
     @removed_at.setter
     def removed_at(self, value: object) -> None:
         errors.raise_for_instance(value, datetime)
@@ -92,6 +126,10 @@ class AbstractModel(abc.ABC):
     def updated_at(self) -> Optional[datetime]:
         """Datetime when object was updated."""
         return getattr(self, "_updated_at", None)
+
+    @updated_at.deleter
+    def updated_at(self) -> None:
+        setattr(self, "_updated_at", None)
 
     @updated_at.setter
     def updated_at(self, value: object) -> None:
