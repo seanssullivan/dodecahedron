@@ -11,7 +11,9 @@ Based on 'Architecture Patterns in Python' unit-of-work pattern.
 # Standard Library Imports
 from __future__ import annotations
 import abc
+from collections import ChainMap
 from typing import Any
+from typing import MutableMapping
 from typing import Optional
 from typing import Type
 
@@ -23,7 +25,19 @@ AUTO_COMMIT_ATTR = "_auto_commit"
 
 
 class AbstractUnitOfWork(abc.ABC):
-    """Represents an abstract unit of work."""
+    """Class represents an abstract unit of work."""
+
+    def __init__(
+        self,
+        *,
+        context: Optional[MutableMapping[str, Any]] = None,
+    ) -> None:
+        self._context = ChainMap(context or {}).new_child()
+
+    @property
+    def context(self) -> MutableMapping[str, Any]:
+        """Context."""
+        return self._context
 
     @property
     def auto_commit(self) -> bool:
