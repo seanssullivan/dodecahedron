@@ -17,7 +17,7 @@ from typing import Optional
 from typing import overload
 
 # Local Imports
-from .base_converter import BaseConverter
+from .abstract_converter import AbstractConverter
 
 __all__ = ["to_boolean"]
 
@@ -63,7 +63,7 @@ def to_boolean(
     return result
 
 
-class BooleanConverter(BaseConverter):
+class BooleanConverter(AbstractConverter):
     """Class implements a boolean converter.
 
     Args:

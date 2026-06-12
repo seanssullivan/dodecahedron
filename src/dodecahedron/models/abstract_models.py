@@ -14,11 +14,15 @@ Implementation based on 'Architecture Patterns in Python' domain model pattern.
 
 # Standard Library Imports
 import abc
+from datetime import datetime
 from typing import Any
 from typing import Deque
 from typing import Optional
 from typing import Union
 from typing import TYPE_CHECKING
+
+# Local Imports
+from .. import errors
 
 if TYPE_CHECKING:
     from ..messages import AbstractMessage
@@ -35,18 +39,34 @@ class AbstractModel(abc.ABC):
 
     Models have one responsibility: to be unique. Therefore, subclasses must
     implement both the `__eq__` and `__hash__` methods.
+    
+    Args:
+        created_at (optional): Datetime when object created. Default ``datetime.now()``.
 
     Attributes:
         parent: Parent model.
+        created_at: Datetime when object created.
+        is_removed: Whether object is removed.
+        removed_at: Datetime when object removed.
+        updated_at: Datetime when object updated.
 
     """
+
+    def __init__(
+        self,
+        *,
+        created_at: Optional[datetime] = None,
+    ) -> None:
+        self._created_at = created_at or datetime.now()
+        self._removed_at = None
+        self._updated_at = None
 
     @property
     @abc.abstractmethod
     def parent(self) -> Optional["AbstractModel"]:
         """Parent model."""
         return getattr(self, "_parent", None)
-
+        
     @abc.abstractmethod
     def __eq__(self, other: object, /) -> bool:
         raise NotImplementedError
@@ -54,6 +74,36 @@ class AbstractModel(abc.ABC):
     @abc.abstractmethod
     def __hash__(self) -> int:
         raise NotImplementedError
+
+    @property
+    def created_at(self) -> datetime:
+        """When object was created."""
+        return getattr(self, "_created_at")
+
+    @property
+    def is_removed(self) -> bool:
+        """Whether object is removed."""
+        return self.removed_at is not None
+
+    @property
+    def removed_at(self) -> Optional[datetime]:
+        """Datetime when object was removed."""
+        return getattr(self, "_removed_at", None)
+
+    @removed_at.setter
+    def removed_at(self, value: object) -> None:
+        errors.raise_for_instance(value, datetime)
+        setattr(self, "_removed_at", value)
+
+    @property
+    def updated_at(self) -> Optional[datetime]:
+        """Datetime when object was updated."""
+        return getattr(self, "_updated_at", None)
+
+    @updated_at.setter
+    def updated_at(self, value: object) -> None:
+        errors.raise_for_instance(value, datetime)
+        setattr(self, "_updated_at", value)
 
 
 class AbstractAggregate(AbstractModel):

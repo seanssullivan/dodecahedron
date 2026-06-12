@@ -21,7 +21,7 @@ from dateutil.parser import parse
 from dateutil.parser import ParserError
 
 # Local Imports
-from .base_converter import BaseConverter
+from .abstract_converter import AbstractConverter
 
 __all__ = ["to_timestamp"]
 
@@ -61,7 +61,7 @@ def to_timestamp(
     return result
 
 
-class TimestampConverter(BaseConverter):
+class TimestampConverter(AbstractConverter):
     """Class implements a timestamp converter.
 
     Args:

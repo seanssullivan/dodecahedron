@@ -23,7 +23,7 @@ from dateutil.parser import parse
 from dateutil.parser import ParserError
 
 # Local Imports
-from .base_converter import BaseConverter
+from .abstract_converter import AbstractConverter
 
 __all__ = ["to_date"]
 
@@ -64,7 +64,7 @@ def to_date(
     return result
 
 
-class DateConverter(BaseConverter):
+class DateConverter(AbstractConverter):
     """Class implements a date converter.
 
     Args:

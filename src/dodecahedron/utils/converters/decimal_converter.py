@@ -17,7 +17,7 @@ from typing import Optional
 from typing import overload
 
 # Local Imports
-from .base_converter import BaseConverter
+from .abstract_converter import AbstractConverter
 from .. import parsers
 
 __all__ = ["to_decimal"]
@@ -59,7 +59,7 @@ def to_decimal(
     return result
 
 
-class DecimalConverter(BaseConverter):
+class DecimalConverter(AbstractConverter):
     """Class implements a decimal converter.
 
     Args:
