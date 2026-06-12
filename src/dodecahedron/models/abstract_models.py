@@ -61,7 +61,7 @@ class AbstractModel(abc.ABC):
         self._context: Any = None
 
         # POArent attributes
-        self._parent: Optional[AbstractAggregate] = None
+        self._parent: Optional[AbstractModel] = None
 
         # Tracking attributes
         self._created_at = created_at or datetime.now()
@@ -90,13 +90,13 @@ class AbstractModel(abc.ABC):
         self._context = obj
 
     @property
-    def parent(self) -> Optional["AbstractAggregate"]:
+    def parent(self) -> Optional["AbstractModel"]:
         """Parent."""
         return self._parent
 
     @parent.setter
     def parent(self, obj: Any) -> None:
-        errors.raise_for_instance(obj, AbstractAggregate)
+        errors.raise_for_instance(obj, AbstractModel)
         self._parent = obj
 
     @property
