@@ -136,6 +136,16 @@ class AbstractModel(abc.ABC):
         errors.raise_for_instance(value, datetime)
         setattr(self, "_updated_at", value)
 
+    def update(self, *args: Any, **kwargs: Any) -> None:
+        """Update rate.
+
+        Args:
+            *args (optional): Positional arguments.
+            **kwargs (optional): keyword arguments.
+
+        """
+        raise NotImplementedError
+
 
 class AbstractAggregate(AbstractModel):
     """Class represents an abstract aggregate.
