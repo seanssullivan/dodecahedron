@@ -39,7 +39,7 @@ class AbstractModel(abc.ABC):
 
     Models have one responsibility: to be unique. Therefore, subclasses must
     implement both the `__eq__` and `__hash__` methods.
-    
+
     Args:
         created_at (optional): Datetime when object created. Default ``datetime.now()``.
 
@@ -68,12 +68,6 @@ class AbstractModel(abc.ABC):
         self._removed_at = None
         self._updated_at = None
 
-    @property
-    @abc.abstractmethod
-    def parent(self) -> Optional["AbstractModel"]:
-        """Parent model."""
-        return getattr(self, "_parent", None)
-        
     @abc.abstractmethod
     def __eq__(self, other: object, /) -> bool:
         raise NotImplementedError
