@@ -138,7 +138,7 @@ class AbstractModel(abc.ABC):
         setattr(self, "_updated_at", value)
 
     def update(self, *args: Any, **kwargs: Any) -> None:
-        """Update rate.
+        """Update.
 
         Args:
             *args (optional): Positional arguments.
