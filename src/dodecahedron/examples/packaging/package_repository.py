@@ -17,7 +17,14 @@ __all__ = ["PackageRepository"]
 
 
 class PackageRepository(EventfulRepository):
-    """Class implements a package repository."""
+    """Class implements a package repository.
+
+    Args:
+        *args: Positional arguments.
+        packages: Packeges to include in repository.
+        **kwargs: Keyword arguments.
+
+    """
 
     def __init__(
         self,

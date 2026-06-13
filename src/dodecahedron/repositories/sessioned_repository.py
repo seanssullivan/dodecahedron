@@ -12,7 +12,7 @@ __all__ = ["SessionedRepository"]
 
 
 class SessionedRepository(AbstractRepository):
-    """Represents a sessioned repository.
+    """Class represents a sessioned repository.
 
     Attributes:
         session: Session.

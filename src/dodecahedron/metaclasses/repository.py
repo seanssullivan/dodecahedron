@@ -8,7 +8,7 @@ __all__ = ["RepositoryMeta"]
 
 
 class RepositoryMeta(SingletonMeta, TrackerMeta):
-    """Implements a repository metaclass.
+    """Class implements a repository metaclass.
 
     Combines the singleton and tracker metaclasses into a single metaclass
     for use by repositories.

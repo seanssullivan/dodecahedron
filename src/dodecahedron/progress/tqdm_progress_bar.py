@@ -16,7 +16,7 @@ __all__ = ["TqdmProgressBar"]
 
 
 class TqdmProgressBar(AbstractProgressBar):
-    """Implements a tqdm progress bar."""
+    """Class implements a tqdm progress bar."""
 
     def __init__(
         self,

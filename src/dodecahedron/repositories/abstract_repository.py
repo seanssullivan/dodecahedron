@@ -23,7 +23,7 @@ __all__ = ["AbstractRepository"]
 
 
 class AbstractRepository(abc.ABC, metaclass=RepositoryMeta):
-    """Represents an abstract repository."""
+    """Class represents an abstract repository."""
 
     @property
     def seen(self) -> Set[Any]:

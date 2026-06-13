@@ -14,7 +14,7 @@ __all__ = ["RedisPublisher"]
 
 
 class RedisPublisher(AbstractPublisher):
-    """Implements a Redis publisher.
+    """Class implements a Redis publisher.
 
     Attributes:
         connection: Redis connection.

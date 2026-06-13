@@ -20,7 +20,7 @@ __all__ = ["DictMapper"]
 
 
 class DictMapper(AbstractMapper):
-    """Implements a dictionary mapper."""
+    """Class implements a dictionary mapper."""
 
     def __init__(
         self,

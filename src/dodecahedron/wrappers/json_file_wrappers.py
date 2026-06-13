@@ -24,7 +24,7 @@ __all__ = ["JsonDirectoryWrapper", "JsonFileWrapper"]
 
 
 class AbstractJsonWrapper(AbstractTextWrapper):
-    """Represents an abstract wrapper class for `.json` files."""
+    """Class represents an abstract wrapper class for `.json` files."""
 
     @property
     @abc.abstractmethod
@@ -48,7 +48,7 @@ class AbstractJsonWrapper(AbstractTextWrapper):
 
 
 class JsonDirectoryWrapper(AbstractJsonWrapper, AbstractDirectoryWrapper):
-    """Implements a wrapper for `.json` files in a directory.
+    """Class implements a wrapper for `.json` files in a directory.
 
     Args:
         directory: Directory from which to load `.json` file(s).
@@ -100,7 +100,7 @@ class JsonDirectoryWrapper(AbstractJsonWrapper, AbstractDirectoryWrapper):
 
 
 class JsonFileWrapper(AbstractJsonWrapper, AbstractFileWrapper):
-    """Implements a wrapper for `.json` files.
+    """Class implements a wrapper for `.json` files.
 
     Args:
         filepath: Path to `.json` file.
@@ -151,7 +151,7 @@ class JsonFileWrapper(AbstractJsonWrapper, AbstractFileWrapper):
 
 
 class JsonIOWrapper(AbstractIOWrapper):
-    """Implements a I/O wrapper for `.json` files."""
+    """Class implements a I/O wrapper for `.json` files."""
 
     def __init__(self, __file: IO[Any]) -> None:
         self._file = __file

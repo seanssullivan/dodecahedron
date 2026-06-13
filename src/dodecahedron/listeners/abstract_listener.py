@@ -7,7 +7,7 @@ __all__ = ["AbstractListener"]
 
 
 class AbstractListener(abc.ABC):
-    """Represents an abstract listener."""
+    """Class represents an abstract listener."""
 
     @abc.abstractmethod
     def start(self) -> None:

@@ -34,7 +34,7 @@ __all__ = [
 
 
 class AbstractQueue(abc.ABC):
-    """Represents an abstract queue.
+    """Class represents an abstract queue.
 
     Args:
         __iterable (optional): Iterable of objects. Default ``None``.
@@ -99,7 +99,7 @@ class AbstractQueue(abc.ABC):
 
 
 class MessageQueue(AbstractQueue):
-    """Implements a message queue.
+    """Class implements a message queue.
 
     Args:
         __iterable (optional): Iterable of messages. Default ``None``.

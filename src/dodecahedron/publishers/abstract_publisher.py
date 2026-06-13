@@ -20,7 +20,7 @@ log = logging.getLogger("dodecahedron")
 
 
 class AbstractPublisher(abc.ABC):
-    """Represents an abstract publisher."""
+    """Class represents an abstract publisher."""
 
     @property
     @abc.abstractmethod

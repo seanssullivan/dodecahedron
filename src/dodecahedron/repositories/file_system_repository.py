@@ -14,7 +14,7 @@ __all__ = ["AbstractFileSystemRepository"]
 
 
 class AbstractFileSystemRepository(AbstractRepository):
-    """Represents an abstract file-system repository.
+    """Class represents an abstract file-system repository.
 
     Args:
         wrapper: File-system wrapper.

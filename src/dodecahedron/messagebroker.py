@@ -35,7 +35,7 @@ RAISE = "raise"
 
 
 class AbstractMessageBroker(abc.ABC):
-    """Represents an abstract message broker."""
+    """Class represents an abstract message broker."""
 
     @property
     @abc.abstractmethod
@@ -73,7 +73,7 @@ class AbstractMessageBroker(abc.ABC):
 
 
 class MessageBroker(AbstractMessageBroker, metaclass=SingletonMeta):
-    """Implements a message broker."""
+    """Class implements a message broker."""
 
     __singleton__ = True
 

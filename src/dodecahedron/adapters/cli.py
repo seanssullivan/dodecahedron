@@ -251,7 +251,7 @@ def get_keyword_only_arguments(
 
 @enum.unique
 class ParameterType(str, enum.Enum):
-    """Implements parameter types."""
+    """Class implements parameter types."""
 
     KEYWORD_ONLY = "KEYWORD_ONLY"
     POSITIONAL_ONLY = "POSITIONAL_ONLY"

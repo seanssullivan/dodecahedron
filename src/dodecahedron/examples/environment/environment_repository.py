@@ -22,7 +22,6 @@ class EnvironmentRepository(AbstractRepository):
 
     Args:
         *args (optional): Positional arguments.
-        mapper (optional): Mapper. Default ``None``.
         **kwargs (optional): Keyword arguments.
 
     """
@@ -63,12 +62,7 @@ class EnvironmentRepository(AbstractRepository):
             TypeError: when argument is not type ``EnvironmentVariable``.
 
         """
-        if not isinstance(obj, EnvironmentVariable):
-            expected = "expected type 'EnvironmentVariable'"
-            actual = f"got {type(obj)} instead"
-            message = ", ".join([expected, actual])
-            raise TypeError(message)
-
+        errors.raise_for_instance(obj, EnvironmentVariable)
         if self.can_add(obj):
             self._objects.add(obj)
 
@@ -175,8 +169,6 @@ class EnvironmentRepository(AbstractRepository):
     def _update_environment_variables(self) -> None:
         """Update variables to environment."""
         updated_variables = [obj for obj in self._objects if obj.is_updated]
-        print(self._objects)
-        print(updated_variables)
         for obj in updated_variables:
             if obj.updated_at and obj.updated_at > self._committed_at:
                 self._update_in_environment(obj)

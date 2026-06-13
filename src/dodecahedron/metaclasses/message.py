@@ -15,7 +15,7 @@ T = TypeVar("T")
 
 
 class MessageMeta(abc.ABCMeta):
-    """Implements a message metaclass."""
+    """Class implements a message metaclass."""
 
     def __call__(cls: Type[T], *args: Any, **kwargs: Any) -> T:
         instance = super().__call__(*args, **kwargs)

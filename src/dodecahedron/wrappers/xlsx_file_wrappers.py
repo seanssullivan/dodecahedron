@@ -43,7 +43,7 @@ T = TypeVar("T")
 
 
 class AbstractXlsxWrapper(AbstractFileSystemWrapper):
-    """Represents an abstract wrapper class for `.xlsx` files."""
+    """Class represents an abstract wrapper class for `.xlsx` files."""
 
     @property
     def fieldnames(self) -> Sequence[Any]:
@@ -74,7 +74,7 @@ class AbstractXlsxWrapper(AbstractFileSystemWrapper):
 
 
 class XlsxDirectoryWrapper(AbstractXlsxWrapper, AbstractDirectoryWrapper):
-    """Implements a wrapper for `.xlsx` files in a directory.
+    """Class implements a wrapper for `.xlsx` files in a directory.
 
     Args:
         directory: Directory from which to load `.xlsx` file(s).
@@ -118,7 +118,7 @@ class XlsxDirectoryWrapper(AbstractXlsxWrapper, AbstractDirectoryWrapper):
 
 
 class XlsxFileWrapper(AbstractXlsxWrapper, AbstractFileWrapper):
-    """Implements a wrapper for `.xlsx` files.
+    """Class implements a wrapper for `.xlsx` files.
 
     Args:
         filepath: Path to `.xlsx` file.
@@ -158,7 +158,7 @@ class XlsxFileWrapper(AbstractXlsxWrapper, AbstractFileWrapper):
 
 
 class OpenPyXLMixin:
-    """Implements an OpenPyXL mixin."""
+    """Class implements an OpenPyXL mixin."""
 
     _file: IO[Any]
     _mode: str
@@ -226,7 +226,7 @@ class OpenPyXLMixin:
 
 
 class XlsxIOWrapper(OpenPyXLMixin, AbstractIOWrapper):
-    """Implements a I/O wrapper for `.xlsx` files."""
+    """Class implements a I/O wrapper for `.xlsx` files."""
 
     def __init__(self, __file: IO[Any], /, mode: str) -> None:
         self._file = __file
@@ -489,7 +489,7 @@ class XlsxIOWrapper(OpenPyXLMixin, AbstractIOWrapper):
 
 
 class _OpenPyXLRecordReader(Iterator[Any]):
-    """Implements an OpenPyXL record reader for `.xlsx` files."""
+    """Class implements an OpenPyXL record reader for `.xlsx` files."""
 
     def __init__(self, __wrapper: "XlsxIOWrapper") -> None:
         self._worksheet = __wrapper.get_worksheet()
@@ -661,7 +661,7 @@ class _OpenPyXLRecordReader(Iterator[Any]):
 
 
 class _OpenPyXLRecordWriter:
-    """Implements an OpenPyXL record writer for `.xlsx` files."""
+    """Class implements an OpenPyXL record writer for `.xlsx` files."""
 
     def __init__(self, __wrapper: "XlsxIOWrapper") -> None:
         self._worksheet = __wrapper.get_worksheet()
@@ -719,7 +719,7 @@ class _OpenPyXLRecordWriter:
 
 
 class _OpenPyXLRowReader(Iterator[Any]):
-    """Implements an OpenPyXL row reader for `.xlsx` files."""
+    """Class implements an OpenPyXL row reader for `.xlsx` files."""
 
     def __init__(self, __wrapper: "XlsxIOWrapper") -> None:
         self._worksheet = __wrapper.get_worksheet()
@@ -866,7 +866,7 @@ class _OpenPyXLRowReader(Iterator[Any]):
 
 
 class _OpenPyXLRowWriter:
-    """Implements an OpenPyXL row writer for `.xlsx` files."""
+    """Class implements an OpenPyXL row writer for `.xlsx` files."""
 
     def __init__(self, __wrapper: "XlsxIOWrapper") -> None:
         self._worksheet = __wrapper.get_worksheet()

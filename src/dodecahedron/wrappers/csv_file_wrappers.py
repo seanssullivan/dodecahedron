@@ -35,7 +35,7 @@ __all__ = [
 
 
 class AbstractCsvWrapper(AbstractTextWrapper):
-    """Represents an abstract wrapper class for `.csv` files."""
+    """Class represents an abstract wrapper class for `.csv` files."""
 
     @property
     def delimiter(self) -> str:
@@ -98,7 +98,7 @@ class AbstractCsvWrapper(AbstractTextWrapper):
 
 
 class CsvDirectoryWrapper(AbstractCsvWrapper, AbstractDirectoryWrapper):
-    """Implements a wrapper for `.csv` files in a directory.
+    """Class implements a wrapper for `.csv` files in a directory.
 
     Args:
         directory: Directory from which to load `.csv` file(s).
@@ -156,7 +156,7 @@ class CsvDirectoryWrapper(AbstractCsvWrapper, AbstractDirectoryWrapper):
 
 
 class CsvFileWrapper(AbstractCsvWrapper, AbstractFileWrapper):
-    """Implements a wrapper for `.csv` files.
+    """Class implements a wrapper for `.csv` files.
 
     Args:
         filepath: Path to `.csv` file.
@@ -214,7 +214,7 @@ class CsvFileWrapper(AbstractCsvWrapper, AbstractFileWrapper):
 
 
 class CsvIOWrapper(AbstractIOWrapper):
-    """Implements a I/O wrapper for `.csv` files."""
+    """Class implements a I/O wrapper for `.csv` files."""
 
     def __init__(self, __file: IO[Any]) -> None:
         self._file = __file
@@ -529,7 +529,7 @@ class CsvIOWrapper(AbstractIOWrapper):
 
 
 class _CsvRecordReader(Iterator[Any]):
-    """Implements a record reader for `.csv` files."""
+    """Class implements a record reader for `.csv` files."""
 
     def __init__(self, __wrapper: "CsvIOWrapper", /) -> None:
         self._reader = csv.DictReader(
@@ -580,7 +580,7 @@ class _CsvRecordReader(Iterator[Any]):
 
 
 class _CsvRecordWriter:
-    """Implements a record writer for `.csv` files."""
+    """Class implements a record writer for `.csv` files."""
 
     def __init__(self, __wrapper: "CsvIOWrapper") -> None:
         self._writer = csv.DictWriter(
@@ -633,7 +633,7 @@ class _CsvRecordWriter:
 
 
 class _CsvRowReader(Iterator[Any]):
-    """Implements a row reader for `.csv` files."""
+    """Class implements a row reader for `.csv` files."""
 
     def __init__(self, __wrapper: "CsvIOWrapper") -> None:
         self._reader = csv.reader(
@@ -757,7 +757,7 @@ class _CsvRowReader(Iterator[Any]):
 
 
 class _CsvRowWriter:
-    """Implements a row writer for `.csv` files."""
+    """Class implements a row writer for `.csv` files."""
 
     def __init__(self, __wrapper: "CsvIOWrapper") -> None:
         self._writer = csv.writer(

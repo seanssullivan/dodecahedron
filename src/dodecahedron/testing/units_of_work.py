@@ -18,7 +18,7 @@ ROLLED_BACK_ATTR = "_rolled_back"
 
 
 class FakeUnitOfWork(AbstractUnitOfWork):
-    """Implements a fake unit of work."""
+    """Class implements a fake unit of work."""
 
     @property
     def committed(self) -> bool:
@@ -55,4 +55,4 @@ class FakeUnitOfWork(AbstractUnitOfWork):
 
 
 class FakeEventfulUnitOfWork(FakeUnitOfWork, EventfulUnitOfWork):
-    """Implements a fake eventful unit of work."""
+    """Class implements a fake eventful unit of work."""

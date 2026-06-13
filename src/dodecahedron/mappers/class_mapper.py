@@ -29,7 +29,7 @@ T = TypeVar("T")
 
 
 class ClassMapper(AbstractMapper, Generic[T]):
-    """Implements a class mapper."""
+    """Class implements a class mapper."""
 
     def __init__(
         self,

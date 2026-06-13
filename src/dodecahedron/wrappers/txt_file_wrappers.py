@@ -30,7 +30,7 @@ log = logging.getLogger("dodecahedron")
 
 
 class AbstractTxtWrapper(AbstractTextWrapper):
-    """Represents an abstract wrapper class for `.txt` files."""
+    """Class represents an abstract wrapper class for `.txt` files."""
 
     def _init_txt_io_wrapper(
         self,
@@ -58,7 +58,7 @@ class AbstractTxtWrapper(AbstractTextWrapper):
 
 
 class TxtDirectoryWrapper(AbstractTxtWrapper, AbstractDirectoryWrapper):
-    """Implements a wrapper for `.txt` files in a directory.
+    """Class implements a wrapper for `.txt` files in a directory.
 
     Args:
         directory: Directory from which to load `.txt` file(s).
@@ -109,7 +109,7 @@ class TxtDirectoryWrapper(AbstractTxtWrapper, AbstractDirectoryWrapper):
 
 
 class TxtFileWrapper(AbstractTxtWrapper, AbstractFileWrapper):
-    """Implements a wrapper for `.txt` files.
+    """Class implements a wrapper for `.txt` files.
 
     Args:
         filepath: Path to `.txt` file.
@@ -153,7 +153,7 @@ class TxtFileWrapper(AbstractTxtWrapper, AbstractFileWrapper):
 
 
 class TxtIOWrapper(io.TextIOWrapper):
-    """Implements a I/O wrapper for `.txt` files."""
+    """Class implements a I/O wrapper for `.txt` files."""
 
     def __init__(
         self,

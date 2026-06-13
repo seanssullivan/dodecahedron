@@ -31,7 +31,7 @@ T = TypeVar("T")
 
 
 class AbstractFileSystemWrapper(abc.ABC):
-    """Represents an abstract file-system wrapper."""
+    """Class represents an abstract file-system wrapper."""
 
     def __init__(self, *, read_only: bool = False) -> None:
         self.read_only = read_only
@@ -101,7 +101,7 @@ class AbstractFileSystemWrapper(abc.ABC):
 
 
 class AbstractDirectoryWrapper(AbstractFileSystemWrapper):
-    """Represents an abstract wrapper class for directories.
+    """Class represents an abstract wrapper class for directories.
 
     Args:
         directory: Directory which contains file(s).
@@ -249,7 +249,7 @@ class AbstractDirectoryWrapper(AbstractFileSystemWrapper):
 
 
 class AbstractFileWrapper(AbstractFileSystemWrapper):
-    """Represents an abstract wrapper class for files.
+    """Class represents an abstract wrapper class for files.
 
     Args:
         filepath: Path to file.
@@ -316,7 +316,7 @@ class AbstractFileWrapper(AbstractFileSystemWrapper):
 
 
 class AbstractTextWrapper(AbstractFileSystemWrapper):
-    """Represents an abstract wrapper class for text files.
+    """Class represents an abstract wrapper class for text files.
 
     Args:
         *args: Positional arguments.
@@ -408,7 +408,7 @@ class AbstractTextWrapper(AbstractFileSystemWrapper):
 
 
 class AbstractIOWrapper(IO[Any]):  # type: ignore
-    """Represents an abstract I/O wrapper class for files.
+    """Class represents an abstract I/O wrapper class for files.
 
     Args:
         __file: File.

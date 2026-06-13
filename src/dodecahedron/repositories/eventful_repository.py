@@ -27,7 +27,7 @@ __all__ = ["EventfulRepository"]
 
 
 class EventfulRepository(AbstractRepository):
-    """Represents an eventful repository.
+    """Class represents an eventful repository.
 
     Args:
         *args (optional): Positional arguments.

@@ -18,7 +18,7 @@ T = TypeVar("T")
 
 
 class SingletonMeta(abc.ABCMeta):
-    """Implements a singleton metaclass.
+    """Class implements a singleton metaclass.
 
     The singleton metaclass allows subclasses to act as singletons.
 

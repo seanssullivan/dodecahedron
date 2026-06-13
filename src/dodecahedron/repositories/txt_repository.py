@@ -17,7 +17,7 @@ log = logging.getLogger("dodecahedron")
 
 
 class AbstractTxtFileRepository(AbstractFileSystemRepository):
-    """Represents an abstract `.txt` file repository.
+    """Class represents an abstract `.txt` file repository.
 
     Args:
         wrapper: Text file wrapper.

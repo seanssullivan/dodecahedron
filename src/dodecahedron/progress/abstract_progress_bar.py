@@ -11,7 +11,7 @@ __all__ = ["AbstractProgressBar"]
 
 
 class AbstractProgressBar(abc.ABC):
-    """Represents an abstract progress bar."""
+    """Class represents an abstract progress bar."""
 
     @property
     @abc.abstractmethod

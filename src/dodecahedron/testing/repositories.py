@@ -27,7 +27,7 @@ ROLLED_BACK_ATTR = "_rolled_back"
 
 
 class FakeRepository(AbstractRepository):
-    """Implements a fake repository."""
+    """Class implements a fake repository."""
 
     def __init__(
         self,
@@ -145,4 +145,4 @@ class FakeRepository(AbstractRepository):
 
 
 class FakeEventfulRepository(FakeRepository, EventfulRepository):
-    """Implements a fake eventful repository."""
+    """Class implements a fake eventful repository."""

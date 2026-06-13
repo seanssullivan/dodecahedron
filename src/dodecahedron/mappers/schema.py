@@ -19,7 +19,7 @@ OUTWARD = "outward"
 
 
 class MapperSchema(collections.UserDict):  # type: ignore
-    """Implements a mapper schema.
+    """Class implements a mapper schema.
 
     Args:
         __mappers: Mappers.

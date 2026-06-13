@@ -21,7 +21,7 @@ __all__ = ["PdfDirectoryWrapper", "PdfFileWrapper"]
 
 
 class AbstractPdfWrapper(AbstractFileSystemWrapper):
-    """Represents an abstract wrapper class for `.pdf` files."""
+    """Class represents an abstract wrapper class for `.pdf` files."""
 
     def _init_pdf_io_wrapper(self, __file: IO[Any], /) -> PdfIOWrapper:
         """Initialize I/O wrapper for `.pdf` file.
@@ -39,7 +39,7 @@ class AbstractPdfWrapper(AbstractFileSystemWrapper):
 
 
 class PdfDirectoryWrapper(AbstractPdfWrapper, AbstractDirectoryWrapper):
-    """Implements a wrapper for `.pdf` files in a directory.
+    """Class implements a wrapper for `.pdf` files in a directory.
 
     Args:
         directory: Directory from which to load `.pdf` file(s).
@@ -76,7 +76,7 @@ class PdfDirectoryWrapper(AbstractPdfWrapper, AbstractDirectoryWrapper):
 
 
 class PdfFileWrapper(AbstractPdfWrapper, AbstractFileWrapper):
-    """Implements a wrapper for `.pdf` files.
+    """Class implements a wrapper for `.pdf` files.
 
     Args:
         filepath: Path to `.pdf` file.
@@ -112,7 +112,7 @@ class PdfFileWrapper(AbstractPdfWrapper, AbstractFileWrapper):
 
 
 class PdfIOWrapper(AbstractIOWrapper):
-    """Implements a I/O wrapper for `.pdf` files."""
+    """Class implements a I/O wrapper for `.pdf` files."""
 
     def __init__(self, __file: IO[Any]) -> None:
         self._file = __file

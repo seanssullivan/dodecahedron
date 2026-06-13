@@ -14,15 +14,11 @@ Implementation based on 'Architecture Patterns in Python' domain model pattern.
 
 # Standard Library Imports
 import abc
-from datetime import datetime
 from typing import Any
 from typing import Deque
 from typing import Optional
 from typing import Union
 from typing import TYPE_CHECKING
-
-# Local Imports
-from .. import errors
 
 if TYPE_CHECKING:
     from ..messages import AbstractMessage
@@ -41,32 +37,13 @@ class AbstractModel(abc.ABC):
     implement both the `__eq__` and `__hash__` methods.
 
     Args:
-        created_at (optional): Datetime when object created. Default ``datetime.now()``.
-
-    Attributes:
-        parent: Parent model.
-        created_at: Datetime when object created.
-        is_removed: Whether object is removed.
-        removed_at: Datetime when object removed.
-        updated_at: Datetime when object updated.
+        *args (optional): Positional arguments.
+        *kargs (optional): Keyword arguments.
 
     """
 
-    def __init__(
-        self,
-        *,
-        created_at: Optional[datetime] = None,
-    ) -> None:
-        # Context attributes
-        self._context: Any = None
-
-        # POArent attributes
-        self._parent: Optional[AbstractModel] = None
-
-        # Tracking attributes
-        self._created_at = created_at or datetime.now()
-        self._removed_at = None
-        self._updated_at = None
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
 
     @abc.abstractmethod
     def __eq__(self, other: object, /) -> bool:
@@ -75,67 +52,6 @@ class AbstractModel(abc.ABC):
     @abc.abstractmethod
     def __hash__(self) -> int:
         raise NotImplementedError
-
-    @property
-    def context(self) -> Any:
-        """Context."""
-        return self._context
-
-    @context.deleter
-    def context(self) -> None:
-        self._context = None
-
-    @context.setter
-    def context(self, obj: Any) -> None:
-        self._context = obj
-
-    @property
-    def parent(self) -> Optional["AbstractModel"]:
-        """Parent."""
-        return self._parent
-
-    @parent.setter
-    def parent(self, obj: Any) -> None:
-        errors.raise_for_instance(obj, AbstractModel)
-        self._parent = obj
-
-    @property
-    def created_at(self) -> datetime:
-        """When object was created."""
-        return getattr(self, "_created_at")
-
-    @property
-    def is_removed(self) -> bool:
-        """Whether object is removed."""
-        return self.removed_at is not None
-
-    @property
-    def removed_at(self) -> Optional[datetime]:
-        """Datetime when object was removed."""
-        return getattr(self, "_removed_at", None)
-
-    @removed_at.deleter
-    def removed_at(self) -> None:
-        setattr(self, "_removed_at", None)
-
-    @removed_at.setter
-    def removed_at(self, value: object) -> None:
-        errors.raise_for_instance(value, datetime)
-        setattr(self, "_removed_at", value)
-
-    @property
-    def updated_at(self) -> Optional[datetime]:
-        """Datetime when object was updated."""
-        return getattr(self, "_updated_at", None)
-
-    @updated_at.deleter
-    def updated_at(self) -> None:
-        setattr(self, "_updated_at", None)
-
-    @updated_at.setter
-    def updated_at(self, value: object) -> None:
-        errors.raise_for_instance(value, datetime)
-        setattr(self, "_updated_at", value)
 
     def update(self, *args: Any, **kwargs: Any) -> None:
         """Update.

@@ -14,7 +14,7 @@ __all__ = ["AbstractMapper"]
 
 
 class AbstractMapper(abc.ABC):
-    """Represents an abstract mapper."""
+    """Class represents an abstract mapper."""
 
     @property
     @abc.abstractmethod

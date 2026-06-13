@@ -66,7 +66,7 @@ RAISE = "raise"
 
 
 class AbstractMessageBus(abc.ABC):
-    """Represents an abstract message bus.
+    """Class represents an abstract message bus.
 
     Attributes:
         uow: Unit of work.
@@ -116,7 +116,7 @@ class AbstractMessageBus(abc.ABC):
 
 
 class MessageBus(AbstractMessageBus):
-    """Implements a message buse.
+    """Class implements a message buse.
 
     Args:
         uow: Unit of work.

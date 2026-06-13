@@ -32,7 +32,7 @@ log = logging.getLogger("dodecahedron")
 
 
 class AbstractCsvRepository(AbstractFileSystemRepository):
-    """Represents an abstract `.csv` repository.
+    """Class represents an abstract `.csv` repository.
 
     Args:
         wrapper: CSV wrapper.
@@ -81,7 +81,7 @@ class AbstractCsvRepository(AbstractFileSystemRepository):
 
 
 class AbstractCsvDirectoryRepository(AbstractCsvRepository):
-    """Represents an abstract `.csv` directory repository.
+    """Class represents an abstract `.csv` directory repository.
 
     Args:
         wrapper: CSV directory wrapper.
@@ -146,7 +146,7 @@ class AbstractCsvDirectoryRepository(AbstractCsvRepository):
 
 
 class AbstractCsvFileRepository(AbstractCsvRepository):
-    """Represents an abstract `.csv` file repository.
+    """Class represents an abstract `.csv` file repository.
 
     Args:
         wrapper: CSV file wrapper.

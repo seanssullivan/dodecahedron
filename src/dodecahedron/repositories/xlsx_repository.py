@@ -25,7 +25,7 @@ log = logging.getLogger("dodecahedron")
 
 
 class AbstractXlsxRepository(AbstractFileSystemRepository):
-    """Represents an abstract `.xlsx` repository.
+    """Class represents an abstract `.xlsx` repository.
 
     Args:
         wrapper: Xlsx wrapper.
@@ -74,7 +74,7 @@ class AbstractXlsxRepository(AbstractFileSystemRepository):
 
 
 class AbstractXlsxDirectoryRepository(AbstractXlsxRepository):
-    """Represents an abstract `.xlsx` directory repository.
+    """Class represents an abstract `.xlsx` directory repository.
 
     Args:
         wrapper: Xlsx directory wrapper.
@@ -139,7 +139,7 @@ class AbstractXlsxDirectoryRepository(AbstractXlsxRepository):
 
 
 class AbstractXlsxFileRepository(AbstractXlsxRepository):
-    """Represents an abstract `.xlsx` file repository.
+    """Class represents an abstract `.xlsx` file repository.
 
     Args:
         wrapper: Xlsx file wrapper.
