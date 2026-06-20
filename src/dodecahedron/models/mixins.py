@@ -37,15 +37,15 @@ class ContextMixin:
     @property
     def context(self) -> Any:
         """Context of object."""
-        return self._context
+        return getattr(self, "_context", None)
 
     @context.deleter
     def context(self) -> None:
-        self._context = None
+        setattr(self, "_context", None)
 
     @context.setter
     def context(self, obj: Any) -> None:
-        self._context = obj
+        setattr(self, "_context", obj)
 
 
 class ParentMixin:
@@ -67,12 +67,12 @@ class ParentMixin:
     @property
     def parent(self) -> Optional["AbstractModel"]:
         """Parent."""
-        return self._parent
+        return getattr(self, "_parent", None)
 
     @parent.setter
     def parent(self, obj: Any) -> None:
         errors.raise_for_instance(obj, AbstractModel)
-        self._parent = obj
+        setattr(self, "_parent", obj)
 
 
 class TrackingMixin:
